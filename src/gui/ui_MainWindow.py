@@ -6,7 +6,7 @@ from gui.widgets.PushButton import PushButton
 from gui.widgets.PageButton import PageButton
 from gui.widgets.LineEdit import LineEdit
 
-#from gui.pages.ui_PageApplication import PageManager
+from gui.pages.PageManager import PageManager
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -17,17 +17,6 @@ class MainWindow(QMainWindow):
         self.resize(1280, 720)
         self.setMinimumSize(800, 600)
 
-        # Shadow effect
-        shadow_effect = QGraphicsDropShadowEffect()
-        shadow_effect.setBlurRadius(20)
-        shadow_effect.setColor(QColor(0, 0, 0, 200))
-        shadow_effect.setOffset(5, 5)
-
-        shadow_effect2 = QGraphicsDropShadowEffect()
-        shadow_effect2.setBlurRadius(20)
-        shadow_effect2.setColor(QColor(0, 0, 0, 200))
-        shadow_effect2.setOffset(5, 5)
-
         self.central_widget = QWidget()
         
         self.main_layout = QHBoxLayout(self.central_widget)
@@ -37,7 +26,6 @@ class MainWindow(QMainWindow):
         # START: side_menu
         self.side_menu = QWidget()
         self.side_menu.setStyleSheet("background-color: #EFEFEF")
-        self.side_menu.setGraphicsEffect(shadow_effect)
         self.side_menu.setMaximumWidth(50)
 
         self.side_menu_layout = QVBoxLayout(self.side_menu)
@@ -49,16 +37,23 @@ class MainWindow(QMainWindow):
 
         self.side_menu_top_layout = QVBoxLayout(self.side_menu_top_widget)
         self.side_menu_top_layout.setContentsMargins(0, 0, 0, 0)
+        self.side_menu_top_layout.setSpacing(0)
 
-        self.menu_btn = PushButton("Toggle")
-        self.product_btn = PushButton("Produtos")
-        self.people_btn = PushButton("Pessoas")
-        self.sell_btn = PushButton("Vendas")
-        self.services_btn = PushButton("Serviços")
+        self.menu_btn = PushButton("Menu", icon_path="menu-burger.svg")
+        self.home_btn = PushButton("Home", icon_path="home.svg")
+        self.product_btn = PushButton("Produtos", icon_path="boxes.svg", is_active=True)
+        self.people_btn = PushButton("Pessoas", icon_path="users-alt.svg")
+        self.sell_btn = PushButton("Vendas", icon_path="shopping-cart.svg")
+        self.services_btn = PushButton("Serviços", icon_path="print.svg")
+
+        self._all_btns = [self.home_btn, self.product_btn, self.people_btn, self.sell_btn, self.services_btn]
 
         self.menu_btn.clicked.connect(self.toggleSideMenu)
+        self.product_btn.clicked.connect(self.productPage)
+        self.people_btn.clicked.connect(self.peoplePage)
 
         self.side_menu_top_layout.addWidget(self.menu_btn)
+        self.side_menu_top_layout.addWidget(self.home_btn)
         self.side_menu_top_layout.addWidget(self.product_btn)
         self.side_menu_top_layout.addWidget(self.people_btn)
         self.side_menu_top_layout.addWidget(self.sell_btn)
@@ -72,7 +67,7 @@ class MainWindow(QMainWindow):
         self.side_menu_bottom_layout = QVBoxLayout(self.side_menu_bottom_widget)
         self.side_menu_bottom_layout.setContentsMargins(0, 0, 0, 0)
 
-        self.settings_btn = PushButton("Configurações")
+        self.settings_btn = PushButton("Configurações", icon_path="settings.svg")
 
         self.side_menu_bottom_layout.addWidget(self.settings_btn)
 
@@ -89,52 +84,34 @@ class MainWindow(QMainWindow):
         self.content_layout.setContentsMargins(0, 0, 0, 0)
         self.content_layout.setSpacing(0)
 
-        self.product_page = QWidget()
+        self.page_manager = PageManager()
 
-        self.product_page_layout = QVBoxLayout(self.product_page)
-
-        self.product_search_widget = QWidget()
-        self.setMaximumHeight(50)
-
-        self.product_search_layout = QHBoxLayout(self.product_search_widget)
-        self.product_search_layout.setContentsMargins(0, 0, 0, 0)
-        self.product_search_layout.setSpacing(0)
-
-        self.product_search_input = LineEdit("Procure por um produto...")
-
-        self.product_search_layout.addWidget(self.product_search_input)
-
-        self.product_buttons_widget = QWidget()
-
-        self.product_buttons_layout = QHBoxLayout(self.product_buttons_widget)
-        self.product_buttons_layout.setContentsMargins(0, 0, 0, 0)
-        self.product_buttons_layout.setSpacing(12)
-
-        self.product_add_btn = PageButton("Adicionar")
-        self.product_edit_btn = PageButton("Editar")
-        self.product_remove_btn = PageButton("Remover")
-
-        self.product_buttons_spacer = QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.product_buttons_layout.addWidget(self.product_add_btn)
-        self.product_buttons_layout.addWidget(self.product_edit_btn)
-        self.product_buttons_layout.addWidget(self.product_remove_btn)
-        self.product_buttons_layout.addItem(self.product_buttons_spacer)
-
-        self.product_table = QTableWidget()
-
-        self.product_page_layout.addWidget(self.product_search_widget)
-        self.product_page_layout.addWidget(self.product_buttons_widget)
-        self.product_page_layout.addWidget(self.product_table)
-
-        self.content_layout.addWidget(self.product_page)
+        self.content_layout.addWidget(self.page_manager)
 
         self.main_layout.addWidget(self.side_menu)
         self.main_layout.addWidget(self.content)
 
         self.setCentralWidget(self.central_widget)
 
-    def toggleSideMenu(self, checked):
+    def productPage(self):
+        self.product_btn.setActive(True)
+
+        for btn in self._all_btns:
+            if btn is not self.product_btn:
+                btn.setActive(False)
+                
+        self.page_manager.setCurrentIndex(0)
+
+    def peoplePage(self):
+        self.people_btn.setActive(True)
+        
+        for btn in self._all_btns:
+            if btn is not self.people_btn:
+                btn.setActive(False)
+        
+        self.page_manager.setCurrentIndex(1)
+
+    def toggleSideMenu(self):
         current_width = self.side_menu.width()
 
         new_width = 50
@@ -144,5 +121,5 @@ class MainWindow(QMainWindow):
         self.animation = QPropertyAnimation(self.side_menu, b"minimumWidth")
         self.animation.setStartValue(self.side_menu.width())
         self.animation.setEndValue(new_width)
-        self.animation.setDuration(100)
+        self.animation.setDuration(50)
         self.animation.start()

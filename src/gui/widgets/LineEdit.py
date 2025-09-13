@@ -1,5 +1,6 @@
 from PySide6.QtWidgets import *
-from PySide6.QtGui import QColor
+from PySide6.QtGui import QColor, QAction, QIcon
+
 
 class LineEdit(QLineEdit):
     def __init__(self, placeholder="", maximum_width=600, font_size=14, text_color="#747474", background_color="#EFEFEF", text_padding=8, border_radius=16):
@@ -14,7 +15,20 @@ class LineEdit(QLineEdit):
         self.text_padding = text_padding
         self.border_radius = border_radius
 
+        search_icon_path = 'src/gui/icons/search.svg' # Exemplo de caminho relativo
+        search_action = QAction(QIcon(search_icon_path), '', self)
+        
+        # Adiciona a ação (o ícone) ao lado esquerdo do QLineEdit
+        self.addAction(search_action, QLineEdit.LeadingPosition)
+
         self.setStyle()
+
+        self.shadow = QGraphicsDropShadowEffect()
+        self.shadow.setBlurRadius(5)
+        self.shadow.setColor(QColor(0, 0, 0, 25))
+        self.shadow.setOffset(4, 4)
+
+        self.setGraphicsEffect(self.shadow)
 
     def setStyle(self):
         style = f"""
