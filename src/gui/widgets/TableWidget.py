@@ -13,12 +13,14 @@ class TableWidget(QTableWidget):
         
         self.shadow = QGraphicsDropShadowEffect()
         self.shadow.setBlurRadius(5)
-        self.shadow.setColor(QColor(0, 0, 0, 50))
+        self.shadow.setColor(QColor(0, 0, 0, 25))
         self.shadow.setOffset(4, 4)
+
+        self.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
 
         self.setGraphicsEffect(self.shadow)
 
-        for i in range(100):
+        for i in range(10):
             self.setItem(i, 0, QTableWidgetItem(str(i + 1)))
             self.setItem(i, 1, QTableWidgetItem(f"{name} {i + 1}"))
             self.setItem(i, 2, QTableWidgetItem(str(20 + i)))
@@ -29,7 +31,7 @@ class TableWidget(QTableWidget):
         self.setAlternatingRowColors(True)
         
         self.setColumnCount(len(self.columns))
-        self.setRowCount(100)
+        self.setRowCount(10)
         
         self.verticalHeader().hide()
         
@@ -58,8 +60,7 @@ class TableWidget(QTableWidget):
             border-top: 0px;
             border-left: 0px;
             subcontrol-origin: padding;                           
-        }
-                                        
+        }                        
                                          
         QTableWidget::item:selected {
             background-color: #E98A37;                             

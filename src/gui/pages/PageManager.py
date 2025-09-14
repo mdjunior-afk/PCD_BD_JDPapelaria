@@ -3,10 +3,53 @@ from PySide6.QtWidgets import *
 from gui.widgets.LineEdit import LineEdit
 from gui.widgets.PageButton import PageButton
 from gui.widgets.TableWidget import TableWidget
+from gui.widgets.InfoWidget import InfoWidget
 
 class PageManager(QStackedWidget):
     def __init__(self):
         super().__init__()
+
+        self.home_page = QWidget()
+
+        self.home_page_layout = QVBoxLayout(self.home_page)
+        self.home_page_layout.setContentsMargins(12, 12, 12, 12)
+        self.home_page_layout.setSpacing(6)
+
+        self.home_search_widget = QWidget()
+        
+        self.home_search_layout = QHBoxLayout(self.home_search_widget)
+        self.home_search_layout.setContentsMargins(0, 0, 0, 12)
+
+        self.home_search_input = LineEdit("Procure por algo...")
+
+        self.home_search_layout.addWidget(self.home_search_input)
+
+        self.box = QWidget()
+
+        self.box_layout = QHBoxLayout(self.box)
+        self.box_layout.setContentsMargins(0, 0, 0, 12)
+        self.box_layout.setSpacing(6)
+
+        self.left_home_box_spacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.right_home_box_spacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.stock_info = InfoWidget(title="Estoques baixos", info="10")
+        self.birthday_qtd = InfoWidget(title="Aniversáriantes do mês", info="3")
+        self.daily_sell = InfoWidget(title="Vendas de hoje", info="5")
+
+        self.box_layout.addItem(self.left_home_box_spacer)
+        self.box_layout.addWidget(self.stock_info)
+        self.box_layout.addWidget(self.daily_sell)
+        self.box_layout.addWidget(self.birthday_qtd)
+        self.box_layout.addItem(self.right_home_box_spacer)
+
+        self.home_spacer = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.home_page_layout.addWidget(self.home_search_widget)
+        self.home_page_layout.addWidget(self.box)
+        self.home_page_layout.addItem(self.home_spacer)
+
+        self.insertWidget(0, self.home_page)
 
         self.product_page = QWidget()
 
@@ -43,7 +86,7 @@ class PageManager(QStackedWidget):
         self.product_page_layout.addWidget(self.product_buttons_box)
         self.product_page_layout.addWidget(self.product_table)
 
-        self.insertWidget(0, self.product_page)
+        self.insertWidget(1, self.product_page)
 
         # People page
         self.people_page = QWidget()
@@ -81,4 +124,4 @@ class PageManager(QStackedWidget):
         self.people_page_layout.addWidget(self.people_buttons_box)
         self.people_page_layout.addWidget(self.people_table)
 
-        self.insertWidget(1, self.people_page)
+        self.insertWidget(2, self.people_page)

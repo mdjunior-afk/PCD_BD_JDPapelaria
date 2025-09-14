@@ -1,10 +1,7 @@
 from PySide6.QtWidgets import *
-from PySide6.QtGui import QColor
-from PySide6.QtCore import QPropertyAnimation
+from PySide6.QtCore import QPropertyAnimation, QEasingCurve
 
 from gui.widgets.PushButton import PushButton
-from gui.widgets.PageButton import PageButton
-from gui.widgets.LineEdit import LineEdit
 
 from gui.pages.PageManager import PageManager
 
@@ -28,6 +25,9 @@ class MainWindow(QMainWindow):
         self.side_menu.setStyleSheet("background-color: #EFEFEF")
         self.side_menu.setMaximumWidth(50)
 
+        self.animation = QPropertyAnimation(self.side_menu, b"minimumWidth")
+        self.animation.setDuration(200)
+
         self.side_menu_layout = QVBoxLayout(self.side_menu)
         self.side_menu_layout.setContentsMargins(0, 0, 0, 0)
         self.side_menu_layout.setSpacing(0)
@@ -40,8 +40,8 @@ class MainWindow(QMainWindow):
         self.side_menu_top_layout.setSpacing(0)
 
         self.menu_btn = PushButton("Menu", icon_path="menu-burger.svg")
-        self.home_btn = PushButton("Home", icon_path="home.svg")
-        self.product_btn = PushButton("Produtos", icon_path="boxes.svg", is_active=True)
+        self.home_btn = PushButton("Home", icon_path="home.svg", is_active=True)
+        self.product_btn = PushButton("Produtos", icon_path="boxes.svg")
         self.people_btn = PushButton("Pessoas", icon_path="users-alt.svg")
         self.sell_btn = PushButton("Vendas", icon_path="shopping-cart.svg")
         self.services_btn = PushButton("Serviços", icon_path="print.svg")
@@ -49,6 +49,7 @@ class MainWindow(QMainWindow):
         self._all_btns = [self.home_btn, self.product_btn, self.people_btn, self.sell_btn, self.services_btn]
 
         self.menu_btn.clicked.connect(self.toggleSideMenu)
+        self.home_btn.clicked.connect(self.homePage)
         self.product_btn.clicked.connect(self.productPage)
         self.people_btn.clicked.connect(self.peoplePage)
 
@@ -93,23 +94,23 @@ class MainWindow(QMainWindow):
 
         self.setCentralWidget(self.central_widget)
 
-    def productPage(self):
-        self.product_btn.setActive(True)
-
+    def homePage(self):
         for btn in self._all_btns:
-            if btn is not self.product_btn:
-                btn.setActive(False)
+            btn.setActive(btn is self.home_btn)
                 
         self.page_manager.setCurrentIndex(0)
 
-    def peoplePage(self):
-        self.people_btn.setActive(True)
-        
+    def productPage(self):
         for btn in self._all_btns:
-            if btn is not self.people_btn:
-                btn.setActive(False)
-        
+            btn.setActive(btn is self.product_btn)
+                
         self.page_manager.setCurrentIndex(1)
+
+    def peoplePage(self):
+        for btn in self._all_btns:
+                btn.setActive(btn is self.people_btn)
+        
+        self.page_manager.setCurrentIndex(2)
 
     def toggleSideMenu(self):
         current_width = self.side_menu.width()
@@ -118,8 +119,8 @@ class MainWindow(QMainWindow):
         if current_width == 50:
             new_width = 250
 
-        self.animation = QPropertyAnimation(self.side_menu, b"minimumWidth")
-        self.animation.setStartValue(self.side_menu.width())
+        """self.animation.setStartValue(self.side_menu.width())
         self.animation.setEndValue(new_width)
-        self.animation.setDuration(50)
-        self.animation.start()
+        self.animation.start()"""
+
+        self.side_menu.setFixedWidth(new_width)

@@ -22,13 +22,10 @@ class PushButton(QPushButton):
         self.btn_hover = btn_hover
         self.is_active = is_active
 
-        self.is_hovered = False
         self.setStyle()
 
     def setStyle(self):
-        # A forma mais simples de alterar a cor ao hover é no stylesheet
-        # e não usando a cor de hover para o ícone. O Qt se encarrega disso.
-        style = f"""
+        base_style = f"""
         QPushButton {{
             color: {self.text_color};
             background-color: {self.btn_color};
@@ -41,34 +38,25 @@ class PushButton(QPushButton):
             color: white; /* O texto também muda de cor ao hover */
         }}
         """
-        style_active = f"""
-        QPushButton {{
+
+        active_style = f"""
+        QPushButton[active="true"] {{
             background-color: {self.btn_hover};
             color: white;
             border-right: 5px solid #D9D9D9;
         }}
-
         """
-
-        if (self.is_active):
-            self.setStyleSheet(style + style_active)
-        else:
-            self.setStyleSheet(style)
+        
+        self.setProperty("active", "true" if self.is_active else "false")
+        
+        # Junte os estilos
+        full_style = base_style + active_style
+        self.setStyleSheet(full_style)
 
     def setActive(self, value):
         self.is_active = value
 
         self.setStyle()
-
-    def enterEvent(self, event):
-        self.is_hovered = True
-        self.update()
-        super().enterEvent(event)
-
-    def leaveEvent(self, event):
-        self.is_hovered = False
-        self.update()
-        super().leaveEvent(event)
 
     def paintEvent(self, event):
         # A forma mais simples é deixar o QPushButton desenhar tudo e depois adicionar o ícone.
@@ -79,7 +67,7 @@ class PushButton(QPushButton):
         qp.setRenderHint(QPainter.Antialiasing)
         
         # Define a cor do ícone
-        if self.is_hovered or self.is_active:
+        if self.underMouse() or self.is_active:
             color = "#FFFFFF" # Cor branca no hover
         else:
             color = self.icon_color # Cor padrão
