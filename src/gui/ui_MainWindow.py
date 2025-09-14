@@ -52,6 +52,7 @@ class MainWindow(QMainWindow):
         self.home_btn.clicked.connect(self.homePage)
         self.product_btn.clicked.connect(self.productPage)
         self.people_btn.clicked.connect(self.peoplePage)
+        self.sell_btn.clicked.connect(self.sellPage)
 
         self.side_menu_top_layout.addWidget(self.menu_btn)
         self.side_menu_top_layout.addWidget(self.home_btn)
@@ -111,6 +112,12 @@ class MainWindow(QMainWindow):
                 btn.setActive(btn is self.people_btn)
         
         self.page_manager.setCurrentIndex(2)
+
+    def sellPage(self):
+        for btn in self._all_btns:
+                btn.setActive(btn is self.sell_btn)
+        
+        self.page_manager.setCurrentIndex(3)
 
     def toggleSideMenu(self):
         current_width = self.side_menu.width()

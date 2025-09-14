@@ -4,6 +4,7 @@ from gui.widgets.LineEdit import LineEdit
 from gui.widgets.PageButton import PageButton
 from gui.widgets.TableWidget import TableWidget
 from gui.widgets.InfoWidget import InfoWidget
+from gui.widgets.DateEdit import DateEdit
 
 class PageManager(QStackedWidget):
     def __init__(self):
@@ -125,3 +126,50 @@ class PageManager(QStackedWidget):
         self.people_page_layout.addWidget(self.people_table)
 
         self.insertWidget(2, self.people_page)
+
+        #Sell Page
+        self.sell_page = QWidget()
+
+        self.sell_page_layout = QVBoxLayout(self.sell_page)
+        self.sell_page_layout.setContentsMargins(12, 12, 12, 24)
+        self.sell_page_layout.setSpacing(12)
+
+        self.sell_search_widget = QWidget()
+        
+        self.sell_search_layout = QHBoxLayout(self.sell_search_widget)
+        self.sell_search_layout.setContentsMargins(0, 0, 0, 12)
+
+        self.sell_left_spacer = QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.sell_intial_date = DateEdit(icon_path="calendar.svg")
+        self.date_label = QLabel(" Até ")
+        self.date_label.setStyleSheet("color: #747474")
+        self.sell_final_date = DateEdit(icon_path="calendar.svg")
+        self.sell_right_spacer = QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.sell_search_layout.addItem(self.sell_left_spacer)
+        self.sell_search_layout.addWidget(self.sell_intial_date)
+        self.sell_search_layout.addWidget(self.date_label)
+        self.sell_search_layout.addWidget(self.sell_final_date)
+        self.sell_search_layout.addItem(self.sell_right_spacer)
+
+        self.sell_buttons_box = QWidget()
+        self.sell_buttons_box_layout = QHBoxLayout(self.sell_buttons_box)
+        self.sell_buttons_box_layout.setContentsMargins(0, 0, 0, 6)
+
+        self.sell_add_btn = PageButton("Adicionar", icon_path="plus.svg")
+        self.sell_edit_btn = PageButton("Editar", icon_path="edit.svg")
+        self.sell_remove_btn = PageButton("Remover", icon_path="cross.svg")
+        self.sell_buttons_box_spacer = QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.sell_buttons_box_layout.addWidget(self.sell_add_btn)
+        self.sell_buttons_box_layout.addWidget(self.sell_edit_btn)
+        self.sell_buttons_box_layout.addWidget(self.sell_remove_btn)
+        self.sell_buttons_box_layout.addItem(self.sell_buttons_box_spacer)
+
+        self.sell_table = TableWidget(["ID", "Nome", "CPF/CNPJ", "Endereço"], "Venda")
+
+        self.sell_page_layout.addWidget(self.sell_search_widget)
+        self.sell_page_layout.addWidget(self.sell_buttons_box)
+        self.sell_page_layout.addWidget(self.sell_table)
+
+        self.insertWidget(3, self.sell_page)
