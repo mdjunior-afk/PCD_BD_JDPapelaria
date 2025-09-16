@@ -28,6 +28,10 @@ class ProductPage(QWidget):
         self.remove_btn = PageButton("Remover", icon_path="cross.svg")
         self.procuct_buttons_box_spacer = QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
+        self.add_btn.clicked.connect(self.addWindow)
+        self.edit_btn.clicked.connect(self.editWindow)
+        self.remove_btn.clicked.connect(self.removeWindow)
+
         self.buttons_box_layout.addWidget(self.add_btn)
         self.buttons_box_layout.addWidget(self.edit_btn)
         self.buttons_box_layout.addWidget(self.remove_btn)
@@ -38,3 +42,14 @@ class ProductPage(QWidget):
         self.main_layout.addWidget(self.search_widget)
         self.main_layout.addWidget(self.buttons_box)
         self.main_layout.addWidget(self.table)
+
+    def addWindow(self):
+        self.win = QWidget()
+        self.win.show()
+        pass
+
+    def editWindow(self):
+        pass
+
+    def removeWindow(self):
+        pass

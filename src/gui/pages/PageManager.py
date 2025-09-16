@@ -19,3 +19,6 @@ class PageManager(QStackedWidget):
 
         self.sell_page = SellPage()
         self.insertWidget(3, self.sell_page)
+
+        self.services_page = ServicePage()
+        self.insertWidget(4, self.services_page)

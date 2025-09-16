@@ -1,11 +1,13 @@
 from PySide6.QtWidgets import QDateEdit, QGraphicsDropShadowEffect, QAbstractSpinBox
 from PySide6.QtGui import QFontMetrics, QColor
-from PySide6.QtCore import QDate, Qt
+from PySide6.QtCore import QDate
 import os
 
 class DateEdit(QDateEdit):
-    def __init__(self, border_radius=15, text_color="#747474", icon_path="", background_color="#EFEFEF", hover="#EA7712"):
+    def __init__(self, border_radius=20, text_color="#747474", icon_path="", background_color="#EFEFEF", hover="#EA7712"):
         super().__init__()
+
+        self.setFixedHeight(40)
 
         self.background_color = background_color
         self.border_radius = border_radius
@@ -16,8 +18,6 @@ class DateEdit(QDateEdit):
         self.setDate(QDate.currentDate())
 
         self.setCalendarPopup(True)
-
-        self.setButtonSymbols(QAbstractSpinBox.NoButtons)
 
         self.setStyle()
 
@@ -35,14 +35,12 @@ class DateEdit(QDateEdit):
             border-radius: {self.border_radius}px;
             color: {self.text_color};
             font-size: 14px;
-            padding: 5px 10px;
-            border: none;
-            border-radius: {self.border_radius}px;
+            padding: 8px;
         }}
 
         QCalendarWidget QToolButton {{
             color: white;
-            font-size:12px;
+            font-size: 12px;
             icon-size: 24px 24px;
             background-color: {self.text_color};
         }}
@@ -53,7 +51,8 @@ class DateEdit(QDateEdit):
 
         QDateEdit::drop-down {{
             image: url(src/gui/icons/calendar.svg);
-            subcontrol-origin: padding;
+            padding-right: 8px;
+            subcontrol-origin: margin;
             subcontrol-position: right center;
             width: 20px;
             height: 20px;
@@ -73,8 +72,8 @@ class DateEdit(QDateEdit):
         }}
 
         QCalendarWidget QAbstractItemView::item:hover {{
-            color: white;
-            background-color: {self.hover};
+            color: {self.text_color};
+            border: 2px solid {self.hover};
         }}
 
         QCalendarWidget QAbstractItemView:enabled {{

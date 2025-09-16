@@ -53,6 +53,7 @@ class MainWindow(QMainWindow):
         self.product_btn.clicked.connect(self.productPage)
         self.people_btn.clicked.connect(self.peoplePage)
         self.sell_btn.clicked.connect(self.sellPage)
+        self.services_btn.clicked.connect(self.servicePage)
 
         self.side_menu_top_layout.addWidget(self.menu_btn)
         self.side_menu_top_layout.addWidget(self.home_btn)
@@ -109,15 +110,21 @@ class MainWindow(QMainWindow):
 
     def peoplePage(self):
         for btn in self._all_btns:
-                btn.setActive(btn is self.people_btn)
+            btn.setActive(btn is self.people_btn)
         
         self.page_manager.setCurrentIndex(2)
 
     def sellPage(self):
         for btn in self._all_btns:
-                btn.setActive(btn is self.sell_btn)
+            btn.setActive(btn is self.sell_btn)
         
         self.page_manager.setCurrentIndex(3)
+
+    def servicePage(self):
+        for btn in self._all_btns:
+            btn.setActive(btn is self.services_btn)
+
+        self.page_manager.setCurrentIndex(4)
 
     def toggleSideMenu(self):
         current_width = self.side_menu.width()
@@ -125,9 +132,5 @@ class MainWindow(QMainWindow):
         new_width = 50
         if current_width == 50:
             new_width = 250
-
-        """self.animation.setStartValue(self.side_menu.width())
-        self.animation.setEndValue(new_width)
-        self.animation.start()"""
 
         self.side_menu.setFixedWidth(new_width)

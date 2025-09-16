@@ -12,6 +12,7 @@ class PageButton(QPushButton):
         self.setText(text)
         self.setMaximumHeight(height)
         self.setMinimumHeight(height)
+        self.setMaximumWidth(125)
         self.setCursor(Qt.PointingHandCursor)
 
         self.minimum_width = minimum_width
