@@ -36,7 +36,7 @@ class PageManager(QStackedWidget):
 
         self.stock_info = InfoWidget(title="Estoques baixos", info="10")
         self.birthday_qtd = InfoWidget(title="Aniversáriantes do mês", info="3")
-        self.daily_sell = InfoWidget(title="Vendas de hoje", info="5")
+        self.daily_sell = InfoWidget(title="Vendas de hoje", info="R$1200,00")
 
         self.box_layout.addItem(self.left_home_box_spacer)
         self.box_layout.addWidget(self.stock_info)

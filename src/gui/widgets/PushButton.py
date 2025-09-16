@@ -22,6 +22,8 @@ class PushButton(QPushButton):
         self.btn_hover = btn_hover
         self.is_active = is_active
 
+        self.first = False
+
         self.setStyle()
 
     def setStyle(self):
@@ -71,6 +73,7 @@ class PushButton(QPushButton):
             color = "#FFFFFF" # Cor branca no hover
         else:
             color = self.icon_color # Cor padrão
+
             
         self.drawIcon(qp, self.icon_path, self.minimum_width, color)
         qp.end()

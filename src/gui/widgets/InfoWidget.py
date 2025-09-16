@@ -23,7 +23,7 @@ class InfoWidget(QFrame):
 
         # Label valor
         self.info_label = QLabel(info)
-        self.info_label.setStyleSheet(f"color: {info_color}; font-size: 20px; font-weight: bold;")
+        self.info_label.setStyleSheet(f"color: {info_color}; font-size: 16px; font-weight: bold;")
         layout.addWidget(self.info_label, alignment=Qt.AlignLeft)
 
         # Estilo inicial
@@ -49,7 +49,7 @@ class InfoWidget(QFrame):
             }}
         """)
         self.title_label.setStyleSheet("color: white; font-size: 14px;")
-        self.info_label.setStyleSheet("color: white; font-size: 20px; font-weight: bold;")
+        self.info_label.setStyleSheet("color: white; font-size: 16px; font-weight: bold;")
         super().enterEvent(event)
 
     def leaveEvent(self, event):
@@ -60,5 +60,5 @@ class InfoWidget(QFrame):
             }}
         """)
         self.title_label.setStyleSheet(f"color: {self.title_color}; font-size: 14px;")
-        self.info_label.setStyleSheet(f"color: {self.info_color}; font-size: 20px; font-weight: bold;")
+        self.info_label.setStyleSheet(f"color: {self.info_color}; font-size: 16px; font-weight: bold;")
         super().leaveEvent(event)
