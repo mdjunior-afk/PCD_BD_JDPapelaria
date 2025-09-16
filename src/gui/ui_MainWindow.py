@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import *
-from PySide6.QtCore import QPropertyAnimation, QEasingCurve
+from PySide6.QtCore import QPropertyAnimation
 
-from gui.widgets.PushButton import PushButton
+from gui.widgets import PushButton
 
 from gui.pages.PageManager import PageManager
 
