@@ -2,6 +2,8 @@ from PySide6.QtWidgets import *
 
 from ..widgets import *
 
+from .Dialogs import *
+
 class PeoplePage(QWidget):
     def __init__(self):
         super().__init__()
@@ -28,6 +30,10 @@ class PeoplePage(QWidget):
         self.remove_btn = PageButton("Remover", icon_path="cross.svg")
         self.box_widget_spacer = QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
+        self.add_btn.clicked.connect(self.addWindow)
+        self.edit_btn.clicked.connect(self.editWindow)
+        self.remove_btn.clicked.connect(self.removeWindow)
+
         self.box_widget_layout.addWidget(self.add_btn)
         self.box_widget_layout.addWidget(self.edit_btn)
         self.box_widget_layout.addWidget(self.remove_btn)
@@ -38,3 +44,20 @@ class PeoplePage(QWidget):
         self.main_layout.addWidget(self.search_widget)
         self.main_layout.addWidget(self.box_widget)
         self.main_layout.addWidget(self.table)
+
+    def addWindow(self):
+        self.current_win = BaseDialog()
+
+        self.current_win.exec()
+
+    def editWindow(self):
+        self.current_win = BaseDialog()
+
+        self.current_win.exec()
+        pass
+
+    def removeWindow(self):
+        self.current_win = BaseDialog()
+
+        self.current_win.exec()
+        pass

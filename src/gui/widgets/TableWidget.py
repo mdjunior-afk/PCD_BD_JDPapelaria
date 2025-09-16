@@ -48,6 +48,7 @@ class TableWidget(QTableWidget):
             gridline-color: #C0C0C0;
             border: none;
             color: #747474;
+            font-size: 12px;
         }                               
 
         QHeaderView::section {

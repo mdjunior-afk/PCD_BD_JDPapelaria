@@ -2,6 +2,8 @@ from PySide6.QtWidgets import *
 
 from ..widgets import *
 
+from .Dialogs import *
+
 class ProductPage(QWidget):
     def __init__(self):
         super().__init__()
@@ -44,12 +46,18 @@ class ProductPage(QWidget):
         self.main_layout.addWidget(self.table)
 
     def addWindow(self):
-        self.win = QWidget()
-        self.win.show()
-        pass
+        self.current_win = BaseDialog()
+
+        self.current_win.exec()
 
     def editWindow(self):
+        self.current_win = BaseDialog()
+
+        self.current_win.exec()
         pass
 
     def removeWindow(self):
+        self.current_win = BaseDialog()
+
+        self.current_win.exec()
         pass
