@@ -36,6 +36,7 @@ class PageButton(QPushButton):
         style = f"""
         QPushButton {{
             color: {BTN_TEXT_COLOR};
+            font-size: 12px;
             background-color: {BTN_BACKGROUND_COLOR};
             padding-right: 10px;
             padding-left: {self.text_padding}px;

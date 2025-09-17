@@ -48,9 +48,8 @@ class HomePage(QWidget):
         self.logo_label = QLabel()
         self.logo_label.setScaledContents(True)
         self.logo_label.setFixedSize(233, 67)
-        self.logo_pixmap = QPixmap("src/gui1/images/logo.png")
+        self.logo_pixmap = QPixmap("src/gui/images/logo.png")
         self.logo_label.setPixmap(self.logo_pixmap)
-        
 
         self.logo_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum))
         self.logo_layout.addWidget(self.logo_label)
