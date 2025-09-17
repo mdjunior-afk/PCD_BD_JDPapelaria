@@ -55,7 +55,7 @@ class SellPage(QWidget):
         self.main_layout.addWidget(self.table)
 
     def addWindow(self):
-        self.current_win = BaseDialog()
+        self.current_win = SellDialog()
 
         self.current_win.exec()
 
