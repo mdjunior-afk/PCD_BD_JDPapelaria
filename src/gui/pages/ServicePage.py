@@ -55,7 +55,7 @@ class ServicePage(QWidget):
         self.main_layout.addWidget(self.table)
 
     def addWindow(self):
-        self.current_win = BaseDialog()
+        self.current_win = TransactionDialog(initial_window=1)
 
         self.current_win.exec()
 
