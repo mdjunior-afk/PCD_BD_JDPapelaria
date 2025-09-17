@@ -28,8 +28,6 @@ class BaseDialog(QDialog):
         self.buttons_layout.addWidget(self.new_btn)
         self.buttons_layout.addWidget(self.cancel_btn)
 
-        self.main_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding))
-
         self.main_layout.addLayout(self.input_layout)
         self.main_layout.addLayout(self.buttons_layout)
 
@@ -77,14 +75,26 @@ class ProductDialog(BaseDialog):
         self.input_layout.addWidget(self.sell_price_label, 2, 5)
         self.input_layout.addWidget(self.sell_price_input, 2, 6)
 
-class SellDialog(BaseDialog):
-    def __init__(self, maximum_width=1200):
+class TransactionDialog(BaseDialog):
+    def __init__(self, maximum_width=800, maximum_height=800, initial_window=0):
         super().__init__(maximum_width)
+
+        self.initial_window = initial_window
+
+        self.setMaximumSize(maximum_width, maximum_height)
+        self.setMinimumSize(800, 600)
 
         self.setWindowTitle("Movimentação")
 
+        self.people_info_widget = QWidget()
+        self.people_info_layout = QVBoxLayout()
+        
         self.search_people = LineEdit("Procure por um cliente")
-        self.search_people.setMaximumWidth(1200)
+        self.search_people.setMaximumWidth(800)
+
+        self.people_info_layout.addWidget(self.search_people)
+
+        self.people_info_widget.setLayout(self.people_info_layout)
 
         self.tab = QTabWidget()
 
@@ -98,7 +108,8 @@ class SellDialog(BaseDialog):
         self.product_info_widget.setLayout(self.product_info_layout)
 
         self.product_search_input = LineEdit("Procure por um produto...")
-        self.product_search_input.setMaximumWidth(1200)
+        self.product_search_input.setMaximumWidth(800)
+
         self.product_price_label = QLabel("Preço: R$")
         self.product_price_input = DoubleSpinBox()
         self.product_quantity_label = QLabel("Quantidade:")
@@ -176,5 +187,7 @@ class SellDialog(BaseDialog):
         self.tab.addTab(self.service_tab, "Serviços")
         self.tab.addTab(self.payment, "Pagamentos")
 
-        self.input_layout.addWidget(self.search_people)
+        self.input_layout.addWidget(self.people_info_widget)
         self.input_layout.addWidget(self.tab)
+
+        self.tab.setCurrentIndex(self.initial_window)

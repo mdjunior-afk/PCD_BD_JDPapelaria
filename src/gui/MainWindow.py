@@ -47,7 +47,7 @@ class MainWindow(QMainWindow):
 
         self.logo_label.setStyleSheet("padding: 8px;")
 
-        self.logo_pixmap = QPixmap("src/gui/images/Logo.png")
+        self.logo_pixmap = QPixmap("src/gui/images/logo.png")
         self.logo_label.setScaledContents(True)
 
         self.logo_label.hide()
