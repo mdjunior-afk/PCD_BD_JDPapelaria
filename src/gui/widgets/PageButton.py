@@ -1,7 +1,8 @@
 from PySide6.QtWidgets import QPushButton, QGraphicsDropShadowEffect
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QPushButton
-from PySide6.QtGui import QPainter, Qt, QPixmap
+from PySide6.QtGui import QPainter, QPixmap
+from PySide6.QtCore import Qt
 
 import os
 
@@ -52,16 +53,6 @@ class PageButton(QPushButton):
 
         self.setStyleSheet(style)
 
-    def enterEvent(self, event):
-        self.is_hovered = True
-        self.update()
-        super().enterEvent(event)
-
-    def leaveEvent(self, event):
-        self.is_hovered = False
-        self.update()
-        super().leaveEvent(event)
-
     def paintEvent(self, event):
         # A forma mais simples é deixar o QPushButton desenhar tudo e depois adicionar o ícone.
         super().paintEvent(event)
@@ -71,7 +62,7 @@ class PageButton(QPushButton):
         qp.setRenderHint(QPainter.Antialiasing)
         
         # Define a cor do ícone
-        if self.is_hovered:
+        if self.underMouse():
             color = "#FFFFFF" # Cor branca no hover
         else:
             color = self.icon_color # Cor padrão
