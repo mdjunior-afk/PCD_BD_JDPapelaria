@@ -62,4 +62,4 @@ class HomePage(QWidget):
         self.main_layout.addItem(self.home_spacer)
         self.main_layout.addStretch(1)
         self.main_layout.addWidget(self.logo_widget)
-        self.main_layout.addStretch(1)
+        self.main_layout.addStretch(2)
