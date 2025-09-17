@@ -6,15 +6,17 @@ class SpinBox(QSpinBox):
     def __init__(self):
         super().__init__()
 
+        self.setMaximum(99999)
+
         self.setStyle()
 
     def setStyle(self):
         style = f"""
         QSpinBox {{
-        background-color: {BTN_TEXT_COLOR};
-        border-radius: 8px;
-        padding: 4px 20px 4px 4px;
-        font-size: 14px;
+            background-color: {BTN_TEXT_COLOR};
+            border-radius: 8px;
+            padding: 4px 20px 4px 4px;
+            font-size: 14px;
         }}
 
         QSpinBox::up-button {{
@@ -51,6 +53,8 @@ class SpinBox(QSpinBox):
 class DoubleSpinBox(QDoubleSpinBox):
     def __init__(self):
         super().__init__()
+
+        self.setMaximum(99999)
 
         self.setStyle()
 
