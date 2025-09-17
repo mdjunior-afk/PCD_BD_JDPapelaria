@@ -4,10 +4,12 @@ from PySide6.QtWidgets import QPushButton
 from PySide6.QtGui import QPainter, QPixmap
 from PySide6.QtCore import Qt
 
+from ..config import *
+
 import os
 
 class PageButton(QPushButton):
-    def __init__(self, text="", minimum_width=50, height=40, text_padding=45, text_color="#747474", icon_path="", icon_color="#747474", btn_color="#EFEFEF", btn_hover="#EA7712"):
+    def __init__(self, text="", minimum_width=50, height=40, text_padding=45, icon_path=""):
         super().__init__()
 
         self.setText(text)
@@ -18,11 +20,7 @@ class PageButton(QPushButton):
 
         self.minimum_width = minimum_width
         self.text_padding = text_padding
-        self.text_color = text_color
         self.icon_path = icon_path
-        self.icon_color = icon_color
-        self.btn_color = btn_color
-        self.btn_hover = btn_hover
 
         self.is_hovered = False
         self.setStyle()
@@ -37,8 +35,8 @@ class PageButton(QPushButton):
     def setStyle(self):
         style = f"""
         QPushButton {{
-            color: {self.text_color};
-            background-color: {self.btn_color};
+            color: {BTN_TEXT_COLOR};
+            background-color: {BTN_BACKGROUND_COLOR};
             padding-right: 10px;
             padding-left: {self.text_padding}px;
             text-align: left;
@@ -46,8 +44,8 @@ class PageButton(QPushButton):
             border-radius: 5px;
         }}
         QPushButton:hover {{
-            color: {self.btn_color};
-            background-color: {self.btn_hover};
+            color: {BTN_HOVER_TEXT_COLOR};
+            background-color: {BTN_HOVER_BACKGROUND_COLOR};
         }}
         """
 
@@ -63,9 +61,9 @@ class PageButton(QPushButton):
         
         # Define a cor do ícone
         if self.underMouse():
-            color = "#FFFFFF" # Cor branca no hover
+            color = ICON_HOVER_COLOR # Cor branca no hover
         else:
-            color = self.icon_color # Cor padrão
+            color = ICON_COLOR # Cor padrão
             
         self.drawIcon(qp, self.icon_path, self.minimum_width, color)
         qp.end()

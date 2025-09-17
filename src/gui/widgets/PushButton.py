@@ -1,11 +1,12 @@
 from PySide6.QtWidgets import QPushButton
 from PySide6.QtGui import QPainter, Qt, QPixmap
-from PySide6.QtCore import QRect, QPoint
+
+from ..config import *
 
 import os
 
 class PushButton(QPushButton):
-    def __init__(self, text="", minimum_width=50, height=40, text_padding=55, text_color="#747474", icon_path="", icon_color="#747474", btn_color="#EFEFEF", btn_hover="#EA7712", is_active=False):
+    def __init__(self, text="", minimum_width=50, height=40, text_padding=55, icon_path="", is_active=False):
         super().__init__()
 
         self.setText(text)
@@ -15,11 +16,7 @@ class PushButton(QPushButton):
 
         self.minimum_width = minimum_width
         self.text_padding = text_padding
-        self.text_color = text_color
         self.icon_path = icon_path
-        self.icon_color = icon_color
-        self.btn_color = btn_color
-        self.btn_hover = btn_hover
         self.is_active = is_active
 
         self.first = False
@@ -29,22 +26,22 @@ class PushButton(QPushButton):
     def setStyle(self):
         base_style = f"""
         QPushButton {{
-            color: {self.text_color};
-            background-color: {self.btn_color};
+            color: {BTN_TEXT_COLOR};
+            background-color: {BTN_BACKGROUND_COLOR};
             padding-left: {self.text_padding}px;
             text-align: left;
             border: none;
         }}
         QPushButton:hover {{
-            background-color: {self.btn_hover};
-            color: white; /* O texto também muda de cor ao hover */
+            background-color: {BTN_HOVER_BACKGROUND_COLOR};
+            color: {BTN_HOVER_TEXT_COLOR}; /* O texto também muda de cor ao hover */
         }}
         """
 
         active_style = f"""
         QPushButton[active="true"] {{
-            background-color: {self.btn_hover};
-            color: white;
+            background-color: {BTN_HOVER_BACKGROUND_COLOR};
+            color: {BTN_HOVER_TEXT_COLOR};
             border-right: 5px solid #D9D9D9;
         }}
         """
@@ -70,9 +67,9 @@ class PushButton(QPushButton):
         
         # Define a cor do ícone
         if self.underMouse() or self.is_active:
-            color = "#FFFFFF" # Cor branca no hover
+            color = ICON_HOVER_COLOR # Cor branca no hover
         else:
-            color = self.icon_color # Cor padrão
+            color = ICON_COLOR # Cor padrão
 
             
         self.drawIcon(qp, self.icon_path, self.minimum_width, color)
