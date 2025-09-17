@@ -1,9 +1,12 @@
 from PySide6.QtWidgets import *
-from PySide6.QtCore import QPropertyAnimation
+from PySide6.QtCore import QPropertyAnimation, Qt
+from PySide6.QtGui import QPixmap
 
 from gui.widgets import PushButton
 
 from gui.pages.PageManager import PageManager
+
+from .config import *
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -22,7 +25,7 @@ class MainWindow(QMainWindow):
 
         # START: side_menu
         self.side_menu = QWidget()
-        self.side_menu.setStyleSheet("background-color: #EFEFEF")
+        self.side_menu.setStyleSheet(f"background-color: {SIDEMENU_COLOR}")
         self.side_menu.setMaximumWidth(50)
 
         self.animation = QPropertyAnimation(self.side_menu, b"minimumWidth")
@@ -38,6 +41,16 @@ class MainWindow(QMainWindow):
         self.side_menu_top_layout = QVBoxLayout(self.side_menu_top_widget)
         self.side_menu_top_layout.setContentsMargins(0, 0, 0, 0)
         self.side_menu_top_layout.setSpacing(0)
+
+        self.logo_label = QLabel()
+        self.logo_label.setFixedSize(233, 67)
+
+        self.logo_label.setStyleSheet("padding: 8px;")
+
+        self.logo_pixmap = QPixmap("src/gui/images/Logo.png")
+        self.logo_label.setScaledContents(True)
+
+        self.logo_label.hide()
 
         self.menu_btn = PushButton("Menu", icon_path="menu-burger.svg")
         self.home_btn = PushButton("Home", icon_path="home.svg", is_active=True)
@@ -55,6 +68,7 @@ class MainWindow(QMainWindow):
         self.sell_btn.clicked.connect(self.sellPage)
         self.services_btn.clicked.connect(self.servicePage)
 
+        self.side_menu_top_layout.addWidget(self.logo_label)
         self.side_menu_top_layout.addWidget(self.menu_btn)
         self.side_menu_top_layout.addWidget(self.home_btn)
         self.side_menu_top_layout.addWidget(self.product_btn)
@@ -81,7 +95,7 @@ class MainWindow(QMainWindow):
         # END: side_menu
 
         self.content = QWidget()
-        self.content.setStyleSheet("background-color: #D9D9D9")
+        self.content.setStyleSheet(f"background-color: {CONTENT_COLOR}")
 
         self.content_layout = QVBoxLayout(self.content)
         self.content_layout.setContentsMargins(0, 0, 0, 0)
@@ -130,7 +144,11 @@ class MainWindow(QMainWindow):
         current_width = self.side_menu.width()
 
         new_width = 50
+        self.logo_label.clear()
+
         if current_width == 50:
             new_width = 250
+
+            self.logo_label.setPixmap(self.logo_pixmap)
 
         self.side_menu.setFixedWidth(new_width)
