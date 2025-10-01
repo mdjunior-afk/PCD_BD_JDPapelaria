@@ -66,6 +66,7 @@ class ReturnData(QFrame):
             if "subtotal" in self.inputs:
                 self.inputs["subtotal"].setValue(data["valor"] * data["quantidade"])
 
+        self.inputs["nome"].setReadOnly(True)
         self.hide()
 
     def showData(self, data):

@@ -7,5 +7,6 @@ from .DateEdit import DateEdit
 from .SpinBox import SpinBox, DoubleSpinBox
 from .ReturnData import ReturnData
 from .ComboBox import ComboBox
+from .DefaultLineEdit import DefaultLineEdit
 
-__all__ = ["PushButton", "PageButton", "LineEdit", "InfoWidget", "TableWidget", "DateEdit", "SpinBox", "DoubleSpinBox", "ReturnData", "ComboBox"]
+__all__ = ["PushButton", "PageButton", "LineEdit", "InfoWidget", "TableWidget", "DateEdit", "SpinBox", "DoubleSpinBox", "ReturnData", "ComboBox", "DefaultLineEdit"]
