@@ -1,4 +1,5 @@
 from PySide6.QtWidgets import *
+from PySide6.QtGui import QColor
 
 from ..config import *
 
@@ -9,6 +10,13 @@ class SpinBox(QSpinBox):
         self.setMaximum(99999)
 
         self.setStyle()
+
+        self.shadow = QGraphicsDropShadowEffect()
+        self.shadow.setBlurRadius(5)
+        self.shadow.setColor(QColor(0, 0, 0, 25))
+        self.shadow.setOffset(4, 4)
+
+        self.setGraphicsEffect(self.shadow)
 
     def setStyle(self):
         style = f"""
@@ -57,6 +65,13 @@ class DoubleSpinBox(QDoubleSpinBox):
         self.setMaximum(99999)
 
         self.setStyle()
+
+        self.shadow = QGraphicsDropShadowEffect()
+        self.shadow.setBlurRadius(5)
+        self.shadow.setColor(QColor(0, 0, 0, 25))
+        self.shadow.setOffset(4, 4)
+
+        self.setGraphicsEffect(self.shadow)
 
     def setStyle(self):
         style = f"""

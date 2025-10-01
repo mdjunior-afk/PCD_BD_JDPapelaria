@@ -5,12 +5,12 @@ from PySide6.QtGui import QIcon
 from ..widgets import *
 
 class BaseDialog(QDialog):
-    def __init__(self, maximum_width=800):
+    def __init__(self, fixed_width=500):
         super().__init__()
 
         self.setStyleSheet("background-color: #D9D9D9; color: #747474;")
 
-        self.setMaximumWidth(maximum_width)
+        self.setFixedWidth(fixed_width)
 
         self.main_layout = QVBoxLayout()
         self.setLayout(self.main_layout)
@@ -40,48 +40,85 @@ class ProductDialog(BaseDialog):
     def __init__(self):
         super().__init__()
 
-        self.name_label = QLabel("Nome:")
-        self.name_input = QLineEdit()
+        self.tab = QTabWidget()
+        self.product_info_tab, self.supplier_info_tab = self.createTabs()
+        self.tab.addTab(self.product_info_tab, "Informações do produto")
+        self.tab.addTab(self.supplier_info_tab, "Informações do fornecedor")
 
-        self.category_label = QLabel("Categoria:")
-        self.category_box = QComboBox()
-        self.category_box.addItems(["CARREGADOR", "PENDRIVE", "CANETA"])
+        self.input_layout.addWidget(self.tab)
 
-        self.barcode_label = QLabel("Cód.Barra:")
-        self.barcode_input = QLineEdit()
+    def createTabs(self):
+        product_info_tab = QWidget()
+        supplier_info_tab = QWidget()
 
-        self.buy_price_label = QLabel("Preço de compra: R$")
-        self.buy_price_input = QSpinBox(minimum=0, maximum=99999)
+        product_info_layout = QVBoxLayout()
+        widget, inputs = self.productInfoInputs()
 
-        self.adjust_label = QLabel("Reajuste: ")
-        self.adjust_input = QSpinBox(minimum=0, maximum=99999)
-        self.perc = QLabel("%")
+        product_info_layout.addWidget(widget)
+        product_info_tab.setLayout(product_info_layout)
 
-        self.sell_price_label = QLabel("Preço de venda: R$")
-        self.sell_price_input = QSpinBox(minimum=0, maximum=99999)
+        return product_info_tab, supplier_info_tab
+    
+    def productInfoInputs(self):
+        widget = QWidget()
+        layout = QFormLayout()
+        widget.setLayout(layout)
 
-        self.input_layout.addWidget(self.name_label, 0, 0)
-        self.input_layout.addWidget(self.name_input, 0, 1, 1, 6)
+        layout.setHorizontalSpacing(8)  # padrão costuma ser 6~10
+        layout.setVerticalSpacing(6)
+        layout.setContentsMargins(5, 5, 5, 5)
 
-        self.input_layout.addWidget(self.category_label, 1, 0)
-        self.input_layout.addWidget(self.category_box, 1, 1)
-        
-        self.input_layout.addWidget(self.barcode_label, 1, 2)
-        self.input_layout.addWidget(self.barcode_input, 1, 3, 1, 4)
+        id_widget = QWidget()
+        id_layout = QHBoxLayout()
+        id_layout.setContentsMargins(0, 0, 0, 0)
 
-        self.input_layout.addWidget(self.buy_price_label, 2, 0)
-        self.input_layout.addWidget(self.buy_price_input, 2, 1)
-        self.input_layout.addWidget(self.adjust_label, 2, 2)
-        self.input_layout.addWidget(self.adjust_input, 2, 3)
-        self.input_layout.addWidget(self.perc, 2, 4)
-        self.input_layout.addWidget(self.sell_price_label, 2, 5)
-        self.input_layout.addWidget(self.sell_price_input, 2, 6)
+        id_widget.setLayout(id_layout)
 
-from PySide6.QtWidgets import *
-from PySide6.QtCore import *
-from PySide6.QtGui import QIcon
+        stock_widget = QWidget()
+        stock_layout = QHBoxLayout()
+        stock_layout.setSpacing(12)
+        stock_layout.setContentsMargins(0, 12, 0, 0)
 
-from ..widgets import *
+        stock_widget.setLayout(stock_layout)
+
+        id_input = SpinBox()
+        name_input = DefaultLineEdit()
+        barcode_input = DefaultLineEdit()
+        category_input = QComboBox()
+        purchase_price_input = DoubleSpinBox()
+        readjustment_input = DoubleSpinBox()
+        sale_price_input = DoubleSpinBox()
+        minimum_stock_input = SpinBox()
+        stock_input = SpinBox()
+
+        categories = ["PEN DRIVE", "CARREGADORES", "CADERNOS", "CANETAS"]
+        category_input.addItems(categories)
+
+        id_layout.addWidget(QLabel("ID:"))
+        id_layout.addWidget(id_input)
+        id_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum))
+
+        stock_layout.addWidget(QLabel("Estoque mínimo:"))
+        stock_layout.addWidget(minimum_stock_input)
+        stock_layout.addWidget(QLabel("Estoque atual:"))
+        stock_layout.addWidget(stock_input)
+
+        layout.addWidget(id_widget)
+        layout.addWidget(QLabel("Nome"))
+        layout.addWidget(name_input)
+        layout.addWidget(QLabel("Cód.Barra"))
+        layout.addWidget(barcode_input)
+        layout.addWidget(QLabel("Categoria"))
+        layout.addWidget(category_input)
+        layout.addWidget(QLabel("Preço de compra (R$)"))
+        layout.addWidget(purchase_price_input)
+        layout.addWidget(QLabel("Reajuste"))
+        layout.addWidget(readjustment_input)
+        layout.addWidget(QLabel("Preço de venda (R$)"))
+        layout.addWidget(sale_price_input)
+        layout.addWidget(stock_widget)
+
+        return widget, (id_input, name_input, category_input, barcode_input, purchase_price_input, readjustment_input, sale_price_input, minimum_stock_input, stock_input)
 
 class TransactionDialog(BaseDialog):
     def __init__(self, maximum_width=800, maximum_height=800, initial_window=0):
@@ -92,9 +129,21 @@ class TransactionDialog(BaseDialog):
         self.setMinimumSize(800, 600)
         self.setWindowTitle("Movimentação")
 
+        # --- Data ---
+        self.date_widget = QWidget()
+        self.date_layout = QHBoxLayout()
+        self.date_layout.setContentsMargins(0, 0, 0, 6)
+
+        self.date = DateEdit()
+        self.date_layout.addWidget(QLabel("Data da venda:"))
+        self.date_layout.addWidget(self.date)
+        self.date_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum))
+        self.date_widget.setLayout(self.date_layout)
+
         # --- Cliente ---
         self.people_info_widget = QWidget()
         self.people_info_layout = QVBoxLayout()
+
         self.search_people = LineEdit("Procure por um cliente")
         self.search_people.setMaximumWidth(800)
         self.people_info_layout.addWidget(self.search_people)
@@ -120,6 +169,7 @@ class TransactionDialog(BaseDialog):
         self.total_info_layout.addWidget(self.total_input)
         self.total_info_widget.setLayout(self.total_info_layout)
 
+        self.input_layout.addWidget(self.date_widget)
         self.input_layout.addWidget(self.people_info_widget)
         self.input_layout.addWidget(self.tab)
         self.input_layout.addWidget(self.total_info_widget)
@@ -130,13 +180,15 @@ class TransactionDialog(BaseDialog):
         self.updateReturnDataTarget(self.initial_window)
         self.tab.currentChanged.connect(self.updateReturnDataTarget)
 
-    # ----------------------
-    # --- Funções Genéricas
-    # ----------------------
     def clearFields(self, fields: list):
         for f in fields:
-            if isinstance(f, (QLineEdit, QSpinBox, QDoubleSpinBox)):
-                f.clear()
+            if isinstance(f, QLineEdit):
+                if f.isReadOnly():
+                    f.setReadOnly(False)
+                    f.clear()
+            elif isinstance(f, (QSpinBox, QDoubleSpinBox)):
+                f.setValue(0)
+
         self.return_data.hide()
 
     def searchItems(self, data: list, targets: dict, search_widget: QLineEdit):
