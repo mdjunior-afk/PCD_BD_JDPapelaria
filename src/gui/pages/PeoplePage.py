@@ -46,12 +46,12 @@ class PeoplePage(QWidget):
         self.main_layout.addWidget(self.table)
 
     def addWindow(self):
-        self.current_win = BaseDialog()
+        self.current_win = PeopleDialog()
 
         self.current_win.exec()
 
     def editWindow(self):
-        self.current_win = BaseDialog()
+        self.current_win = PeopleDialog()
 
         self.current_win.exec()
         pass

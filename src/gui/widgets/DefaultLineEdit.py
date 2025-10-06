@@ -21,7 +21,8 @@ class DefaultLineEdit(QLineEdit):
         QLineEdit {{
             background-color: {LINE_BACKGROUND_COLOR};
             border-radius: 8px;
-            padding: 4px 8px;
+            padding: 8px;
+            font-size: 14px;
         }}
         
         
