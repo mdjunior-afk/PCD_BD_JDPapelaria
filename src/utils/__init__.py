@@ -1,0 +1,2 @@
+from .LocationInput import Location
+
