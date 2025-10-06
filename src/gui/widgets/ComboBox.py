@@ -4,15 +4,21 @@ from PySide6.QtCore import *
 from ..config import *
 
 class ComboBox(QComboBox):
-    def __init__(self):
+    def __init__(self, items = []):
         super().__init__()
+
+        self.addItems(items)
+
+        self.setEditable(True)
+        self.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
+
         self.setStyle()
 
     def setStyle(self):
         style = f"""
         QComboBox {{
             background-color: {BTN_TEXT_COLOR};
-            padding: 4px;
+            padding: 8px;
             border-radius: 8px;
             outline: none;
             box-shadow: none;

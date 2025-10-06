@@ -1,6 +1,9 @@
 from PySide6.QtWidgets import *
 from PySide6.QtCore import *
 from PySide6.QtGui import QIcon
+import requests, json
+
+from utils.LocationInput import Location
 
 from ..widgets import *
 
@@ -12,8 +15,8 @@ class BaseDialog(QDialog):
 
         self.maximum_width = maximum_width
 
-        self.setMinimumWidth(self.maximum_width)
-        self.setMaximumWidth(self.maximum_width + 100)
+        self.setMinimumWidth(self.maximum_width + 100)
+        self.setMaximumWidth(self.maximum_width + 200)
 
         self.main_layout = QVBoxLayout()
         self.setLayout(self.main_layout)
@@ -160,6 +163,8 @@ class PeopleDialog(BaseDialog):
     def __init__(self):
         super().__init__()
 
+        self.setWindowTitle("Cadastro de Pessoa")
+
         self.tab = QTabWidget()
         self.people_info_tab = self.createTabs()
         self.tab.addTab(self.people_info_tab, "Informações da pessoa")
@@ -184,27 +189,148 @@ class PeopleDialog(BaseDialog):
 
         widget.setLayout(layout)
 
-        person_type_input = QComboBox()
-        person_type_input.addItems(["Pessoa Física", "Pessoa Jurídica"])
+        person_info_widget = QGroupBox("Informações Gerais")
+        person_info_widget.setStyleSheet("background-color: none;")
+        person_info_layout = QGridLayout()
 
-        person_type_input.currentIndexChanged.connect(self.onTextChanged)
+        name_label = QLabel("Nome:")
+        person_type_label = QLabel("Tipo de pessoa:")
+        self.document_label = QLabel("CPF:")
+        sex_label = QLabel("Sexo:")
+        birthday_label = QLabel("Nascimento:")
+        cellphone_label = QLabel("Celular:")
+        email_label = QLabel("Email:")
+        
+        name_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        person_type_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        self.document_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        sex_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        birthday_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        cellphone_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        email_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
 
-        self.document_label = QLabel("CPF")
+        name_input = DefaultLineEdit()
+        person_type_input = ComboBox(["PF", "PJ"])
+        person_type_input.currentIndexChanged.connect(self.onIndexChanged)
         self.document_input = DefaultLineEdit()
         self.document_input.setInputMask("000.000.000-00;_")
+        sex_input = ComboBox(["Masculino", "Feminino", "Outro"])
+        birthday_input = DateEdit()
+        
+        # Contact inputs
+        cellphone_input = DefaultLineEdit()
+        cellphone_input.setInputMask("(00) 00000-0000;_")
+        email_input = DefaultLineEdit()
 
-        layout.addWidget(QLabel("Nome"), 0, 0)
-        layout.addWidget(DefaultLineEdit(), 1, 0, 1, 2)
-        layout.addWidget(QLabel("Tipo de pessoa"), 2, 0)
-        layout.addWidget(person_type_input, 3, 0)
-        layout.addWidget(self.document_label, 2, 1)
-        layout.addWidget(self.document_input, 3, 1)
-        layout.addWidget(QLabel("Data de nascimento"), 4, 0)
-        layout.addWidget(DateEdit(), 5, 0)
+        person_info_layout.addWidget(name_label, 0, 0)
+        person_info_layout.addWidget(name_input, 0, 1, 1, 3)
+        person_info_layout.addWidget(person_type_label, 1, 0)
+        person_info_layout.addWidget(person_type_input, 1, 1)
+        person_info_layout.addWidget(self.document_label, 1, 2)
+        person_info_layout.addWidget(self.document_input, 1, 3)
+        person_info_layout.addWidget(sex_label, 2, 0)
+        person_info_layout.addWidget(sex_input, 2, 1)
+        person_info_layout.addWidget(birthday_label, 2, 2)
+        person_info_layout.addWidget(birthday_input, 2, 3)
+        person_info_layout.addWidget(email_label, 3, 0)
+        person_info_layout.addWidget(email_input, 3, 1)
+        person_info_layout.addWidget(cellphone_label, 3, 2)
+        person_info_layout.addWidget(cellphone_input, 3, 3)
+
+        person_info_widget.setLayout(person_info_layout)
+        
+        # Address inputs
+        address_widget = QGroupBox("Informações de Endereço:")
+        address_widget.setStyleSheet("background-color: none;")
+        address_layout = QGridLayout()
+
+        cep_label = QLabel("CEP:")
+        self.warning_label = QLabel("")
+        estate_label = QLabel("Estado:")
+        city_label = QLabel("Cidade:")
+        neighborhood_label = QLabel("Bairro:")
+        number_label =  QLabel("Número:")
+        street_label = QLabel("Rua:")
+        complement_label = QLabel("Complemento:")
+
+        cep_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        estate_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        city_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        neighborhood_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        number_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        street_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        complement_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+
+        self.cep_input = DefaultLineEdit()
+        self.cep_input.setInputMask("00000-000")
+        search_btn = PageButton("Procurar", icon_path="search.svg")
+        search_btn.clicked.connect(self.searchCEP)
+        self.estate_input = ComboBox()
+        self.city_input = ComboBox()
+        self.neighborhood_input = DefaultLineEdit()
+        self.number_input =  DefaultLineEdit()
+        self.street_input = DefaultLineEdit()
+        self.complement_input = DefaultLineEdit()
+
+        self.add_btn = PageButton("Adicionar", icon_path="plus.svg")
+        self.remove_btn = PageButton("Remover", icon_path="cross.svg")
+        self.add_btn.clicked.connect(self.addAddress)
+
+        self.address_table = TableWidget(["CEP", "Rua", "Nº", "Complemento", "Bairro", "Cidade", "Estado" ])
+        self.address_table.setFixedHeight(200)
+        self.address_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
+        self.address_table.horizontalHeader().setSectionResizeMode(6, QHeaderView.ResizeMode.Stretch)
+
+        self.location = Location(self.estate_input, self.city_input)
+        self.location.loadData()
+        self.location.fillEstates()
+
+        self.estate_input.currentIndexChanged.connect(lambda i: self.location.filterCities())
+        self.city_input.lineEdit().editingFinished.connect(self.location.validateCity)
+
+        address_layout.addWidget(cep_label, 0, 0)
+        address_layout.addWidget(self.cep_input, 0, 1)
+        address_layout.addWidget(search_btn, 0, 2)
+        address_layout.addWidget(self.warning_label, 0, 3)
+        address_layout.addWidget(estate_label, 1, 0)
+        address_layout.addWidget(self.estate_input, 1, 1)
+        address_layout.addWidget(city_label, 1, 2)
+        address_layout.addWidget(self.city_input, 1, 3, 1, 2)
+        address_layout.addWidget(number_label, 2, 0)
+        address_layout.addWidget(self.number_input, 2, 1)
+        address_layout.addWidget(neighborhood_label, 2, 2)
+        address_layout.addWidget(self.neighborhood_input, 2, 3, 1, 2)
+        address_layout.addWidget(street_label, 3, 0)
+        address_layout.addWidget(self.street_input, 3, 1, 1, 4)
+        address_layout.addWidget(complement_label, 4, 0)
+        address_layout.addWidget(self.complement_input, 4, 1, 1, 4)
+        address_layout.addWidget(self.add_btn, 5, 3)
+        address_layout.addWidget(self.remove_btn, 5, 4)
+        address_layout.addWidget(self.address_table, 6, 0, 1, address_layout.columnCount())
+
+        address_layout.setColumnStretch(3, 2)
+
+        address_widget.setLayout(address_layout)
+
+        layout.addWidget(person_info_widget, 0, 0)
+        layout.addWidget(address_widget, 1, 0)
 
         return widget, ()
     
-    def onTextChanged(self, index):
+    def addAddress(self):
+        row_index = self.address_table.rowCount()
+        print(row_index)
+        self.address_table.insertRow(row_index)
+
+        self.address_table.setItem(row_index, 0, QTableWidgetItem(self.cep_input.text()))
+        self.address_table.setItem(row_index, 1, QTableWidgetItem(self.street_input.text()))
+        self.address_table.setItem(row_index, 2, QTableWidgetItem(self.number_input.text()))
+        self.address_table.setItem(row_index, 3, QTableWidgetItem(self.complement_input.text()))
+        self.address_table.setItem(row_index, 4, QTableWidgetItem(self.neighborhood_input.text()))
+        self.address_table.setItem(row_index, 5, QTableWidgetItem(self.city_input.currentText()))
+        self.address_table.setItem(row_index, 6, QTableWidgetItem(self.estate_input.currentText()))
+    
+    def onIndexChanged(self, index):
         if index == 0:
             self.document_input.setInputMask("000.000.000-00;_")
             self.document_label.setText("CPF")
@@ -213,6 +339,56 @@ class PeopleDialog(BaseDialog):
             self.document_input.setInputMask("00.000.000/0000-00;_")
             self.document_label.setText("CNPJ")
             self.document_input.clear()
+
+    def searchCEP(self):
+        cep = self.cep_input.text()
+        self.warning_label.setText("Consultando...")
+
+        cep = ''.join(filter(str.isdigit, cep))
+        
+        if len(cep) != 8:
+            print("ERRO")
+            return
+        
+        url = f"https://viacep.com.br/ws/{cep}/json/"
+
+        QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
+
+        try:
+            response = requests.get(url, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+
+            if 'erro' in data and data['erro']:
+                print(f"CEP não encontrado!")
+                return
+            
+            uf_do_cep = data['uf']
+            estate_index = self.estate_input.findData(uf_do_cep)
+
+            if estate_index >= 0:
+                self.estate_input.setCurrentIndex(estate_index)
+                
+                city = data['localidade']
+
+                city_index = self.city_input.findText(city, Qt.MatchFlag.MatchExactly)
+                if city_index >= 0:
+                    self.city_input.setCurrentIndex(city_index)
+                else:
+                    self.city_input.lineEdit().setText(city)
+
+            self.neighborhood_input.setText(data["bairro"])
+            self.street_input.setText(data["logradouro"])
+
+        except requests.exceptions.RequestException as e:
+            print(f"Erro ao consultar o ViaCEP: {e}")
+            return None
+        except json.JSONDecodeError:
+            print("Erro ao decodificar a resposta JSON.")
+            return None
+        finally:
+            self.warning_label.setText("")
+            QApplication.restoreOverrideCursor()
 
 class TransactionDialog(BaseDialog):
     def __init__(self, maximum_width=800, maximum_height=800, initial_window=0):
