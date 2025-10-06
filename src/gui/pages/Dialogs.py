@@ -5,12 +5,15 @@ from PySide6.QtGui import QIcon
 from ..widgets import *
 
 class BaseDialog(QDialog):
-    def __init__(self, fixed_width=500):
+    def __init__(self, maximum_width=600):
         super().__init__()
 
         self.setStyleSheet("background-color: #D9D9D9; color: #747474;")
 
-        self.setFixedWidth(fixed_width)
+        self.maximum_width = maximum_width
+
+        self.setMinimumWidth(self.maximum_width)
+        self.setMaximumWidth(self.maximum_width + 100)
 
         self.main_layout = QVBoxLayout()
         self.setLayout(self.main_layout)
@@ -52,20 +55,26 @@ class ProductDialog(BaseDialog):
         supplier_info_tab = QWidget()
 
         product_info_layout = QVBoxLayout()
-        widget, inputs = self.productInfoInputs()
+        product_widget, product_inputs = self.productInfoInputs()
 
-        product_info_layout.addWidget(widget)
+        product_info_layout.addWidget(product_widget)
         product_info_tab.setLayout(product_info_layout)
+
+        supplier_info_layout = QVBoxLayout()
+        supplier_widget, supplier_inputs = self.supplierInfoInputs()
+
+        supplier_info_layout.addWidget(supplier_widget)
+        supplier_info_tab.setLayout(supplier_info_layout)
 
         return product_info_tab, supplier_info_tab
     
     def productInfoInputs(self):
         widget = QWidget()
-        layout = QFormLayout()
+        layout = QGridLayout()
         widget.setLayout(layout)
 
-        layout.setHorizontalSpacing(8)  # padrão costuma ser 6~10
-        layout.setVerticalSpacing(6)
+        layout.setHorizontalSpacing(8)
+        #layout.setVerticalSpacing(6)
         layout.setContentsMargins(5, 5, 5, 5)
 
         id_widget = QWidget()
@@ -103,22 +112,107 @@ class ProductDialog(BaseDialog):
         stock_layout.addWidget(QLabel("Estoque atual:"))
         stock_layout.addWidget(stock_input)
 
-        layout.addWidget(id_widget)
-        layout.addWidget(QLabel("Nome"))
-        layout.addWidget(name_input)
-        layout.addWidget(QLabel("Cód.Barra"))
-        layout.addWidget(barcode_input)
-        layout.addWidget(QLabel("Categoria"))
-        layout.addWidget(category_input)
-        layout.addWidget(QLabel("Preço de compra (R$)"))
-        layout.addWidget(purchase_price_input)
-        layout.addWidget(QLabel("Reajuste"))
-        layout.addWidget(readjustment_input)
-        layout.addWidget(QLabel("Preço de venda (R$)"))
-        layout.addWidget(sale_price_input)
-        layout.addWidget(stock_widget)
+        layout.addWidget(id_widget, 0, 0)
+        layout.addWidget(QLabel("Nome"), 1, 0,)
+        layout.addWidget(name_input, 2, 0, 1, 3)
+        layout.addWidget(QLabel("Cód.Barra"), 3, 0)
+        layout.addWidget(barcode_input, 4, 0, 1, 2)
+        layout.addWidget(QLabel("Categoria"), 3, 1)
+        layout.addWidget(category_input, 4, 1)
+        layout.addWidget(QLabel("Preço de compra (R$)"), 5, 0)
+        layout.addWidget(purchase_price_input, 6, 0)
+        layout.addWidget(QLabel("Reajuste"), 5, 1)
+        layout.addWidget(readjustment_input, 6, 1)
+        layout.addWidget(QLabel("Preço de venda (R$)"), 5, 2)
+        layout.addWidget(sale_price_input, 6, 2)
+        layout.addWidget(stock_widget, 7, 0)
 
         return widget, (id_input, name_input, category_input, barcode_input, purchase_price_input, readjustment_input, sale_price_input, minimum_stock_input, stock_input)
+
+    def supplierInfoInputs(self):
+        widget = QWidget()
+        layout = QGridLayout()
+
+        layout.setHorizontalSpacing(8)  # padrão costuma ser 6~10
+        layout.setVerticalSpacing(6)
+        layout.setContentsMargins(5, 5, 5, 5)
+
+        widget.setLayout(layout)
+
+        search_input = LineEdit()
+        search_input.setPlaceholderText("Procure por um fornecedor")
+        search_input.setMaximumWidth(1000)
+        
+        suppliers_table = TableWidget(["CNPJ", "Razão social", "Data", "Data de Validade"])
+
+        layout.addWidget(search_input, 0, 0, 1, 5)
+        layout.addWidget(QLabel("Data de validade:"), 1, 0)
+        date = DateEdit()
+        layout.addWidget(date, 1, 1)
+        layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum), 1, 2)
+        layout.addWidget(PageButton("Adicionar", icon_path="plus.svg"), 1, 3)
+        layout.addWidget(PageButton("Remover", icon_path="cross.svg"), 1, 4)
+        layout.addWidget(suppliers_table, 2, 0, 1, 5)
+
+        return widget, (search_input, suppliers_table)
+
+class PeopleDialog(BaseDialog):
+    def __init__(self):
+        super().__init__()
+
+        self.tab = QTabWidget()
+        self.people_info_tab = self.createTabs()
+        self.tab.addTab(self.people_info_tab, "Informações da pessoa")
+
+        self.input_layout.addWidget(self.tab)
+
+    def createTabs(self):
+        people_info_tab = QWidget()
+
+        people_info_layout = QVBoxLayout()
+        people_widget, people_inputs = self.peopleInfoInputs()
+
+        people_info_layout.addWidget(people_widget)
+        people_info_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding))
+        people_info_tab.setLayout(people_info_layout)
+
+        return people_info_tab
+    
+    def peopleInfoInputs(self):
+        widget = QWidget()
+        layout = QGridLayout()
+
+        widget.setLayout(layout)
+
+        person_type_input = QComboBox()
+        person_type_input.addItems(["Pessoa Física", "Pessoa Jurídica"])
+
+        person_type_input.currentIndexChanged.connect(self.onTextChanged)
+
+        self.document_label = QLabel("CPF")
+        self.document_input = DefaultLineEdit()
+        self.document_input.setInputMask("000.000.000-00;_")
+
+        layout.addWidget(QLabel("Nome"), 0, 0)
+        layout.addWidget(DefaultLineEdit(), 1, 0, 1, 2)
+        layout.addWidget(QLabel("Tipo de pessoa"), 2, 0)
+        layout.addWidget(person_type_input, 3, 0)
+        layout.addWidget(self.document_label, 2, 1)
+        layout.addWidget(self.document_input, 3, 1)
+        layout.addWidget(QLabel("Data de nascimento"), 4, 0)
+        layout.addWidget(DateEdit(), 5, 0)
+
+        return widget, ()
+    
+    def onTextChanged(self, index):
+        if index == 0:
+            self.document_input.setInputMask("000.000.000-00;_")
+            self.document_label.setText("CPF")
+            self.document_input.clear()
+        elif index == 1:
+            self.document_input.setInputMask("00.000.000/0000-00;_")
+            self.document_label.setText("CNPJ")
+            self.document_input.clear()
 
 class TransactionDialog(BaseDialog):
     def __init__(self, maximum_width=800, maximum_height=800, initial_window=0):
@@ -282,7 +376,7 @@ class TransactionDialog(BaseDialog):
         widget.setLayout(layout)
 
         search_input = LineEdit("Procure por um produto...")
-        search_input.setMaximumWidth(800)
+        search_input.setMaximumWidth(self.maximum_width)
 
         price_input = DoubleSpinBox()
         quantity_input = SpinBox()
@@ -310,7 +404,7 @@ class TransactionDialog(BaseDialog):
         widget.setLayout(layout)
 
         search_input = LineEdit("Procure por um serviço...")
-        search_input.setMaximumWidth(1200)
+        search_input.setMaximumWidth(self.maximum_width)
 
         price_input = DoubleSpinBox()
         quantity_input = SpinBox()
