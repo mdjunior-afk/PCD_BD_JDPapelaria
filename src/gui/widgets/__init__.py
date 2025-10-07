@@ -9,5 +9,6 @@ from .ReturnData import ReturnData
 from .ComboBox import ComboBox
 from .DefaultLineEdit import DefaultLineEdit
 from .GroupBox import GroupBox
+from .Label import Label
 
-__all__ = ["PushButton", "PageButton", "LineEdit", "InfoWidget", "TableWidget", "DateEdit", "SpinBox", "DoubleSpinBox", "ReturnData", "ComboBox", "DefaultLineEdit", "GroupBox"]
+__all__ = ["PushButton", "PageButton", "LineEdit", "InfoWidget", "TableWidget", "DateEdit", "SpinBox", "DoubleSpinBox", "ReturnData", "ComboBox", "DefaultLineEdit", "GroupBox", "Label"]

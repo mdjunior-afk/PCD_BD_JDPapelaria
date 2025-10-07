@@ -23,7 +23,7 @@ class SpinBox(QSpinBox):
         QSpinBox {{
             background-color: {BTN_TEXT_COLOR};
             border-radius: 8px;
-            padding: 4px 20px 4px 4px;
+            padding: 8px 20px 8px 8px;
             font-size: 14px;
         }}
 
@@ -78,7 +78,7 @@ class DoubleSpinBox(QDoubleSpinBox):
         QDoubleSpinBox {{
         background-color: {BTN_TEXT_COLOR};
         border-radius: 8px;
-        padding: 4px 20px 4px 4px;
+        padding: 8px 20px 8px 8px;
         font-size: 14px;
         }}
 

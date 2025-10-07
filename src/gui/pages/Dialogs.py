@@ -14,6 +14,8 @@ class BaseDialog(QDialog):
         self.setStyleSheet("background-color: #D9D9D9; color: #747474;")
 
         self.maximum_width = maximum_width
+        
+        self.setFixedHeight(700)
 
         self.setMinimumWidth(self.maximum_width + 100)
         self.setMaximumWidth(self.maximum_width + 200)
@@ -47,9 +49,8 @@ class ProductDialog(BaseDialog):
         super().__init__()
 
         self.tab = QTabWidget()
-        self.product_info_tab, self.supplier_info_tab = self.createTabs()
+        self.product_info_tab = self.createTabs()
         self.tab.addTab(self.product_info_tab, "Informações do produto")
-        self.tab.addTab(self.supplier_info_tab, "Informações do fornecedor")
 
         self.input_layout.addWidget(self.tab)
 
@@ -61,103 +62,120 @@ class ProductDialog(BaseDialog):
         product_widget, product_inputs = self.productInfoInputs()
 
         product_info_layout.addWidget(product_widget)
+        product_info_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding))
         product_info_tab.setLayout(product_info_layout)
 
-        supplier_info_layout = QVBoxLayout()
-        supplier_widget, supplier_inputs = self.supplierInfoInputs()
-
-        supplier_info_layout.addWidget(supplier_widget)
-        supplier_info_tab.setLayout(supplier_info_layout)
-
-        return product_info_tab, supplier_info_tab
+        return product_info_tab
     
     def productInfoInputs(self):
         widget = QWidget()
         layout = QGridLayout()
-        widget.setLayout(layout)
 
         layout.setHorizontalSpacing(8)
-        #layout.setVerticalSpacing(6)
-        layout.setContentsMargins(5, 5, 5, 5)
-
-        id_widget = QWidget()
-        id_layout = QHBoxLayout()
-        id_layout.setContentsMargins(0, 0, 0, 0)
-
-        id_widget.setLayout(id_layout)
-
-        stock_widget = QWidget()
-        stock_layout = QHBoxLayout()
-        stock_layout.setSpacing(12)
-        stock_layout.setContentsMargins(0, 12, 0, 0)
-
-        stock_widget.setLayout(stock_layout)
-
-        id_input = SpinBox()
-        name_input = DefaultLineEdit()
-        barcode_input = DefaultLineEdit()
-        category_input = QComboBox()
-        purchase_price_input = DoubleSpinBox()
-        readjustment_input = DoubleSpinBox()
-        sale_price_input = DoubleSpinBox()
-        minimum_stock_input = SpinBox()
-        stock_input = SpinBox()
-
-        categories = ["PEN DRIVE", "CARREGADORES", "CADERNOS", "CANETAS"]
-        category_input.addItems(categories)
-
-        id_layout.addWidget(QLabel("ID:"))
-        id_layout.addWidget(id_input)
-        id_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum))
-
-        stock_layout.addWidget(QLabel("Estoque mínimo:"))
-        stock_layout.addWidget(minimum_stock_input)
-        stock_layout.addWidget(QLabel("Estoque atual:"))
-        stock_layout.addWidget(stock_input)
-
-        layout.addWidget(id_widget, 0, 0)
-        layout.addWidget(QLabel("Nome"), 1, 0,)
-        layout.addWidget(name_input, 2, 0, 1, 3)
-        layout.addWidget(QLabel("Cód.Barra"), 3, 0)
-        layout.addWidget(barcode_input, 4, 0, 1, 2)
-        layout.addWidget(QLabel("Categoria"), 3, 1)
-        layout.addWidget(category_input, 4, 1)
-        layout.addWidget(QLabel("Preço de compra (R$)"), 5, 0)
-        layout.addWidget(purchase_price_input, 6, 0)
-        layout.addWidget(QLabel("Reajuste"), 5, 1)
-        layout.addWidget(readjustment_input, 6, 1)
-        layout.addWidget(QLabel("Preço de venda (R$)"), 5, 2)
-        layout.addWidget(sale_price_input, 6, 2)
-        layout.addWidget(stock_widget, 7, 0)
-
-        return widget, (id_input, name_input, category_input, barcode_input, purchase_price_input, readjustment_input, sale_price_input, minimum_stock_input, stock_input)
-
-    def supplierInfoInputs(self):
-        widget = QWidget()
-        layout = QGridLayout()
-
-        layout.setHorizontalSpacing(8)  # padrão costuma ser 6~10
         layout.setVerticalSpacing(6)
         layout.setContentsMargins(5, 5, 5, 5)
 
         widget.setLayout(layout)
 
-        search_input = LineEdit()
-        search_input.setPlaceholderText("Procure por um fornecedor")
-        search_input.setMaximumWidth(1000)
+        product_info_widget = GroupBox("Informações gerais")
+        product_info_layout = QGridLayout()
+
+        name_label = Label("Nome:")
+        barcode_label = Label("Cód. Barra:")
+        category_label = Label("Categoria:")
+
+        name_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        barcode_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        category_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+
+        name_input = DefaultLineEdit()
+        barcode_input = DefaultLineEdit()
+        category_input = ComboBox()
+
+        product_info_layout.addWidget(name_label, 0, 0)
+        product_info_layout.addWidget(name_input, 0, 1, 1, 3)
+        product_info_layout.addWidget(category_label, 1, 0)
+        product_info_layout.addWidget(category_input, 1, 1)
+        product_info_layout.addWidget(barcode_label, 1, 2)
+        product_info_layout.addWidget(barcode_input, 1, 3)
+
+        product_info_widget.setLayout(product_info_layout)
+
+        product_price_widget = GroupBox("Informações de preço")
+        product_price_layout = QGridLayout()
+
+        purchase_price_label = Label("Compra: R$")
+        adjust_price_label = Label("Reajuste:")
+        sell_price_label = Label("Venda: R$")
         
-        suppliers_table = TableWidget(["CNPJ", "Razão social", "Data", "Data de Validade"])
+        purchase_price_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        adjust_price_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        sell_price_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
 
-        layout.addWidget(search_input, 0, 0, 1, 5)
-        layout.addWidget(QLabel("Data de validade:"), 1, 0)
-        date = DateEdit()
-        layout.addWidget(date, 1, 1)
-        layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum), 1, 2)
-        layout.addWidget(PageButton("Adicionar", icon_path="plus.svg"), 1, 3)
-        layout.addWidget(PageButton("Remover", icon_path="cross.svg"), 1, 4)
-        layout.addWidget(suppliers_table, 2, 0, 1, 5)
+        purchase_price_input = DoubleSpinBox()
+        adjust_price_input = DoubleSpinBox()
+        sell_price_input = DoubleSpinBox()
 
-        return widget, (search_input, suppliers_table)
+        product_price_layout.addWidget(purchase_price_label, 0, 0)
+        product_price_layout.addWidget(purchase_price_input, 0, 1)
+        product_price_layout.addWidget(adjust_price_label, 0, 2)
+        product_price_layout.addWidget(adjust_price_input, 0, 3)
+        product_price_layout.addWidget(sell_price_label, 0, 4)
+        product_price_layout.addWidget(sell_price_input, 0, 5)
+
+        product_price_widget.setLayout(product_price_layout)
+
+        # Stock widget
+        product_stock_widget = GroupBox("Informações de estoque")
+        product_stock_layout = QGridLayout()
+
+        minimum_stock_label = Label("Estoque mínimo:")
+        current_stock_label = Label("Estoque atual:")
+
+        minimum_stock_input = SpinBox()
+        current_stock_input = SpinBox()
+
+        product_stock_layout.addWidget(minimum_stock_label, 0, 0)
+        product_stock_layout.addWidget(minimum_stock_input, 0, 1)
+        product_stock_layout.addWidget(current_stock_label, 0, 4)
+        product_stock_layout.addWidget(current_stock_input, 0, 5)
+        product_stock_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum), 0, 2, 1, 2)
+
+        product_stock_widget.setLayout(product_stock_layout)
+
+        # Supplier widget
+        supplier_info_widget = GroupBox("Informações do fornecedor")
+        supplier_info_layout = QGridLayout()
+
+        supplier_validate_date_label = Label("Data de validade:")
+
+        supplier_search_input = LineEdit()
+        supplier_search_input.setMaximumWidth(1000)
+        supplier_search_input.setPlaceholderText("Procure por um fornecedor")
+
+        supplier_validate_date_input = DateEdit()
+        add_btn = PageButton("Adicionar", icon_path="plus.svg")
+        remove_btn = PageButton("Remover", icon_path="cross.svg")
+
+        supplier_table = TableWidget(["Data", "CNPJ", "Razão Social", "Data de validade"])
+        supplier_table.setMinimumHeight(100)
+
+        supplier_info_layout.addWidget(supplier_search_input, 0, 0, 1, 5)
+        supplier_info_layout.addWidget(supplier_validate_date_label, 1, 0)
+        supplier_info_layout.addWidget(supplier_validate_date_input, 1, 1)
+        supplier_info_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum), 1, 2)
+        supplier_info_layout.addWidget(add_btn, 1, 3)
+        supplier_info_layout.addWidget(remove_btn, 1, 4)
+        supplier_info_layout.addWidget(supplier_table, 2, 0, 1, 5)
+
+        supplier_info_widget.setLayout(supplier_info_layout)
+
+        layout.addWidget(product_info_widget)
+        layout.addWidget(product_price_widget)
+        layout.addWidget(product_stock_widget)
+        layout.addWidget(supplier_info_widget)
+
+        return widget, ()
 
 class PeopleDialog(BaseDialog):
     def __init__(self):
@@ -189,17 +207,16 @@ class PeopleDialog(BaseDialog):
 
         widget.setLayout(layout)
 
-        person_info_widget = QGroupBox("Informações Gerais")
-        person_info_widget.setStyleSheet("background-color: none;")
+        person_info_widget = GroupBox("Informações Gerais")
         person_info_layout = QGridLayout()
 
-        name_label = QLabel("Nome:")
-        person_type_label = QLabel("Tipo de pessoa:")
-        self.document_label = QLabel("CPF:")
-        sex_label = QLabel("Sexo:")
-        birthday_label = QLabel("Nascimento:")
-        cellphone_label = QLabel("Celular:")
-        email_label = QLabel("Email:")
+        name_label = Label("Nome:")
+        person_type_label = Label("Tipo de pessoa:")
+        self.document_label = Label("CPF:")
+        sex_label = Label("Sexo:")
+        birthday_label = Label("Nascimento:")
+        cellphone_label = Label("Celular:")
+        email_label = Label("Email:")
         
         name_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         person_type_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
@@ -240,18 +257,17 @@ class PeopleDialog(BaseDialog):
         person_info_widget.setLayout(person_info_layout)
         
         # Address inputs
-        address_widget = QGroupBox("Informações de Endereço:")
-        address_widget.setStyleSheet("background-color: none;")
+        address_widget = GroupBox("Informações de Endereço:")
         address_layout = QGridLayout()
 
-        cep_label = QLabel("CEP:")
-        self.warning_label = QLabel("")
-        estate_label = QLabel("Estado:")
-        city_label = QLabel("Cidade:")
-        neighborhood_label = QLabel("Bairro:")
-        number_label =  QLabel("Número:")
-        street_label = QLabel("Rua:")
-        complement_label = QLabel("Complemento:")
+        cep_label = Label("CEP:")
+        self.warning_label = Label("")
+        estate_label = Label("Estado:")
+        city_label = Label("Cidade:")
+        neighborhood_label = Label("Bairro:")
+        number_label =  Label("Número:")
+        street_label = Label("Rua:")
+        complement_label = Label("Complemento:")
 
         cep_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         estate_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
@@ -277,7 +293,7 @@ class PeopleDialog(BaseDialog):
         self.add_btn.clicked.connect(self.addAddress)
 
         self.address_table = TableWidget(["CEP", "Rua", "Nº", "Complemento", "Bairro", "Cidade", "Estado" ])
-        self.address_table.setFixedHeight(200)
+        self.address_table.setFixedHeight(150)
         self.address_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
         self.address_table.horizontalHeader().setSectionResizeMode(6, QHeaderView.ResizeMode.Stretch)
 
@@ -319,7 +335,6 @@ class PeopleDialog(BaseDialog):
     
     def addAddress(self):
         row_index = self.address_table.rowCount()
-        print(row_index)
         self.address_table.insertRow(row_index)
 
         self.address_table.setItem(row_index, 0, QTableWidgetItem(self.cep_input.text()))
@@ -405,7 +420,7 @@ class TransactionDialog(BaseDialog):
         self.date_layout.setContentsMargins(0, 0, 0, 6)
 
         self.date = DateEdit()
-        self.date_layout.addWidget(QLabel("Data da venda:"))
+        self.date_layout.addWidget(Label("Data da venda:"))
         self.date_layout.addWidget(self.date)
         self.date_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum))
         self.date_widget.setLayout(self.date_layout)
@@ -435,7 +450,7 @@ class TransactionDialog(BaseDialog):
         self.total_input.setReadOnly(True)
 
         self.total_info_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum))
-        self.total_info_layout.addWidget(QLabel("Total: R$"))
+        self.total_info_layout.addWidget(Label("Total: R$"))
         self.total_info_layout.addWidget(self.total_input)
         self.total_info_widget.setLayout(self.total_info_layout)
 
@@ -561,11 +576,11 @@ class TransactionDialog(BaseDialog):
         subtotal_input.setButtonSymbols(QAbstractSpinBox.NoButtons)
 
         layout.addWidget(search_input, 0, 0, 1, 9)
-        layout.addWidget(QLabel("Preço: R$"), 1, 0)
+        layout.addWidget(Label("Preço: R$"), 1, 0)
         layout.addWidget(price_input, 1, 1)
-        layout.addWidget(QLabel("Quantidade:"), 1, 2)
+        layout.addWidget(Label("Quantidade:"), 1, 2)
         layout.addWidget(quantity_input, 1, 3)
-        layout.addWidget(QLabel(" = "), 1, 4)
+        layout.addWidget(Label(" = "), 1, 4)
         layout.addWidget(subtotal_input, 1, 5)
 
         layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum), 1, 6)
@@ -589,11 +604,11 @@ class TransactionDialog(BaseDialog):
         subtotal_input.setButtonSymbols(QAbstractSpinBox.NoButtons)
 
         layout.addWidget(search_input, 0, 0, 1, 9)
-        layout.addWidget(QLabel("Preço: R$"), 1, 0)
+        layout.addWidget(Label("Preço: R$"), 1, 0)
         layout.addWidget(price_input, 1, 1)
-        layout.addWidget(QLabel("Quantidade:"), 1, 2)
+        layout.addWidget(Label("Quantidade:"), 1, 2)
         layout.addWidget(quantity_input, 1, 3)
-        layout.addWidget(QLabel(" = "), 1, 4)
+        layout.addWidget(Label(" = "), 1, 4)
         layout.addWidget(subtotal_input, 1, 5)
 
         layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum), 1, 6)
@@ -611,9 +626,9 @@ class TransactionDialog(BaseDialog):
         document_input.addItems(["PIX", "Cartão de Crédito", "Cartão de Débito"])
         value_input = DoubleSpinBox()
 
-        layout.addWidget(QLabel("Documento:"), 0, 0)
+        layout.addWidget(Label("Documento:"), 0, 0)
         layout.addWidget(document_input, 0, 1)
-        layout.addWidget(QLabel("Valor: R$"), 0, 2)
+        layout.addWidget(Label("Valor: R$"), 0, 2)
         layout.addWidget(value_input, 0, 3)
 
         layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum), 0, 4)
