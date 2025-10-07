@@ -90,7 +90,7 @@ class ProductDialog(BaseDialog):
 
         name_input = DefaultLineEdit()
         barcode_input = DefaultLineEdit()
-        category_input = ComboBox()
+        category_input = ComboBox(["Pen-Drives", "Carregadores", "Canetas", "Cadernos"], True)
 
         product_info_layout.addWidget(name_label, 0, 0)
         product_info_layout.addWidget(name_input, 0, 1, 1, 3)
@@ -622,8 +622,7 @@ class TransactionDialog(BaseDialog):
         layout = QGridLayout()
         widget.setLayout(layout)
 
-        document_input = QComboBox()
-        document_input.addItems(["PIX", "Cartão de Crédito", "Cartão de Débito"])
+        document_input = ComboBox(["PIX", "Cartão de Crédito", "Cartão de Débito"], True)
         value_input = DoubleSpinBox()
 
         layout.addWidget(Label("Documento:"), 0, 0)
