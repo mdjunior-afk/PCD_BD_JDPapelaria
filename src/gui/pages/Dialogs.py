@@ -90,7 +90,7 @@ class ProductDialog(BaseDialog):
 
         name_input = DefaultLineEdit()
         barcode_input = DefaultLineEdit()
-        category_input = ComboBox()
+        category_input = ComboBox(["Pen-Drives", "Carregadores", "Canetas", "Cadernos"], True)
 
         product_info_layout.addWidget(name_label, 0, 0)
         product_info_layout.addWidget(name_input, 0, 1, 1, 3)
@@ -112,16 +112,20 @@ class ProductDialog(BaseDialog):
         adjust_price_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         sell_price_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
 
-        purchase_price_input = DoubleSpinBox()
-        adjust_price_input = DoubleSpinBox()
-        sell_price_input = DoubleSpinBox()
+        self.purchase_price_input = DoubleSpinBox()
+        self.adjust_price_input = DoubleSpinBox()
+        self.sell_price_input = DoubleSpinBox()
+
+        self.purchase_price_input.editingFinished.connect(self.updateSellPrice)
+        self.adjust_price_input.editingFinished.connect(self.updateSellPrice)
+        self.sell_price_input.editingFinished.connect(self.updateAdjustPrice)
 
         product_price_layout.addWidget(purchase_price_label, 0, 0)
-        product_price_layout.addWidget(purchase_price_input, 0, 1)
+        product_price_layout.addWidget(self.purchase_price_input, 0, 1)
         product_price_layout.addWidget(adjust_price_label, 0, 2)
-        product_price_layout.addWidget(adjust_price_input, 0, 3)
+        product_price_layout.addWidget(self.adjust_price_input, 0, 3)
         product_price_layout.addWidget(sell_price_label, 0, 4)
-        product_price_layout.addWidget(sell_price_input, 0, 5)
+        product_price_layout.addWidget(self.sell_price_input, 0, 5)
 
         product_price_widget.setLayout(product_price_layout)
 
@@ -176,6 +180,20 @@ class ProductDialog(BaseDialog):
         layout.addWidget(supplier_info_widget)
 
         return widget, ()
+
+    def updateSellPrice(self):
+        purchase = self.purchase_price_input.value()
+        adjust = self.adjust_price_input.value()
+
+        self.sell_price_input.setValue(purchase + (purchase * (adjust / 100)))
+    
+    def updateAdjustPrice(self):
+        sell = self.sell_price_input.value()
+        purchase = self.purchase_price_input.value()
+
+        self.adjust_price_input.setValue(((sell/purchase) - 1) * 100)
+
+
 
 class PeopleDialog(BaseDialog):
     def __init__(self):
@@ -622,8 +640,7 @@ class TransactionDialog(BaseDialog):
         layout = QGridLayout()
         widget.setLayout(layout)
 
-        document_input = QComboBox()
-        document_input.addItems(["PIX", "Cartão de Crédito", "Cartão de Débito"])
+        document_input = ComboBox(["PIX", "Cartão de Crédito", "Cartão de Débito"], True)
         value_input = DoubleSpinBox()
 
         layout.addWidget(Label("Documento:"), 0, 0)
