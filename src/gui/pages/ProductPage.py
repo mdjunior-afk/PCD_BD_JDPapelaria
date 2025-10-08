@@ -15,10 +15,13 @@ class ProductPage(QWidget):
         self.search_widget = QWidget()
         
         self.search_layout = QHBoxLayout(self.search_widget)
+        self.search_layout.setSpacing(0)
         self.search_layout.setContentsMargins(0, 0, 0, 12)
 
-        self.search_input = LineEdit("Procure por um produto...")
+        self.category_input = ComboBox(["Pen-Drives", "Carregadores", "Canetas", "Cadernos"])
+        self.search_input = LineEdit("Procure por um produto")
 
+        #self.search_layout.addWidget(self.category_input)
         self.search_layout.addWidget(self.search_input)
 
         self.buttons_box = QWidget()

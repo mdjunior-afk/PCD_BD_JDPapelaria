@@ -35,12 +35,20 @@ class SpinBox(QSpinBox):
             background-color: {BTN_BACKGROUND_COLOR};
         }}
 
+        QSpinBox::up-button:hover {{
+            background-color: {PRIMARY_COLOR2};
+        }}
+
         QSpinBox::down-button {{
             subcontrol-origin: border;
             subcontrol-position: bottom right;
             width: 20px;
             border-bottom-right-radius: 8px;
             background-color: {BTN_BACKGROUND_COLOR};
+        }}
+
+        QSpinBox::down-button:hover {{
+            background-color: {PRIMARY_COLOR2};
         }}
 
         QSpinBox::up-arrow {{
@@ -90,12 +98,20 @@ class DoubleSpinBox(QDoubleSpinBox):
             background-color: {BTN_BACKGROUND_COLOR};
         }}
 
+        QDoubleSpinBox::up-button:hover {{
+            background-color: {PRIMARY_COLOR2};
+        }}
+
         QDoubleSpinBox::down-button {{
             subcontrol-origin: border;
             subcontrol-position: bottom right;
             width: 20px;
             border-bottom-right-radius: 8px;
             background-color: {BTN_BACKGROUND_COLOR};
+        }}
+
+        QDoubleSpinBox::down-button:hover {{
+            background-color: {PRIMARY_COLOR2};
         }}
 
         QDoubleSpinBox::up-arrow {{
