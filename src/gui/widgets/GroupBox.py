@@ -12,6 +12,7 @@ class GroupBox(QGroupBox):
             padding: 1ex;
 
             background-color: {GROUP_BOX_BG_COLOR};
+            color: {TEXT_COLOR};
 
             border: 2px solid lightgray;
             border-radius: 8px;

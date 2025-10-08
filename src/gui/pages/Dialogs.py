@@ -62,7 +62,7 @@ class ProductDialog(BaseDialog):
         product_widget, product_inputs = self.productInfoInputs()
 
         product_info_layout.addWidget(product_widget)
-        product_info_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding))
+        #product_info_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding))
         product_info_tab.setLayout(product_info_layout)
 
         return product_info_tab
@@ -193,8 +193,6 @@ class ProductDialog(BaseDialog):
 
         self.adjust_price_input.setValue(((sell/purchase) - 1) * 100)
 
-
-
 class PeopleDialog(BaseDialog):
     def __init__(self):
         super().__init__()
@@ -214,7 +212,7 @@ class PeopleDialog(BaseDialog):
         people_widget, people_inputs = self.peopleInfoInputs()
 
         people_info_layout.addWidget(people_widget)
-        people_info_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding))
+        #people_info_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding))
         people_info_tab.setLayout(people_info_layout)
 
         return people_info_tab
@@ -311,7 +309,6 @@ class PeopleDialog(BaseDialog):
         self.add_btn.clicked.connect(self.addAddress)
 
         self.address_table = TableWidget(["CEP", "Rua", "Nº", "Complemento", "Bairro", "Cidade", "Estado" ])
-        self.address_table.setFixedHeight(150)
         self.address_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
         self.address_table.horizontalHeader().setSectionResizeMode(6, QHeaderView.ResizeMode.Stretch)
 

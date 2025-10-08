@@ -58,8 +58,9 @@ class MainWindow(QMainWindow):
         self.people_btn = PushButton("Pessoas", icon_path="users-alt.svg")
         self.sell_btn = PushButton("Vendas", icon_path="shopping-cart.svg")
         self.services_btn = PushButton("Serviços", icon_path="print.svg")
+        self.invoice_entry_btn = PushButton("Entrada de notas", icon_path="document.svg")
 
-        self._all_btns = [self.home_btn, self.product_btn, self.people_btn, self.sell_btn, self.services_btn]
+        self._all_btns = [self.home_btn, self.product_btn, self.people_btn, self.sell_btn, self.services_btn, self.invoice_entry_btn]
 
         self.menu_btn.clicked.connect(self.toggleSideMenu)
         self.home_btn.clicked.connect(self.homePage)
@@ -67,6 +68,7 @@ class MainWindow(QMainWindow):
         self.people_btn.clicked.connect(self.peoplePage)
         self.sell_btn.clicked.connect(self.sellPage)
         self.services_btn.clicked.connect(self.servicePage)
+        self.invoice_entry_btn.clicked.connect(self.invoicePage)
 
         self.side_menu_top_layout.addWidget(self.logo_label)
         self.side_menu_top_layout.addWidget(self.menu_btn)
@@ -75,6 +77,7 @@ class MainWindow(QMainWindow):
         self.side_menu_top_layout.addWidget(self.people_btn)
         self.side_menu_top_layout.addWidget(self.sell_btn)
         self.side_menu_top_layout.addWidget(self.services_btn)
+        self.side_menu_top_layout.addWidget(self.invoice_entry_btn)
 
         self.side_menu_spacer = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
@@ -95,7 +98,7 @@ class MainWindow(QMainWindow):
         # END: side_menu
 
         self.content = QWidget()
-        self.content.setStyleSheet(f"background-color: {CONTENT_COLOR}")
+        self.content.setStyleSheet(f"background-color: {CONTENT_COLOR}; color: {TEXT_COLOR}")
 
         self.content_layout = QVBoxLayout(self.content)
         self.content_layout.setContentsMargins(0, 0, 0, 0)
@@ -139,6 +142,12 @@ class MainWindow(QMainWindow):
             btn.setActive(btn is self.services_btn)
 
         self.page_manager.setCurrentIndex(4)
+
+    def invoicePage(self):
+        for btn in self._all_btns:
+            btn.setActive(btn is self.invoice_entry_btn)
+
+        self.page_manager.setCurrentIndex(5)
 
     def toggleSideMenu(self):
         current_width = self.side_menu.width()

@@ -22,3 +22,6 @@ class PageManager(QStackedWidget):
 
         self.services_page = ServicePage()
         self.insertWidget(4, self.services_page)
+
+        self.invoice_page = InvoicePage()
+        self.insertWidget(5, self.invoice_page)

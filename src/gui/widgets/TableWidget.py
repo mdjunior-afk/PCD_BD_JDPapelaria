@@ -22,13 +22,6 @@ class TableWidget(QTableWidget):
 
         self.setGraphicsEffect(self.shadow)
 
-        """for i in range(10):
-            self.setItem(i, 0, QTableWidgetItem(str(i + 1)))
-            self.setItem(i, 1, QTableWidgetItem(f"{name} {i + 1}"))
-            self.setItem(i, 2, QTableWidgetItem(str(20 + i)))
-            self.setItem(i, 3, QTableWidgetItem("100,00"))
-            self.setItem(i, 4, QTableWidgetItem(f"Categoria 1"))"""
-
     def config(self):
         self.setAlternatingRowColors(True)
         
