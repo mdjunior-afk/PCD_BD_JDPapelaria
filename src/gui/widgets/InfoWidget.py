@@ -17,18 +17,18 @@ class InfoWidget(QFrame):
 
         # Label título
         self.title_label = QLabel(title)
-        self.title_label.setStyleSheet(f"color: {BTN_TEXT_COLOR}; font-size: 14px;")
+        self.title_label.setStyleSheet(f"background-color: transparent !important; color: {BTN_TEXT_COLOR}; font-size: 14px;")
         layout.addWidget(self.title_label, alignment=Qt.AlignLeft)
 
         # Label valor
         self.info_label = QLabel(info)
-        self.info_label.setStyleSheet(f"color: {BTN_TEXT_COLOR}; font-size: 16px; font-weight: bold;")
+        self.info_label.setStyleSheet(f"background-color: transparent !important; color: {BTN_TEXT_COLOR}; font-size: 16px; font-weight: bold;")
         layout.addWidget(self.info_label, alignment=Qt.AlignLeft)
 
         # Estilo inicial
         self.setStyleSheet(f"""
             QFrame {{
-                background-color: {BTN_BACKGROUND_COLOR};
+                background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 {PRIMARY_COLOR}, stop: 1 {PRIMARY_COLOR2});
                 border-radius: {self.border_radius}px;
             }}
         """)
@@ -43,21 +43,21 @@ class InfoWidget(QFrame):
     def enterEvent(self, event):
         self.setStyleSheet(f"""
             QFrame {{
-                background-color: {BTN_HOVER_BACKGROUND_COLOR};
+            background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 {SECONDARY_COLOR}, stop: 1 {SECONDARY_COLOR2});
                 border-radius: {self.border_radius}px;
             }}
         """)
-        self.title_label.setStyleSheet(f"color: {BTN_TEXT_COLOR}; font-size: 14px;")
-        self.info_label.setStyleSheet(f"color: {BTN_TEXT_COLOR}; font-size: 16px; font-weight: bold;")
+        self.title_label.setStyleSheet(f"background-color: transparent !important; color: {BTN_TEXT_COLOR}; font-size: 14px;")
+        self.info_label.setStyleSheet(f"background-color: transparent !important; color: {BTN_TEXT_COLOR}; font-size: 16px; font-weight: bold;")
         super().enterEvent(event)
 
     def leaveEvent(self, event):
         self.setStyleSheet(f"""
             QFrame {{
-                background-color: {BTN_BACKGROUND_COLOR};
+                background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 {PRIMARY_COLOR}, stop: 1 {PRIMARY_COLOR2});
                 border-radius: {self.border_radius}px;
             }}
         """)
-        self.title_label.setStyleSheet(f"color: {BTN_TEXT_COLOR}; font-size: 14px;")
-        self.info_label.setStyleSheet(f"color: {BTN_TEXT_COLOR}; font-size: 16px; font-weight: bold;")
+        self.title_label.setStyleSheet(f"background-color: transparent !important; color: {BTN_TEXT_COLOR}; font-size: 14px;")
+        self.info_label.setStyleSheet(f"background-color: transparent !important; color: {BTN_TEXT_COLOR}; font-size: 16px; font-weight: bold;")
         super().leaveEvent(event)

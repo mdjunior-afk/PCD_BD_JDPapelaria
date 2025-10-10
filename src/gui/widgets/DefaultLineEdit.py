@@ -19,7 +19,7 @@ class DefaultLineEdit(QLineEdit):
     def setStyle(self):
         style = f"""
         QLineEdit {{
-            background-color: {LINE_BACKGROUND_COLOR};
+            background-color: {LINE_EDIT_BACKGROUND_COLOR};
             border-radius: 8px;
             padding: 8px;
             font-size: 14px;

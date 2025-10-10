@@ -32,7 +32,7 @@ class SpinBox(QSpinBox):
             subcontrol-position: top right;
             width: 20px;
             border-top-right-radius: 8px;
-            background-color: {BTN_BACKGROUND_COLOR};
+            background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 {PRIMARY_COLOR}, stop: 1 {PRIMARY_COLOR2});
         }}
 
         QSpinBox::up-button:hover {{
@@ -44,7 +44,7 @@ class SpinBox(QSpinBox):
             subcontrol-position: bottom right;
             width: 20px;
             border-bottom-right-radius: 8px;
-            background-color: {BTN_BACKGROUND_COLOR};
+            background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 {PRIMARY_COLOR2}, stop: 1 {PRIMARY_COLOR});
         }}
 
         QSpinBox::down-button:hover {{
@@ -84,7 +84,7 @@ class DoubleSpinBox(QDoubleSpinBox):
     def setStyle(self):
         style = f"""
         QDoubleSpinBox {{
-        background-color: {BTN_TEXT_COLOR};
+        background-color: {LINE_EDIT_BACKGROUND_COLOR};
         border-radius: 8px;
         padding: 8px 20px 8px 8px;
         font-size: 14px;
@@ -95,7 +95,7 @@ class DoubleSpinBox(QDoubleSpinBox):
             subcontrol-position: top right;
             width: 20px;
             border-top-right-radius: 8px;
-            background-color: {BTN_BACKGROUND_COLOR};
+            background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 {PRIMARY_COLOR}, stop: 1 {PRIMARY_COLOR2});
         }}
 
         QDoubleSpinBox::up-button:hover {{
@@ -107,7 +107,7 @@ class DoubleSpinBox(QDoubleSpinBox):
             subcontrol-position: bottom right;
             width: 20px;
             border-bottom-right-radius: 8px;
-            background-color: {BTN_BACKGROUND_COLOR};
+            background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 {PRIMARY_COLOR2}, stop: 1 {PRIMARY_COLOR});
         }}
 
         QDoubleSpinBox::down-button:hover {{

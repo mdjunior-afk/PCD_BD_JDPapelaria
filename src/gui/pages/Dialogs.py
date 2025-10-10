@@ -243,7 +243,7 @@ class PeopleDialog(BaseDialog):
         email_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
 
         name_input = DefaultLineEdit()
-        person_type_input = ComboBox(["PF", "PJ"])
+        person_type_input = ComboBox(["Pessoa Física", "Pessoa Jurídica"])
         person_type_input.currentIndexChanged.connect(self.onIndexChanged)
         self.document_input = DefaultLineEdit()
         self.document_input.setInputMask("000.000.000-00;_")
@@ -583,7 +583,7 @@ class TransactionDialog(BaseDialog):
         layout = QGridLayout()
         widget.setLayout(layout)
 
-        search_input = LineStock("Procure por um produto")
+        search_input = LineComplement("Procure por um produto")
 
         price_input = DoubleSpinBox()
         quantity_input = SpinBox()
@@ -603,7 +603,7 @@ class TransactionDialog(BaseDialog):
         layout.addWidget(PageButton("Adicionar", icon_path="plus.svg"), 1, 7)
         layout.addWidget(PageButton("Remover", icon_path="cross.svg"), 1, 8)
 
-        return widget, search_input.search_input, (search_input.stock_input, price_input, quantity_input, subtotal_input)
+        return widget, search_input.search_input, (search_input.complement_input, price_input, quantity_input, subtotal_input)
 
     def createServiceInputs(self):
         widget = QWidget()

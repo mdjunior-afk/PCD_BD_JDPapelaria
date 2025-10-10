@@ -44,10 +44,12 @@ class TableWidget(QTableWidget):
             border: none;
             color: #747474;
             font-size: 12px;
+
+            border-radius: 8px;
         }}                         
 
         QHeaderView::section {{
-            background-color: {PRIMARY_COLOR};
+            background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 {PRIMARY_COLOR}, stop: 1 {PRIMARY_COLOR2});
             color: white;
             font-size: 14px;
             border: 1px solid #C0C0C0;
@@ -56,10 +58,18 @@ class TableWidget(QTableWidget):
             border-top: 0px;
             border-left: 0px;
             subcontrol-origin: padding;                           
-        }}                        
+        }}    
+
+        QHeaderView::section:first {{
+            border-top-left-radius: 8px;
+        }}     
+
+        QHeaderView::section:last {{
+            border-top-right-radius: 8px;
+        }}                 
                                          
         QTableWidget::item:selected {{
-            background-color: #E98A37;                             
+            background-color: {PRIMARY_COLOR};                             
         }}
                                          
         /* Estilo para a barra de rolagem vertical */

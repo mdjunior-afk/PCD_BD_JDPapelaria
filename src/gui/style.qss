@@ -1,0 +1,47 @@
+QWidget {
+    background-color: transparent !important;
+}
+
+QGroupBox {
+        margin-top: 1ex;
+        padding: 1ex;
+
+        background-color: "#FFFFFF" !important;
+        color: black;
+
+        border: 2px solid lightgray;
+        border-radius: 8px;
+}
+
+QGroupBox::title {
+        subcontrol-origin: margin;
+        subcontrol-position: top left;
+
+        padding: 0 3px;
+
+        font-weight: bolder;
+}
+
+QLineEdit {
+    border: none;
+}
+
+QLineEdit#SearchInput[class="WithComplement"] {
+    font-size: 14px;
+    padding: 8px;
+
+    border-top-left-radius: 8px;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 0;
+}
+
+QLineEdit#SearchInput[class="WithoutComplement"] {
+    font-size: 14px;
+    padding: 8px;
+
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
