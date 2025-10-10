@@ -484,7 +484,7 @@ class TransactionDialog(BaseDialog):
         for f in fields:
             if isinstance(f, QLineEdit):
                 if f.isReadOnly():
-                    f.setReadOnly(False)
+                    f.setReadOnly(False if "SearchInput" in f.__class__.__name__ else True)
                     f.clear()
             elif isinstance(f, (QSpinBox, QDoubleSpinBox)):
                 f.setValue(0)
@@ -495,6 +495,7 @@ class TransactionDialog(BaseDialog):
         if not search_widget.text():
             self.return_data.hide()
             return
+
         self.return_data.setTarget(targets)
         self.return_data.showData(data)
 
@@ -508,6 +509,7 @@ class TransactionDialog(BaseDialog):
         if index == 0:  # Produtos
             targets = {
                 "nome": self.product_search_input,
+                "estoque": self.product_stock_input,
                 "quantidade": self.product_quantity_input,
                 "valor": self.product_price_input,
                 "subtotal": self.product_subtotal_input
@@ -536,7 +538,7 @@ class TransactionDialog(BaseDialog):
         product_layout = QVBoxLayout()
         product_info_widget, product_search, product_inputs = self.createProductInputs()
         self.product_search_input = product_search
-        self.product_price_input, self.product_quantity_input, self.product_subtotal_input = product_inputs
+        self.product_stock_input, self.product_price_input, self.product_quantity_input, self.product_subtotal_input = product_inputs
 
         product_layout.addWidget(product_info_widget)
         product_layout.addWidget(TableWidget(["Nome", "Quantidade", "Preço", "Total"]))
@@ -544,8 +546,8 @@ class TransactionDialog(BaseDialog):
 
         # Conecta search e clear
         self.setupSearch(product_search, product_inputs, data=[
-            {"nome": "PENDRIVE SAMSUNG 8G", "quantidade": 1, "valor": 39.90},
-            {"nome": "PENDRIVE SANDISK 16GB", "quantidade": 1, "valor": 59.90}
+            {"nome": "PENDRIVE SAMSUNG 8G", "estoque": 3, "quantidade": 1, "valor": 39.90},
+            {"nome": "PENDRIVE SANDISK 16GB", "estoque": 5, "quantidade": 1, "valor": 59.90}
         ])
 
         # --- Serviços ---
@@ -560,8 +562,8 @@ class TransactionDialog(BaseDialog):
 
         # Conecta search e clear
         self.setupSearch(service_search, service_inputs, data=[
-            {"nome": "XEROX", "quantidade": 1, "valor": 0.50},
-            {"nome": "CURRÍCULO", "quantidade": 10, "valor": 10}
+            {"nome": "XEROX", "estoque": 1, "valor": 0.50},
+            {"nome": "CURRÍCULO", "estoque": 10, "valor": 10}
         ])
 
         payment_layout = QVBoxLayout()
@@ -581,9 +583,7 @@ class TransactionDialog(BaseDialog):
         layout = QGridLayout()
         widget.setLayout(layout)
 
-        search_input = LineEdit("Procure por um produto...")
-        search_input.setMaximumWidth(self.maximum_width)
-        stock_input = SpinBox()
+        search_input = LineStock("Procure por um produto")
 
         price_input = DoubleSpinBox()
         quantity_input = SpinBox()
@@ -591,8 +591,7 @@ class TransactionDialog(BaseDialog):
         subtotal_input.setReadOnly(True)
         subtotal_input.setButtonSymbols(QAbstractSpinBox.NoButtons)
 
-        layout.addWidget(search_input, 0, 0)
-        layout.addWidget(stock_input, 0, 1)
+        layout.addWidget(search_input, 0, 0, 1, 9)
         layout.addWidget(Label("Preço: R$"), 1, 0)
         layout.addWidget(price_input, 1, 1)
         layout.addWidget(Label("Quantidade:"), 1, 2)
@@ -604,7 +603,7 @@ class TransactionDialog(BaseDialog):
         layout.addWidget(PageButton("Adicionar", icon_path="plus.svg"), 1, 7)
         layout.addWidget(PageButton("Remover", icon_path="cross.svg"), 1, 8)
 
-        return widget, search_input, (price_input, quantity_input, subtotal_input)
+        return widget, search_input.search_input, (search_input.stock_input, price_input, quantity_input, subtotal_input)
 
     def createServiceInputs(self):
         widget = QWidget()
@@ -657,17 +656,16 @@ class TransactionDialog(BaseDialog):
     # --- Configura Search
     # ----------------------
     def setupSearch(self, search_widget, inputs, data):
-        # Botão de limpar
         clear_action = search_widget.addAction(QIcon.fromTheme("window-close"), QLineEdit.TrailingPosition)
         clear_action.triggered.connect(lambda: self.clearFields([search_widget, *inputs]))
 
-        # Conecta textChanged
         search_widget.textChanged.connect(
             lambda text: self.searchItems(data,
                                           {"nome": search_widget,
-                                           "quantidade": inputs[1],
-                                           "valor": inputs[0],
-                                           "subtotal": inputs[2]},
+                                           "estoque": inputs[0],
+                                           "quantidade": inputs[2],
+                                           "valor": inputs[1],
+                                           "subtotal": inputs[3]},
                                           search_widget)
         )
 
