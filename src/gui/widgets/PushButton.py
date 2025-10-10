@@ -27,20 +27,30 @@ class PushButton(QPushButton):
         base_style = f"""
         QPushButton {{
             color: {BTN_TEXT_COLOR};
-            background-color: {BTN_BACKGROUND_COLOR};
+            background-color: transparent !important;
             padding-left: {self.text_padding}px;
             text-align: left;
             border: none;
         }}
         QPushButton:hover {{
-            background-color: {BTN_HOVER_BACKGROUND_COLOR};
+            background: qlineargradient(
+                x1: 0, y1: 0,
+                x2: 0, y2: 1,
+                stop: 0 {SECONDARY_COLOR},
+                stop: 1 {SECONDARY_COLOR2}
+            );
             color: {BTN_HOVER_TEXT_COLOR}; /* O texto também muda de cor ao hover */
         }}
         """
 
         active_style = f"""
         QPushButton[active="true"] {{
-            background-color: {BTN_HOVER_BACKGROUND_COLOR};
+            background: qlineargradient(
+                x1: 0, y1: 0,
+                x2: 0, y2: 1,
+                stop: 0 {SECONDARY_COLOR},
+                stop: 1 {SECONDARY_COLOR2}
+            );
             color: {BTN_HOVER_TEXT_COLOR};
             border-right: 5px solid #D9D9D9;
         }}

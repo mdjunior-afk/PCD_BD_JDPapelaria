@@ -56,13 +56,13 @@ class ReturnData(QFrame):
     def onItemClicked(self, item):
         data = item.data(Qt.UserRole)
 
-        print(data)
+        
 
         if data and self.inputs:
             if "nome" in self.inputs:
                 self.inputs["nome"].setText(data["nome"])
             if "estoque" in self.inputs:
-                self.inputs["estoque"].setText(str(data["estoque"]))
+                self.inputs["estoque"].setText(f"{data["estoque"]} UN")
             if "quantidade" in self.inputs:
                 self.inputs["quantidade"].setValue(1)
             if "valor" in self.inputs:

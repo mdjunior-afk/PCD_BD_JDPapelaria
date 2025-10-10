@@ -25,7 +25,14 @@ class MainWindow(QMainWindow):
 
         # START: side_menu
         self.side_menu = QWidget()
-        self.side_menu.setStyleSheet(f"background-color: {SIDEMENU_COLOR}")
+        self.side_menu.setStyleSheet(f"""
+            background: qlineargradient(
+                x1: 0, y1: 0,
+                x2: 0, y2: 1,
+                stop: 0 {SIDEMENU_COLOR},
+                stop: 1 {PRIMARY_COLOR2}
+            );
+        """)
         self.side_menu.setMaximumWidth(50)
 
         self.animation = QPropertyAnimation(self.side_menu, b"minimumWidth")
@@ -36,6 +43,7 @@ class MainWindow(QMainWindow):
         self.side_menu_layout.setSpacing(0)
 
         self.side_menu_top_widget = QWidget()
+        self.side_menu_top_widget.setStyleSheet("background-color: none;")
         self.side_menu_top_widget.setMinimumHeight(50)
 
         self.side_menu_top_layout = QVBoxLayout(self.side_menu_top_widget)
@@ -83,6 +91,7 @@ class MainWindow(QMainWindow):
         self.side_menu_spacer = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.side_menu_bottom_widget = QWidget()
+        self.side_menu_bottom_widget.setStyleSheet("background-color: none;")
         self.side_menu_bottom_widget.setMinimumHeight(50)
 
         self.side_menu_bottom_layout = QVBoxLayout(self.side_menu_bottom_widget)
@@ -99,10 +108,10 @@ class MainWindow(QMainWindow):
         # END: side_menu
 
         self.content = QWidget()
-        self.content.setStyleSheet(f"background-color: {CONTENT_COLOR}; color: {TEXT_COLOR}")
+        self.content.setStyleSheet(f"background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 {CONTENT_COLOR}, stop: 1 {CONTENT_COLOR2}); color: {TEXT_COLOR}")
 
         self.content_layout = QVBoxLayout(self.content)
-        self.content_layout.setContentsMargins(0, 0, 0, 0)
+        self.content_layout.setContentsMargins(12, 12, 12, 12)
         self.content_layout.setSpacing(0)
 
         self.page_manager = PageManager()

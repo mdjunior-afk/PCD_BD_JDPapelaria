@@ -9,7 +9,7 @@ from ..config import *
 import os
 
 class PageButton(QPushButton):
-    def __init__(self, text="", minimum_width=50, height=40, text_padding=45, icon_path=""):
+    def __init__(self, text="", minimum_width=50, height=36, text_padding=45, icon_path=""):
         super().__init__()
 
         self.setText(text)
@@ -36,17 +36,27 @@ class PageButton(QPushButton):
         style = f"""
         QPushButton {{
             color: {BTN_TEXT_COLOR};
-            font-size: 12px;
-            background-color: {BTN_BACKGROUND_COLOR};
-            padding-right: 10px;
+            font-size: 14px;
+            background: qlineargradient(
+                x1: 0, y1: 0,
+                x2: 0, y2: 1,
+                stop: 0 {PRIMARY_COLOR},
+                stop: 1 {PRIMARY_COLOR2}
+            );
+            padding-right: 8px;
             padding-left: {self.text_padding}px;
             text-align: left;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
         }}
         QPushButton:hover {{
             color: {BTN_HOVER_TEXT_COLOR};
-            background-color: {BTN_HOVER_BACKGROUND_COLOR};
+            background: qlineargradient(
+                x1: 0, y1: 0,
+                x2: 0, y2: 1,
+                stop: 0 {SECONDARY_COLOR},
+                stop: 1 {SECONDARY_COLOR2}
+            );
         }}
         """
 

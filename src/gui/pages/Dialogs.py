@@ -8,7 +8,7 @@ from utils.LocationInput import Location
 from ..widgets import *
 
 class BaseDialog(QDialog):
-    def __init__(self, maximum_width=600):
+    def __init__(self, maximum_width=800):
         super().__init__()
 
         self.setStyleSheet("background-color: #D9D9D9; color: #747474;")
@@ -62,7 +62,6 @@ class ProductDialog(BaseDialog):
         product_widget, product_inputs = self.productInfoInputs()
 
         product_info_layout.addWidget(product_widget)
-        #product_info_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding))
         product_info_tab.setLayout(product_info_layout)
 
         return product_info_tab
@@ -243,7 +242,7 @@ class PeopleDialog(BaseDialog):
         email_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
 
         name_input = DefaultLineEdit()
-        person_type_input = ComboBox(["PF", "PJ"])
+        person_type_input = ComboBox(["Pessoa Física", "Pessoa Jurídica"])
         person_type_input.currentIndexChanged.connect(self.onIndexChanged)
         self.document_input = DefaultLineEdit()
         self.document_input.setInputMask("000.000.000-00;_")
@@ -421,15 +420,16 @@ class PeopleDialog(BaseDialog):
             QApplication.restoreOverrideCursor()
 
 class TransactionDialog(BaseDialog):
-    def __init__(self, maximum_width=800, maximum_height=800, initial_window=0):
+    def __init__(self, maximum_width=1000, maximum_height=800, initial_window=0):
         super().__init__(maximum_width)
+
+        self.total = 0
 
         self.initial_window = initial_window
         self.setMaximumSize(maximum_width, maximum_height)
-        self.setMinimumSize(800, 600)
+        self.setMinimumSize(900, 600)
         self.setWindowTitle("Movimentação")
 
-        # --- Data ---
         self.date_widget = QWidget()
         self.date_layout = QHBoxLayout()
         self.date_layout.setContentsMargins(0, 0, 0, 6)
@@ -440,7 +440,6 @@ class TransactionDialog(BaseDialog):
         self.date_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum))
         self.date_widget.setLayout(self.date_layout)
 
-        # --- Cliente ---
         self.people_info_widget = QWidget()
         self.people_info_layout = QVBoxLayout()
 
@@ -449,14 +448,12 @@ class TransactionDialog(BaseDialog):
         self.people_info_layout.addWidget(self.search_people)
         self.people_info_widget.setLayout(self.people_info_layout)
 
-        # --- Tabs ---
         self.tab = QTabWidget()
         self.product_tab, self.service_tab, self.payment_tab = self.createTabs()
-        self.tab.addTab(self.product_tab, "Produtos")
-        self.tab.addTab(self.service_tab, "Serviços")
-        self.tab.addTab(self.payment_tab, "Pagamentos")
+        self.tab.addTab(self.product_tab.widget, "Produtos")
+        self.tab.addTab(self.service_tab.widget, "Serviços")
+        self.tab.addTab(self.payment_tab.widget, "Pagamentos")
 
-        # -- Total --
         self.total_info_widget = QWidget()
         self.total_info_layout = QHBoxLayout()
 
@@ -475,10 +472,245 @@ class TransactionDialog(BaseDialog):
         self.input_layout.addWidget(self.total_info_widget)
         self.tab.setCurrentIndex(self.initial_window)
 
-        # --- ReturnData ---
         self.return_data = ReturnData(self)
         self.updateReturnDataTarget(self.initial_window)
         self.tab.currentChanged.connect(self.updateReturnDataTarget)
+
+    def createTabs(self):
+        return self.ProductTab(self), self.ServiceTab(self), self.PaymentTab(self)
+
+    class ProductTab():
+        def __init__(self, parent):
+            self.widget = QWidget()
+            self.parent = parent
+
+            product_layout = QVBoxLayout()
+            product_info_widget, product_search, product_inputs = self.createProductInputs()
+            self.product_search_input = product_search
+            self.product_stock_input, self.product_price_input, self.product_quantity_input, self.product_subtotal_input = product_inputs
+            self.table_widget = TableWidget(["Nome", "Preço", "Quantidade", "Total"])
+
+            self.product_price_input.editingFinished.connect(self.updateSellPrice)
+            self.product_quantity_input.editingFinished.connect(self.updateSellPrice)
+
+            product_layout.addWidget(product_info_widget)
+            product_layout.addWidget(self.table_widget)
+            
+            self.widget.setLayout(product_layout)
+
+            self.parent.setupSearch(product_search, product_inputs, data=[
+                {"nome": "PENDRIVE SAMSUNG 8G", "estoque": 3, "quantidade": 1, "valor": 39.90},
+                {"nome": "PENDRIVE SANDISK 16GB", "estoque": 5, "quantidade": 1, "valor": 59.90}
+            ])
+
+        def createProductInputs(self):
+            widget = QWidget()
+            layout = QGridLayout()
+            layout.setSpacing(6)
+            layout.setContentsMargins(0, 0, 0, 0)
+
+            widget.setLayout(layout)
+
+            search_input = LineComplement("Procure por um produto")
+
+            price_input = DoubleSpinBox()
+            quantity_input = SpinBox()
+            subtotal_input = DoubleSpinBox()
+            subtotal_input.setReadOnly(True)
+            subtotal_input.setButtonSymbols(QAbstractSpinBox.NoButtons)
+
+            optionsButtons, buttons = self.parent.createOptionsButtons()
+            add_button, edit_button, remove_button = buttons
+
+            add_button.clicked.connect(self.addProduct)
+            edit_button.clicked.connect(self.editProduct)
+            remove_button.clicked.connect(self.removeProduct)
+
+            layout.addWidget(search_input, 0, 0, 1, 12)
+            layout.addWidget(Label("Preço: R$"), 1, 0)
+            layout.addWidget(price_input, 1, 1)
+            layout.addWidget(Label("Quantidade:"), 1, 2)
+            layout.addWidget(quantity_input, 1, 3)
+            layout.addWidget(Label(" = "), 1, 4)
+            layout.addWidget(subtotal_input, 1, 5)
+            layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum), 1, 6)
+            layout.addWidget(optionsButtons, 1, 7, 1, 5)
+
+            return widget, search_input.search_input, (search_input.complement_input, price_input, quantity_input, subtotal_input)
+        
+        def updateSellPrice(self):
+            price = self.product_price_input.value()
+            quantity = self.product_quantity_input.value()
+
+            self.product_subtotal_input.setValue(price * quantity)
+        
+        def addProduct(self):
+            row_count = self.table_widget.rowCount()
+
+            self.table_widget.insertRow(row_count)
+
+            search = self.product_search_input.text()
+            price = self.product_price_input.value()
+            quantity = self.product_quantity_input.value()
+            subtotal = self.product_subtotal_input.value()
+            total_input = self.parent.total_input
+            
+            self.table_widget.setItem(row_count, 0, QTableWidgetItem(search))
+            self.table_widget.setItem(row_count, 1, QTableWidgetItem(str(price)))
+            self.table_widget.setItem(row_count, 2, QTableWidgetItem(str(quantity)))
+            self.table_widget.setItem(row_count, 3, QTableWidgetItem(str(subtotal)))
+
+            self.parent.total += subtotal
+            self.parent.payment_tab.value_input.setValue(self.parent.total)
+            total_input.setValue(self.parent.total)
+
+            self.parent.clearFields([self.product_search_input, *(self.product_price_input, self.product_quantity_input, self.product_subtotal_input)])
+
+        def editProduct(self):
+            pass
+
+        def removeProduct(self):
+            pass
+
+    class ServiceTab():
+        def __init__(self, parent):
+            self.widget = QWidget()
+            self.parent = parent
+
+            service_layout = QVBoxLayout()
+            service_info_widget, service_search, service_inputs = self.createServiceInputs()
+            self.service_search_input = service_search
+            self.service_price_input, self.service_quantity_input, self.service_subtotal_input = service_inputs
+
+            self.table_widget = TableWidget(["Tipo", "Quantidade", "Preço", "Total"])
+
+            self.service_price_input.editingFinished.connect(self.updateSellPrice)
+            self.service_quantity_input.editingFinished.connect(self.updateSellPrice)
+
+            service_layout.addWidget(service_info_widget)
+            service_layout.addWidget(self.table_widget)
+            
+            self.widget.setLayout(service_layout)
+
+            # Conecta search e clear
+            self.parent.setupSearch(service_search, service_inputs, data=[
+                {"nome": "XEROX", "quantidade": 1, "valor": 0.50},
+                {"nome": "CURRÍCULO", "quantidade": 10, "valor": 10}
+            ])
+    
+        def createServiceInputs(self):
+            widget = QWidget()
+            layout = QGridLayout()
+            widget.setLayout(layout)
+
+            search_input = LineComplement("Procure por um serviço...", property="WithoutComplement")
+
+            price_input = DoubleSpinBox()
+            quantity_input = SpinBox()
+            subtotal_input = DoubleSpinBox()
+            subtotal_input.setReadOnly(True)
+            subtotal_input.setButtonSymbols(QAbstractSpinBox.NoButtons)
+
+            optionsButtons, buttons = self.parent.createOptionsButtons()
+            add_button, edit_button, remove_button = buttons
+
+            add_button.clicked.connect(self.addService)
+            edit_button.clicked.connect(self.editService)
+            remove_button.clicked.connect(self.removeService)
+
+            layout.addWidget(search_input, 0, 0, 1, 9)
+            layout.addWidget(Label("Preço: R$"), 1, 0)
+            layout.addWidget(price_input, 1, 1)
+            layout.addWidget(Label("Quantidade:"), 1, 2)
+            layout.addWidget(quantity_input, 1, 3)
+            layout.addWidget(Label(" = "), 1, 4)
+            layout.addWidget(subtotal_input, 1, 5)
+            layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum), 1, 6)
+            layout.addWidget(optionsButtons, 1, 7, 1, 5)
+
+            return widget, search_input.search_input, (price_input, quantity_input, subtotal_input)
+        
+        def updateSellPrice(self):
+            price = self.service_price_input.value()
+            quantity = self.service_quantity_input.value()
+
+            self.service_subtotal_input.setValue(price * quantity)
+        
+        def addService(self):
+            row_count = self.table_widget.rowCount()
+
+            self.table_widget.insertRow(row_count)
+
+            search = self.service_search_input.text()
+            price = self.service_price_input.value()
+            quantity = self.service_quantity_input.value()
+            subtotal = self.service_subtotal_input.value()
+            total_input = self.parent.total_input
+            
+            self.table_widget.setItem(row_count, 0, QTableWidgetItem(search))
+            self.table_widget.setItem(row_count, 1, QTableWidgetItem(str(price)))
+            self.table_widget.setItem(row_count, 2, QTableWidgetItem(str(quantity)))
+            self.table_widget.setItem(row_count, 3, QTableWidgetItem(str(subtotal)))
+
+            self.parent.total += subtotal
+            self.parent.payment_tab.value_input.setValue(self.parent.total)
+            total_input.setValue(self.parent.total)
+
+            self.parent.clearFields([self.service_search_input, *(self.service_price_input, self.service_quantity_input, self.service_subtotal_input)])
+            pass
+
+        def editService(self):
+            pass
+
+        def removeService(self):
+            pass
+
+    class PaymentTab():
+        def __init__(self, parent):
+            self.widget = QWidget()
+            self.parent = parent
+
+            payment_layout = QVBoxLayout()
+            payment_info_widget, inputs = self.createPaymentInputs()
+            self.document_input, self.value_input = inputs
+
+            payment_layout.addWidget(payment_info_widget)
+            payment_layout.addWidget(TableWidget(["Data", "Documento", "Valor"]))
+            
+            self.widget.setLayout(payment_layout)
+
+        def createPaymentInputs(self):
+            widget = QWidget()
+            layout = QGridLayout()
+            widget.setLayout(layout)
+
+            document_input = ComboBox(["PIX", "Cartão de Crédito", "Cartão de Débito"], True)
+            value_input = DoubleSpinBox()
+
+            optionsButtons, buttons = self.parent.createOptionsButtons()
+            add_button, edit_button, remove_button = buttons
+
+            add_button.clicked.connect(self.addPayment)
+            edit_button.clicked.connect(self.editPayment)
+            remove_button.clicked.connect(self.removePayment)
+
+            layout.addWidget(Label("Documento:"), 0, 0)
+            layout.addWidget(document_input, 0, 1)
+            layout.addWidget(Label("Valor: R$"), 0, 2)
+            layout.addWidget(value_input, 0, 3)
+            layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum), 1, 6)
+            layout.addWidget(optionsButtons, 1, 7, 1, 5)
+
+            return widget, (document_input, value_input)
+    
+        def addPayment(self):
+            pass
+
+        def editPayment(self):
+            pass
+
+        def removePayment(self):
+            pass
 
     def clearFields(self, fields: list):
         for f in fields:
@@ -499,7 +731,6 @@ class TransactionDialog(BaseDialog):
         self.return_data.setTarget(targets)
         self.return_data.showData(data)
 
-        # Posiciona o dropdown
         pos_global = search_widget.mapToGlobal(QPoint(0, search_widget.height()))
         pos_local = self.mapFromGlobal(pos_global)
         self.return_data.move(pos_local)
@@ -508,149 +739,41 @@ class TransactionDialog(BaseDialog):
     def updateReturnDataTarget(self, index):
         if index == 0:  # Produtos
             targets = {
-                "nome": self.product_search_input,
-                "estoque": self.product_stock_input,
-                "quantidade": self.product_quantity_input,
-                "valor": self.product_price_input,
-                "subtotal": self.product_subtotal_input
+                "nome": self.product_tab.product_search_input,
+                "estoque": self.product_tab.product_stock_input,
+                "quantidade": self.product_tab.product_quantity_input,
+                "valor": self.product_tab.product_price_input,
+                "subtotal": self.product_tab.product_subtotal_input
             }
         elif index == 1:  # Serviços
             targets = {
-                "nome": self.service_search_input,
-                "quantidade": self.service_quantity_input,
-                "valor": self.service_price_input,
-                "subtotal": self.service_subtotal_input
+                "nome": self.service_tab.service_search_input,
+                "quantidade": self.service_tab.service_quantity_input,
+                "valor": self.service_tab.service_price_input,
+                "subtotal": self.service_tab.service_subtotal_input
             }
         else:
             targets = {}
         
         self.return_data.setTarget(targets)
 
-    # ----------------------
-    # --- Criar Tabs
-    # ----------------------
-    def createTabs(self):
-        product_tab = QWidget()
-        service_tab = QWidget()
-        payment_tab = QWidget()
-
-        # --- Produtos ---
-        product_layout = QVBoxLayout()
-        product_info_widget, product_search, product_inputs = self.createProductInputs()
-        self.product_search_input = product_search
-        self.product_stock_input, self.product_price_input, self.product_quantity_input, self.product_subtotal_input = product_inputs
-
-        product_layout.addWidget(product_info_widget)
-        product_layout.addWidget(TableWidget(["Nome", "Quantidade", "Preço", "Total"]))
-        product_tab.setLayout(product_layout)
-
-        # Conecta search e clear
-        self.setupSearch(product_search, product_inputs, data=[
-            {"nome": "PENDRIVE SAMSUNG 8G", "estoque": 3, "quantidade": 1, "valor": 39.90},
-            {"nome": "PENDRIVE SANDISK 16GB", "estoque": 5, "quantidade": 1, "valor": 59.90}
-        ])
-
-        # --- Serviços ---
-        service_layout = QVBoxLayout()
-        service_info_widget, service_search, service_inputs = self.createServiceInputs()
-        self.service_search_input = service_search
-        self.service_price_input, self.service_quantity_input, self.service_subtotal_input = service_inputs
-
-        service_layout.addWidget(service_info_widget)
-        service_layout.addWidget(TableWidget(["Tipo", "Quantidade", "Preço", "Total"]))
-        service_tab.setLayout(service_layout)
-
-        # Conecta search e clear
-        self.setupSearch(service_search, service_inputs, data=[
-            {"nome": "XEROX", "estoque": 1, "valor": 0.50},
-            {"nome": "CURRÍCULO", "estoque": 10, "valor": 10}
-        ])
-
-        payment_layout = QVBoxLayout()
-        payment_info_widget, document_input = self.createPaymentInputs()
-
-        payment_layout.addWidget(payment_info_widget)
-        payment_layout.addWidget(TableWidget(["Data", "Documento", "Valor"]))
-        payment_tab.setLayout(payment_layout)
-
-        return product_tab, service_tab, payment_tab
-
-    # ----------------------
-    # --- Helpers Inputs
-    # ----------------------
-    def createProductInputs(self):
+    def createOptionsButtons(self):
         widget = QWidget()
-        layout = QGridLayout()
+        layout = QHBoxLayout()
+        layout.setContentsMargins(0, 6, 6, 6)
+
+        add_button = PageButton("Adicionar", icon_path="plus.svg")
+        edit_button = PageButton("Editar", icon_path="edit.svg")
+        remove_button = PageButton("Remover", icon_path="cross.svg")
+
+        layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum))
+        layout.addWidget(add_button)
+        layout.addWidget(edit_button)
+        layout.addWidget(remove_button)
+
         widget.setLayout(layout)
 
-        search_input = LineStock("Procure por um produto")
-
-        price_input = DoubleSpinBox()
-        quantity_input = SpinBox()
-        subtotal_input = DoubleSpinBox()
-        subtotal_input.setReadOnly(True)
-        subtotal_input.setButtonSymbols(QAbstractSpinBox.NoButtons)
-
-        layout.addWidget(search_input, 0, 0, 1, 9)
-        layout.addWidget(Label("Preço: R$"), 1, 0)
-        layout.addWidget(price_input, 1, 1)
-        layout.addWidget(Label("Quantidade:"), 1, 2)
-        layout.addWidget(quantity_input, 1, 3)
-        layout.addWidget(Label(" = "), 1, 4)
-        layout.addWidget(subtotal_input, 1, 5)
-
-        layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum), 1, 6)
-        layout.addWidget(PageButton("Adicionar", icon_path="plus.svg"), 1, 7)
-        layout.addWidget(PageButton("Remover", icon_path="cross.svg"), 1, 8)
-
-        return widget, search_input.search_input, (search_input.stock_input, price_input, quantity_input, subtotal_input)
-
-    def createServiceInputs(self):
-        widget = QWidget()
-        layout = QGridLayout()
-        widget.setLayout(layout)
-
-        search_input = LineEdit("Procure por um serviço...")
-        search_input.setMaximumWidth(self.maximum_width)
-
-        price_input = DoubleSpinBox()
-        quantity_input = SpinBox()
-        subtotal_input = DoubleSpinBox()
-        subtotal_input.setReadOnly(True)
-        subtotal_input.setButtonSymbols(QAbstractSpinBox.NoButtons)
-
-        layout.addWidget(search_input, 0, 0, 1, 9)
-        layout.addWidget(Label("Preço: R$"), 1, 0)
-        layout.addWidget(price_input, 1, 1)
-        layout.addWidget(Label("Quantidade:"), 1, 2)
-        layout.addWidget(quantity_input, 1, 3)
-        layout.addWidget(Label(" = "), 1, 4)
-        layout.addWidget(subtotal_input, 1, 5)
-
-        layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum), 1, 6)
-        layout.addWidget(PageButton("Adicionar", icon_path="plus.svg"), 1, 7)
-        layout.addWidget(PageButton("Remover", icon_path="cross.svg"), 1, 8)
-
-        return widget, search_input, (price_input, quantity_input, subtotal_input)
-    
-    def createPaymentInputs(self):
-        widget = QWidget()
-        layout = QGridLayout()
-        widget.setLayout(layout)
-
-        document_input = ComboBox(["PIX", "Cartão de Crédito", "Cartão de Débito"], True)
-        value_input = DoubleSpinBox()
-
-        layout.addWidget(Label("Documento:"), 0, 0)
-        layout.addWidget(document_input, 0, 1)
-        layout.addWidget(Label("Valor: R$"), 0, 2)
-        layout.addWidget(value_input, 0, 3)
-
-        layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum), 0, 4)
-        layout.addWidget(PageButton("Adicionar", icon_path="plus.svg"), 0, 5)
-        layout.addWidget(PageButton("Remover", icon_path="cross.svg"), 0, 6)
-
-        return widget, (document_input, value_input)
+        return widget, (add_button, edit_button, remove_button)
 
     # ----------------------
     # --- Configura Search
@@ -659,15 +782,31 @@ class TransactionDialog(BaseDialog):
         clear_action = search_widget.addAction(QIcon.fromTheme("window-close"), QLineEdit.TrailingPosition)
         clear_action.triggered.connect(lambda: self.clearFields([search_widget, *inputs]))
 
-        search_widget.textChanged.connect(
-            lambda text: self.searchItems(data,
-                                          {"nome": search_widget,
-                                           "estoque": inputs[0],
-                                           "quantidade": inputs[2],
-                                           "valor": inputs[1],
-                                           "subtotal": inputs[3]},
-                                          search_widget)
+        if len(inputs) == 3:
+            search_widget.textChanged.connect(
+                lambda text: self.searchItems(data,
+                                            {"nome": search_widget,
+                                            "valor": inputs[0],
+                                            "quantidade": inputs[1],
+                                            "subtotal": inputs[2]},
+                                            search_widget)
         )
+        else:
+            search_widget.textChanged.connect(
+                lambda text: self.searchItems(data,
+                                {"nome": search_widget,
+                                "estoque": inputs[0],
+                                "valor": inputs[1],
+                                "quantidade": inputs[2],
+                                "subtotal": inputs[3]},
+                                search_widget)
+        )
+    
+    def updateServiceSellPrice(self):
+        price = self.service_price_input.value()
+        quantity = self.service_quantity_input.value()
+
+        self.service_subtotal_input.setValue(price * quantity)
 
 class InvoiceDialog(BaseDialog):
     def __init__(self):

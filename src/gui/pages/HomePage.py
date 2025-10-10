@@ -17,7 +17,7 @@ class HomePage(QWidget):
         self.search_layout = QHBoxLayout(self.search_widget)
         self.search_layout.setContentsMargins(0, 0, 0, 12)
 
-        self.search_input = LineEdit("Procure por algo...")
+        self.search_input = LineComplement(placeholder="Procure por algo", property="WithoutComplement")
 
         self.search_layout.addWidget(self.search_input)
 
@@ -63,3 +63,10 @@ class HomePage(QWidget):
         self.main_layout.addStretch(1)
         self.main_layout.addWidget(self.logo_widget)
         self.main_layout.addStretch(2)
+
+        self.setStyleSheet("""
+        QWidget {
+            background-color: transparent !important;
+        }
+
+        """)
