@@ -20,8 +20,8 @@ class BaseDialog(QDialog):
         self.setMinimumWidth(self.maximum_width + 100)
         self.setMaximumWidth(self.maximum_width + 200)
 
-        self.main_layout = QVBoxLayout()
-        self.setLayout(self.main_layout)
+        self.layout = QVBoxLayout()
+        self.setLayout(self.layout)
 
         self.input_layout = QGridLayout()
         self.input_layout.setContentsMargins(0, 0, 0, 0)
@@ -38,8 +38,8 @@ class BaseDialog(QDialog):
         self.buttons_layout.addWidget(self.new_btn)
         self.buttons_layout.addWidget(self.cancel_btn)
 
-        self.main_layout.addLayout(self.input_layout)
-        self.main_layout.addLayout(self.buttons_layout)
+        self.layout.addLayout(self.input_layout)
+        self.layout.addLayout(self.buttons_layout)
 
     def save(self):
         pass
@@ -583,6 +583,7 @@ class TransactionDialog(BaseDialog):
 
         search_input = LineEdit("Procure por um produto...")
         search_input.setMaximumWidth(self.maximum_width)
+        stock_input = SpinBox()
 
         price_input = DoubleSpinBox()
         quantity_input = SpinBox()
@@ -590,7 +591,8 @@ class TransactionDialog(BaseDialog):
         subtotal_input.setReadOnly(True)
         subtotal_input.setButtonSymbols(QAbstractSpinBox.NoButtons)
 
-        layout.addWidget(search_input, 0, 0, 1, 9)
+        layout.addWidget(search_input, 0, 0)
+        layout.addWidget(stock_input, 0, 1)
         layout.addWidget(Label("Preço: R$"), 1, 0)
         layout.addWidget(price_input, 1, 1)
         layout.addWidget(Label("Quantidade:"), 1, 2)
@@ -668,3 +670,88 @@ class TransactionDialog(BaseDialog):
                                            "subtotal": inputs[2]},
                                           search_widget)
         )
+
+class InvoiceDialog(BaseDialog):
+    def __init__(self):
+        super().__init__()
+        widget = QWidget()
+        layout = QVBoxLayout()
+
+        supplier_info_group = GroupBox("Informações do fornecedor")
+        supplier_info_layout = QGridLayout()
+
+        search_supplier_input = LineEdit()
+        search_supplier_input.setMaximumWidth(1200)
+        search_supplier_input.setPlaceholderText("Procure por um fornecedor")
+
+        company_name_label = Label("Razão Social:")
+        cnpj_label = Label("CNPJ:")
+        address_label = Label("Endereço:")
+        cellphone_label = Label("Telefone:")
+        email_label = Label("Email:")
+
+        company_name_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        cnpj_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        address_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        cellphone_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        email_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+
+        company_name_input = Label("")
+        cnpj_input = Label("")
+        address_input = Label("")
+        cellphone_input = Label("")
+        email_input = Label("")
+
+        supplier_info_layout.addWidget(search_supplier_input, 0, 0, 1, 2)
+        supplier_info_layout.addWidget(company_name_label, 1, 0)
+        supplier_info_layout.addWidget(company_name_input, 1, 1)
+        supplier_info_layout.addWidget(cnpj_label, 2, 0)
+        supplier_info_layout.addWidget(cnpj_input, 2, 1)
+        supplier_info_layout.addWidget(address_label, 3, 0)
+        supplier_info_layout.addWidget(address_input, 3, 1)
+        supplier_info_layout.addWidget(cellphone_label, 4, 0)
+        supplier_info_layout.addWidget(cellphone_input, 4, 1)
+        supplier_info_layout.addWidget(email_label, 5, 0)
+        supplier_info_layout.addWidget(email_input, 5, 1)
+
+        supplier_info_layout.setColumnStretch(1, 2)
+
+        supplier_info_group.setLayout(supplier_info_layout)
+
+        product_info_group = GroupBox("Informações do produto")
+        product_info_layout = QGridLayout()
+
+        purchase_price_label = Label("Compra: R$")
+        quantity_label = Label("Quantidade:")
+
+        search_product_input = LineEdit()
+        search_product_input.setMaximumWidth(1200)
+        search_product_input.setPlaceholderText("Procure por um produto")
+        purchase_price_input = DoubleSpinBox()
+        quantity_input = SpinBox()
+
+        add_btn = PageButton("Adicionar", icon_path="plus.svg")
+        edit_btn = PageButton("Editar", icon_path="edit.svg")
+        remove_btn = PageButton("Remover", icon_path="cross.svg")
+
+        table_input = TableWidget(["Produto", "Preço de compra", "Quantidade", "Novo estoque"])
+
+        product_info_layout.addWidget(search_product_input, 0, 0, 1, 9)
+        product_info_layout.addWidget(purchase_price_label, 1, 0)
+        product_info_layout.addWidget(purchase_price_input, 1, 1)
+        product_info_layout.addWidget(quantity_label, 1, 2)
+        product_info_layout.addWidget(quantity_input, 1, 3)
+        product_info_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum), 1, 4)
+        product_info_layout.addWidget(add_btn, 1, 5)
+        product_info_layout.addWidget(edit_btn, 1, 6)
+        product_info_layout.addWidget(remove_btn, 1, 7)
+        product_info_layout.addWidget(table_input, 2, 0, 1, 8)
+
+        product_info_group.setLayout(product_info_layout)
+
+        layout.addWidget(supplier_info_group)
+        layout.addWidget(product_info_group)
+
+        widget.setLayout(layout)
+
+        self.input_layout.addWidget(widget)
