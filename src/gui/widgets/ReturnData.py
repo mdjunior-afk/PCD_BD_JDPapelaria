@@ -56,11 +56,15 @@ class ReturnData(QFrame):
     def onItemClicked(self, item):
         data = item.data(Qt.UserRole)
 
+        print(data)
+
         if data and self.inputs:
             if "nome" in self.inputs:
                 self.inputs["nome"].setText(data["nome"])
+            if "estoque" in self.inputs:
+                self.inputs["estoque"].setText(str(data["estoque"]))
             if "quantidade" in self.inputs:
-                self.inputs["quantidade"].setValue(data["quantidade"])
+                self.inputs["quantidade"].setValue(1)
             if "valor" in self.inputs:
                 self.inputs["valor"].setValue(data["valor"])
             if "subtotal" in self.inputs:
@@ -80,7 +84,6 @@ class ReturnData(QFrame):
         
         for obj in data:
             item = QListWidgetItem(obj["nome"])
-            print(item)
             item.setData(Qt.UserRole, obj)
             self.list_widget.addItem(item)
 
