@@ -45,7 +45,7 @@ Em relação às vendas, elas podem ser realizadas envolvendo tanto produtos qua
 
  ## 3. Projeto Conceitual
  
-<img width="1902" height="947" alt="Diagram drawio(2)" src="https://github.com/user-attachments/assets/ba5beb96-16f9-442b-8004-ad77eb7a2b7c" />
+<img width="1902" height="947" alt="Diagram drawio(3)" src="https://github.com/user-attachments/assets/ee0b57d8-50dc-470b-a148-319f0a2f1770" />
 
 ## 4. Projeto Lógico
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur vulputate a purus eu gravida. Suspendisse faucibus dictum venenatis. Donec bibendum vehicula condimentum. Ut facilisis velit ante. Vestibulum tellus urna, posuere ut interdum in, cursus eu lectus. Cras dictum augue ut ipsum pretium sodales. Aenean nec nisl non nunc tempor tincidunt. Duis ullamcorper turpis quis nulla feugiat, in lobortis dolor maximus. Morbi turpis est, malesuada porttitor mauris sed, pharetra ornare magna.
