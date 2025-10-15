@@ -47,7 +47,8 @@ Em relação às vendas, elas podem ser realizadas envolvendo tanto produtos qua
  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur vulputate a purus eu gravida. Suspendisse faucibus dictum venenatis. Donec bibendum vehicula condimentum. Ut facilisis velit ante. Vestibulum tellus urna, posuere ut interdum in, cursus eu lectus. Cras dictum augue ut ipsum pretium sodales. Aenean nec nisl non nunc tempor tincidunt. Duis ullamcorper turpis quis nulla feugiat, in lobortis dolor maximus. Morbi turpis est, malesuada porttitor mauris sed, pharetra ornare magna.
 
  ## 3. Projeto Conceitual
-  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur vulputate a purus eu gravida. Suspendisse faucibus dictum venenatis. Donec bibendum vehicula condimentum. Ut facilisis velit ante. Vestibulum tellus urna, posuere ut interdum in, cursus eu lectus. Cras dictum augue ut ipsum pretium sodales. Aenean nec nisl non nunc tempor tincidunt. Duis ullamcorper turpis quis nulla feugiat, in lobortis dolor maximus. Morbi turpis est, malesuada porttitor mauris sed, pharetra ornare magna.
+
+<img width="1902" height="947" alt="Diagram drawio" src="https://github.com/user-attachments/assets/c631944f-247e-4401-9904-2070c3bcd518" />
 
 **Adicionar a imagem do diagrama**
 
