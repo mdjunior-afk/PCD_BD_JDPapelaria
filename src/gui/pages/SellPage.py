@@ -115,7 +115,7 @@ class SellPage(QWidget):
         tab.addTab(payment_tab, "Pagamentos")
 
         total_label = Label("Total:")
-        total_input
+        total_input = QDoubleSpinBox()
 
         layout.addWidget(client_label)
         layout.addWidget(client_input)
