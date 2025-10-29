@@ -4,31 +4,84 @@ from ..widgets import *
 
 from .Dialogs import *
 
-class SellPage(GroupBox):
-    def __init__(self, title="Consulta de Vendas"):
-        super().__init__(title)
+class SellPage(QWidget):
+    def __init__(self):
+        super().__init__()
 
         layout = QVBoxLayout()
 
-        inputs = self.createInputs()
+        page_title = Label("Painel de Vendas", property="Title", fixed=False)
+        page_subtitle = Label("Gerencie todas as vendas registradas", property="Subtitle", fixed=False)
 
-        layout.addWidget(inputs)
+        search_tab = QTabWidget()
+        search_layout = QVBoxLayout()
+
+        inputs_widget = QWidget()
+        inputs_layout = QHBoxLayout()
+
+        search_label = Label("Pesquise:", property="NormalBolder", fixed=False)
+
+        initial_date = DateEdit()
+        final_date = DateEdit()
+
+        search_button = Button("Pesquisar", property="WithoutBackground")
+        export_button = Button("Exportar", icon_path="download.svg")
+
+        inputs_layout.addWidget(search_label)
+        inputs_layout.addWidget(initial_date);
+        inputs_layout.addWidget(Label(" até "));
+        inputs_layout.addWidget(final_date);
+        inputs_layout.addWidget(search_button)
+        inputs_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum))
+        inputs_layout.addWidget(export_button)
+
+        inputs_widget.setLayout(inputs_layout)
+
+        table = TableWidget(["ID", "Nome", "Estoque", "Preço", "Categoria"])
+        
+        search_layout.addWidget(inputs_widget)
+        search_layout.addWidget(table)
+
+        search_tab.setLayout(search_layout)
+
+        filter_tab = TabWidget()
+
+        edit_tab = TabWidget()
+        edit_tab_layout = QVBoxLayout()
+
+        edit_widget = self.createEditInputs()
+        add_buttons_widget = self.createAddButtons()
+
+        edit_tab_layout.addWidget(edit_widget)
+        edit_tab_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding))
+        edit_tab_layout.addWidget(add_buttons_widget)
+
+        edit_tab.setLayout(edit_tab_layout)
+
+        tab = Tab()
+        tab.addTab(search_tab, "Pesquisar vendas")
+        tab.addTab(filter_tab, "Pesquisar com filtros")
+        tab.addTab(edit_tab, "Adicionar/Editar venda")
+
+        total_label = Label("Total:")
+        total_input = DoubleSpinBox()
+
+        layout.addWidget(page_title)
+        layout.addWidget(page_subtitle)
+        layout.addWidget(tab)
 
         self.setLayout(layout)
 
-    def createOptionsButtons(self):
+    def createAddButtons(self):
         widget = QWidget()
+        widget.setStyleSheet("background: none;")
         layout = QHBoxLayout()
-        layout.setContentsMargins(0, 0, 6, 6)
 
-        add_button = PageButton("Adicionar", icon_path="plus.svg")
-        edit_button = PageButton("Editar", icon_path="edit.svg")
-        remove_button = PageButton("Remover", icon_path="cross.svg")
+        add_button = Button("Salvar", icon_path="disk.svg")
+        edit_button = Button("Novo", icon_path="plus.svg")
+        remove_button = Button("Cancelar", icon_path="cross.svg")
 
-        add_button.clicked.connect(self.addWindow)
-        edit_button.clicked.connect(self.editWindow)
-        remove_button.clicked.connect(self.removeWindow)
-
+        layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum))
         layout.addWidget(add_button)
         layout.addWidget(edit_button)
         layout.addWidget(remove_button)
@@ -37,67 +90,84 @@ class SellPage(GroupBox):
 
         return widget
 
-    def createInputs(self):
+    def createEditInputs(self):
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setStyleSheet("background: transparent !important;")
+
         widget = QWidget()
+        widget.setStyleSheet("background: transparent !important;")
         layout = QVBoxLayout()
-        layout.setContentsMargins(0, 0, 6, 0)
 
-        inputs_widget = QWidget()
-        inputs_layout = QHBoxLayout()
-        inputs_layout.setContentsMargins(0, 0, 0, 0)
+        client_label = Label("Cliente:", fixed=True)
 
-        intial_date = DateEdit(icon_path="calendar.svg")
-        date_label = QLabel(" Até ")
-        date_label.setStyleSheet("color: #747474")
-        final_date = DateEdit(icon_path="calendar.svg")
-        search_btn = PageButton("Procurar", icon_path="search.svg")
+        client_input = SearchInput("Procure por um cliente:", max_width=1200)
 
-        options_widget = self.createOptionsButtons()
+        tab = Tab()
 
-        inputs_layout.addWidget(intial_date)
-        inputs_layout.addWidget(date_label)
-        inputs_layout.addWidget(final_date)
-        inputs_layout.addWidget(search_btn)
-        inputs_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum))
-        inputs_layout.addWidget(options_widget)
+        product_tab = self.createProductTab()
 
-        inputs_widget.setLayout(inputs_layout)
+        service_tab = QWidget()
+        payment_tab = QWidget()
 
-        table_widget = TableWidget(["Data", "Cliente", "Total", "Forma de Pagamento"])
+        tab.addTab(product_tab, "Produtos")
+        tab.addTab(service_tab, "Serviços")
+        tab.addTab(payment_tab, "Pagamentos")
 
-        row_count = 1000
+        total_label = Label("Total:")
+        total_input = QDoubleSpinBox()
 
-        table_widget.setRowCount(row_count)
-
-        for i in range(row_count):
-            table_widget.setItem(i, 0, QTableWidgetItem(f"Venda {i}"))
-            table_widget.setItem(i, 1, QTableWidgetItem(f"Cliente {i}"))
-            table_widget.setItem(i, 2, QTableWidgetItem(f"{i+1}00,00"))
-            table_widget.setItem(i, 3, QTableWidgetItem("Dinheiro"))
-
-        layout.addWidget(inputs_widget)
-        layout.addWidget(table_widget)
-        layout.addWidget(Label(f"{row_count} vendas encontradas!"))
+        layout.addWidget(client_label)
+        layout.addWidget(client_input)
+        layout.addWidget(tab)
+        layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum))
+        layout.addWidget(total_label)
+        layout.addWidget(total_input)
 
         widget.setLayout(layout)
 
-        widget.setStyleSheet("background-color: transparent !important;")
+        scroll_area.setWidget(widget)
+
+        return scroll_area
+
+    def createProductTab(self):
+        widget = QWidget()
+        layout = QGridLayout()
+        widget.setLayout(layout)
+
+        quantity_label = Label("Quantidade:", fixed=False)
+        price_label = Label("Preço:", fixed=False)
+        subtotal_label = Label("Subtotal:", fixed=False)
+
+        search_input = SearchInput("Procure por um produto", max_width=1200)
+        quantity_input = SpinBox()
+        price_input = DoubleSpinBox()
+        subtotal_input = DoubleSpinBox()
+        subtotal_input.setReadOnly(True)
+
+        table_input = TableWidget(["ID", "Nome", "Preço", "Quantidade", "Subtotal"])
+
+        buttons_widget = QWidget()
+        buttons_layout = QHBoxLayout()
+
+        add_button = Button("Adicionar", icon_path="plus.svg")
+        edit_button = Button("Editar", icon_path="edit.svg")
+        remove_button = Button("Remover", icon_path="cross.svg")
+
+        buttons_layout.addWidget(add_button)
+        buttons_layout.addWidget(edit_button)
+        buttons_layout.addWidget(remove_button)
+
+        buttons_widget.setLayout(buttons_layout)
+
+        layout.addWidget(search_input, 0, 0, 1, 8)
+        layout.addWidget(quantity_label, 1, 0)
+        layout.addWidget(quantity_input, 1, 1)
+        layout.addWidget(price_label, 1, 2)
+        layout.addWidget(price_input, 1, 3)
+        layout.addWidget(subtotal_label, 1, 4)
+        layout.addWidget(subtotal_input, 1, 5)
+        layout.addWidget(buttons_widget, 1, 7)
+        layout.addWidget(table_input, 2, 0, 1, 8)
 
         return widget
-
-    def addWindow(self):
-        self.current_win = TransactionDialog()
-
-        self.current_win.exec()
-
-    def editWindow(self):
-        self.current_win = TransactionDialog()
-
-        self.current_win.exec()
-        pass
-
-    def removeWindow(self):
-        self.current_win = BaseDialog()
-
-        self.current_win.exec()
-        pass

@@ -16,7 +16,7 @@ class LineEdit(QLineEdit):
         self.text_padding = text_padding
         self.border_radius = border_radius
 
-        search_icon_path = 'src/gui/icons/search.svg' # Exemplo de caminho relativo
+        search_icon_path = 'gui/icons/search.svg' # Exemplo de caminho relativo
         search_action = QAction(QIcon(search_icon_path), '', self)
         
         # Adiciona a ação (o ícone) ao lado esquerdo do QLineEdit

@@ -40,7 +40,7 @@ class InvoicePage(QWidget):
         self.buttons_box_layout.addWidget(self.remove_btn)
         self.buttons_box_layout.addItem(self.procuct_buttons_box_spacer)
 
-        self.table = TableWidget(["Nota", "CNPJ", "Fornecedor", "Total da nota"])
+        self.table = TableWidget()
 
         self.main_layout.addWidget(self.search_widget)
         self.main_layout.addWidget(self.buttons_box)

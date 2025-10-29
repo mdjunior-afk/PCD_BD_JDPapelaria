@@ -5,8 +5,12 @@ from PySide6.QtGui import QColor, QIcon
 from ..config import *
 
 class ComboBox(QComboBox):
-    def __init__(self, items = [], has_menu=False):
+    def __init__(self, items = [], has_menu=False, max_width=1200):
         super().__init__()
+
+        self.setMinimumHeight(36)
+
+        self.setMaximumWidth(max_width)
 
         self.addItems(items)
 
@@ -16,13 +20,6 @@ class ComboBox(QComboBox):
         if has_menu:
             self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
             self.customContextMenuRequested.connect(self.contextMenu)
-
-        self.shadow = QGraphicsDropShadowEffect()
-        self.shadow.setBlurRadius(5)
-        self.shadow.setColor(QColor(0, 0, 0, 25))
-        self.shadow.setOffset(4, 4)
-
-        self.setGraphicsEffect(self.shadow)
 
         self.setStyle()
 
@@ -57,29 +54,16 @@ class ComboBox(QComboBox):
         menu.exec(self.mapToGlobal(point))
 
     def setStyle(self):
-        style = f"""
+        _style = f"""
         QComboBox {{
-            background-color: {BTN_TEXT_COLOR};
-            padding: 8px;
-            border-radius: 8px;
-            outline: none;
-            box-shadow: none;
+            background-color: transparent !important;
+            border: 1px solid lightgray;
         }}
 
-        QComboBox::drop-down {{
-            subcontrol-origin: border;
-            subcontrol-position: top right;
-            width: 20px;
-            border-top-right-radius: 8px;
-            border-bottom-right-radius: 8px;
-            background-color: {BTN_BACKGROUND_COLOR};
+        QComboBox:focus {{
+            border-color: {PRIMARY_COLOR};
         }}
 
-        QComboBox:down-arrow {{
-            image: url(src/gui/icons/caret-down.svg);
-            width: 10px;
-            height: 10px;
-        }}
         """
 
-        self.setStyleSheet(style)
+        self.setStyleSheet(_style)

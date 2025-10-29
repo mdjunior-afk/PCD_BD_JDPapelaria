@@ -12,7 +12,7 @@ class GroupBox(QGroupBox):
     def setColor(self):
         _style = f"""
         QGroupBox {{
-            background-color: {GROUP_BOX_BACKGROUND_COLOR} !important;
+            background-color: transparent !important;
         }}
         """
 
