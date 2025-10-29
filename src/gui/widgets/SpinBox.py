@@ -30,7 +30,7 @@ class SpinBox(QSpinBox):
         }}
 
         QSpinBox::up-button:hover {{
-            background-color: {PRIMARY_COLOR2};
+            background-color: lightgray;
         }}
 
         QSpinBox::down-button {{
@@ -42,17 +42,17 @@ class SpinBox(QSpinBox):
         }}
 
         QSpinBox::down-button:hover {{
-            background-color: {PRIMARY_COLOR2};
+            background-color: lightgray;
         }}
 
         QSpinBox::up-arrow {{
-        image: url(gui/icons/angle-small-up.svg);
+        image: url(src/gui/icons/angle-small-up.svg);
         width: 10px;
         height: 10px;
         }}
 
         QSpinBox::down-arrow {{
-        image: url(gui/icons/angle-small-down.svg);
+        image: url(src/gui/icons/angle-small-down.svg);
         width: 10px;
         height: 10px;
         }}
@@ -87,7 +87,7 @@ class DoubleSpinBox(QDoubleSpinBox):
         }}
 
         QDoubleSpinBox::up-button:hover {{
-            background-color: {PRIMARY_COLOR2};
+            background-color: lightgray;
         }}
 
         QDoubleSpinBox::down-button {{
@@ -99,17 +99,17 @@ class DoubleSpinBox(QDoubleSpinBox):
         }}
 
         QDoubleSpinBox::down-button:hover {{
-            background-color: {PRIMARY_COLOR2};
+            background-color: lightgray;
         }}
 
         QDoubleSpinBox::up-arrow {{
-        image: url(gui/icons/angle-small-up.svg);
+        image: url(src/gui/icons/angle-small-up.svg);
         width: 10px;
         height: 10px;
         }}
 
         QDoubleSpinBox::down-arrow {{
-        image: url(gui/icons/angle-small-down.svg);
+        image: url(src/gui/icons/angle-small-down.svg);
         width: 10px;
         height: 10px;
         }}

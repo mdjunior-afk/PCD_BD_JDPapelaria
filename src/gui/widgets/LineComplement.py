@@ -40,7 +40,7 @@ class SearchInput(QLineEdit):
 
         self.setPlaceholderText(placeholder)
 
-        search_icon_path = 'gui/icons/search.svg'
+        search_icon_path = 'src/gui/icons/search.svg'
         search_action = QAction(QIcon(search_icon_path), '', self)
         
         self.addAction(search_action, QLineEdit.LeadingPosition)

@@ -61,7 +61,7 @@ class ProductPage(QWidget):
         tab = Tab()
         tab.addTab(search_tab, "Pesquisar produtos")
         tab.addTab(filter_tab, "Pesquisar com filtros")
-        tab.addTab(edit_tab, "Adicionar/Editar produto")
+        tab.addTab(edit_tab, "Adicionar/Editar produtos")
 
         layout.addWidget(page_title)
         layout.addWidget(page_subtitle)

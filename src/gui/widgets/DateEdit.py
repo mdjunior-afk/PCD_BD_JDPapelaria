@@ -44,7 +44,7 @@ class DateEdit(QDateEdit):
         }}
 
         QDateEdit::drop-down {{
-            image: url(gui/icons/calendar.svg);
+            image: url(src/gui/icons/calendar.svg);
             padding-right: 8px;
             subcontrol-origin: margin;
             subcontrol-position: right center;

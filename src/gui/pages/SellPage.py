@@ -1,5 +1,6 @@
 from PySide6.QtWidgets import *
 
+from ..config import CONTENT_COLOR
 from ..widgets import *
 
 from .Dialogs import *
@@ -61,7 +62,7 @@ class SellPage(QWidget):
         tab = Tab()
         tab.addTab(search_tab, "Pesquisar vendas")
         tab.addTab(filter_tab, "Pesquisar com filtros")
-        tab.addTab(edit_tab, "Adicionar/Editar venda")
+        tab.addTab(edit_tab, "Adicionar/Editar vendas")
 
         total_label = Label("Total:")
         total_input = DoubleSpinBox()
@@ -106,23 +107,29 @@ class SellPage(QWidget):
         tab = Tab()
 
         product_tab = self.createProductTab()
-
-        service_tab = QWidget()
-        payment_tab = QWidget()
+        service_tab = self.createServiceTab()
+        payment_tab = self.createPaymentTab()
 
         tab.addTab(product_tab, "Produtos")
         tab.addTab(service_tab, "Serviços")
         tab.addTab(payment_tab, "Pagamentos")
 
+        total_widget = QWidget()
+        total_layout = QHBoxLayout()
+
         total_label = Label("Total:")
-        total_input = QDoubleSpinBox()
+        total_input = DoubleSpinBox()
+
+        total_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum))
+        total_layout.addWidget(total_label)
+        total_layout.addWidget(total_input)
+
+        total_widget.setLayout(total_layout)
 
         layout.addWidget(client_label)
         layout.addWidget(client_input)
         layout.addWidget(tab)
-        layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum))
-        layout.addWidget(total_label)
-        layout.addWidget(total_input)
+        layout.addWidget(total_widget)
 
         widget.setLayout(layout)
 
@@ -169,5 +176,76 @@ class SellPage(QWidget):
         layout.addWidget(subtotal_input, 1, 5)
         layout.addWidget(buttons_widget, 1, 7)
         layout.addWidget(table_input, 2, 0, 1, 8)
+
+        return widget
+
+    def createServiceTab(self):
+        widget = QWidget()
+        layout = QGridLayout()
+        widget.setLayout(layout)
+
+        quantity_label = Label("Quantidade:", fixed=False)
+        price_label = Label("Preço:", fixed=False)
+        subtotal_label = Label("Subtotal:", fixed=False)
+
+        search_input = SearchInput("Procure por um serviço", max_width=1200)
+        quantity_input = SpinBox()
+        price_input = DoubleSpinBox()
+        subtotal_input = DoubleSpinBox()
+        subtotal_input.setReadOnly(True)
+
+        table_input = TableWidget(["ID", "Nome", "Preço", "Quantidade", "Subtotal"])
+
+        buttons_widget = QWidget()
+        buttons_layout = QHBoxLayout()
+
+        add_button = Button("Adicionar", icon_path="plus.svg")
+        edit_button = Button("Editar", icon_path="edit.svg")
+        remove_button = Button("Remover", icon_path="cross.svg")
+
+        buttons_layout.addWidget(add_button)
+        buttons_layout.addWidget(edit_button)
+        buttons_layout.addWidget(remove_button)
+
+        buttons_widget.setLayout(buttons_layout)
+
+        layout.addWidget(search_input, 0, 0, 1, 8)
+        layout.addWidget(quantity_label, 1, 0)
+        layout.addWidget(quantity_input, 1, 1)
+        layout.addWidget(price_label, 1, 2)
+        layout.addWidget(price_input, 1, 3)
+        layout.addWidget(subtotal_label, 1, 4)
+        layout.addWidget(subtotal_input, 1, 5)
+        layout.addWidget(buttons_widget, 1, 7)
+        layout.addWidget(table_input, 2, 0, 1, 8)
+
+        return widget
+
+    def createPaymentTab(self):
+        widget = QWidget()
+        layout = QGridLayout()
+
+        payment_label = Label("Forma de pagamento:", fixed=False)
+        value_label = Label("Valor:", fixed=False)
+
+        payment_input = ComboBox(["Cartão de Crédito", "Cartão de Débito", "Pix", "Dinheiro"])
+        value_input = DoubleSpinBox()
+
+        add_btn = Button("Adicionar", icon_path="plus.svg")
+        edit_btn = Button("Editar", icon_path="edit.svg")
+        remove_btn = Button("Remover", icon_path="cross.svg")
+
+        table_input = TableWidget(["ID", "Data", "Documento", "Valor"])
+
+        layout.addWidget(payment_label, 0, 0)
+        layout.addWidget(payment_input, 0, 1)
+        layout.addWidget(value_label, 0, 2)
+        layout.addWidget(value_input, 0, 3)
+        layout.addWidget(add_btn, 0, 5)
+        layout.addWidget(edit_btn, 0, 6)
+        layout.addWidget(remove_btn, 0, 7)
+        layout.addWidget(table_input, 1, 0, 1, 8)
+
+        widget.setLayout(layout)
 
         return widget

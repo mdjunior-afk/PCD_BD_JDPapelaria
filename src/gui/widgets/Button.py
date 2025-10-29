@@ -12,6 +12,8 @@ class Button(QPushButton):
     def __init__(self, text, property="WithBackground", icon_path=""):
         super().__init__(text)
 
+        self.setFixedHeight(36)
+
         self.property_text = property
         self.icon_path = icon_path
 
