@@ -63,7 +63,7 @@ class ServicePage(GroupBox):
 
         inputs_widget.setLayout(inputs_layout)
 
-        table_widget = TableWidget(["Data", "Cliente", "Total", "Forma de Pagamento"])
+        table_widget = TableWidget()
 
         row_count = 1000
 

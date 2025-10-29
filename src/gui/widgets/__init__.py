@@ -12,5 +12,9 @@ from .GroupBox import GroupBox
 from .Label import Label
 from .StockInput import StockInput
 from .LineComplement import LineComplement
+from .Tab import Tab
+from .Tab import TabWidget
+from .LineInputs import SearchInput
+from .Button import Button
 
-__all__ = ["PushButton", "PageButton", "LineEdit", "InfoWidget", "TableWidget", "DateEdit", "SpinBox", "DoubleSpinBox", "ReturnData", "ComboBox", "DefaultLineEdit", "GroupBox", "Label", "StockInput", "LineComplement"]
+__all__ = ["PushButton", "PageButton", "LineEdit", "InfoWidget", "TableWidget", "DateEdit", "SpinBox", "DoubleSpinBox", "ReturnData", "ComboBox", "DefaultLineEdit", "GroupBox", "Label", "StockInput", "LineComplement", "Tab", "TabWidget", "SearchInput", "Button"]

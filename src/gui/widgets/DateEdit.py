@@ -21,20 +21,14 @@ class DateEdit(QDateEdit):
 
         self.setStyle()
 
-        self.shadow = QGraphicsDropShadowEffect()
-        self.shadow.setBlurRadius(5)
-        self.shadow.setColor(QColor(0, 0, 0, 25))
-        self.shadow.setOffset(4, 4)
-
-        self.setGraphicsEffect(self.shadow)
-        
     def setStyle(self):
         style = f"""
         QDateEdit {{
-            background-color: {self.background_color};
-            border-radius: {self.border_radius}px;
+            background-color: transparent !important;
+            border: 1px solid lightgray;
+            border-radius: 4px;
             color: {self.text_color};
-            font-size: 14px;
+            font-size: 12px;
             padding: 8px;
         }}
 
@@ -50,7 +44,7 @@ class DateEdit(QDateEdit):
         }}
 
         QDateEdit::drop-down {{
-            image: url(src/gui/icons/calendar.svg);
+            image: url(gui/icons/calendar.svg);
             padding-right: 8px;
             subcontrol-origin: margin;
             subcontrol-position: right center;
