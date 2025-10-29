@@ -4,10 +4,10 @@ from PySide6.QtCore import QDate
 import os
 
 class DateEdit(QDateEdit):
-    def __init__(self, border_radius=20, text_color="#747474", icon_path="", background_color="#EFEFEF", hover="#EA7712"):
+    def __init__(self, border_radius=8, text_color="#747474", icon_path="", background_color="#EFEFEF", hover="#EA7712"):
         super().__init__()
 
-        self.setFixedHeight(40)
+        self.setFixedHeight(36)
 
         self.background_color = background_color
         self.border_radius = border_radius

@@ -1,13 +1,12 @@
 from PySide6.QtWidgets import QFrame, QLabel, QVBoxLayout, QGraphicsDropShadowEffect
 from PySide6.QtGui import QColor, Qt
 
+from ..config import *
+
 class InfoWidget(QFrame):
-    def __init__(self, background_color="#EFEFEF", border_radius=10, title="", title_color="#747474", info="", info_color="#EA7712"):
+    def __init__(self, border_radius=10, title="", info=""):
         super().__init__()
 
-        self.background_color = background_color
-        self.title_color = title_color
-        self.info_color = info_color
         self.border_radius = border_radius
 
         self.setCursor(Qt.PointingHandCursor)
@@ -18,18 +17,18 @@ class InfoWidget(QFrame):
 
         # Label título
         self.title_label = QLabel(title)
-        self.title_label.setStyleSheet(f"color: {title_color}; font-size: 14px;")
+        self.title_label.setStyleSheet(f"background-color: transparent !important; color: {BTN_TEXT_COLOR}; font-size: 14px;")
         layout.addWidget(self.title_label, alignment=Qt.AlignLeft)
 
         # Label valor
         self.info_label = QLabel(info)
-        self.info_label.setStyleSheet(f"color: {info_color}; font-size: 16px; font-weight: bold;")
+        self.info_label.setStyleSheet(f"background-color: transparent !important; color: {BTN_TEXT_COLOR}; font-size: 16px; font-weight: bold;")
         layout.addWidget(self.info_label, alignment=Qt.AlignLeft)
 
         # Estilo inicial
         self.setStyleSheet(f"""
             QFrame {{
-                background-color: {self.background_color};
+                background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 {PRIMARY_COLOR}, stop: 1 {PRIMARY_COLOR2});
                 border-radius: {self.border_radius}px;
             }}
         """)
@@ -44,21 +43,21 @@ class InfoWidget(QFrame):
     def enterEvent(self, event):
         self.setStyleSheet(f"""
             QFrame {{
-                background-color: {self.info_color};
+            background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 {SECONDARY_COLOR}, stop: 1 {SECONDARY_COLOR2});
                 border-radius: {self.border_radius}px;
             }}
         """)
-        self.title_label.setStyleSheet("color: white; font-size: 14px;")
-        self.info_label.setStyleSheet("color: white; font-size: 16px; font-weight: bold;")
+        self.title_label.setStyleSheet(f"background-color: transparent !important; color: {BTN_TEXT_COLOR}; font-size: 14px;")
+        self.info_label.setStyleSheet(f"background-color: transparent !important; color: {BTN_TEXT_COLOR}; font-size: 16px; font-weight: bold;")
         super().enterEvent(event)
 
     def leaveEvent(self, event):
         self.setStyleSheet(f"""
             QFrame {{
-                background-color: {self.background_color};
+                background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 {PRIMARY_COLOR}, stop: 1 {PRIMARY_COLOR2});
                 border-radius: {self.border_radius}px;
             }}
         """)
-        self.title_label.setStyleSheet(f"color: {self.title_color}; font-size: 14px;")
-        self.info_label.setStyleSheet(f"color: {self.info_color}; font-size: 16px; font-weight: bold;")
+        self.title_label.setStyleSheet(f"background-color: transparent !important; color: {BTN_TEXT_COLOR}; font-size: 14px;")
+        self.info_label.setStyleSheet(f"background-color: transparent !important; color: {BTN_TEXT_COLOR}; font-size: 16px; font-weight: bold;")
         super().leaveEvent(event)

@@ -1,12 +1,15 @@
 from PySide6.QtWidgets import QPushButton, QGraphicsDropShadowEffect
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QPushButton
-from PySide6.QtGui import QPainter, Qt, QPixmap
+from PySide6.QtGui import QPainter, QPixmap
+from PySide6.QtCore import Qt
+
+from ..config import *
 
 import os
 
 class PageButton(QPushButton):
-    def __init__(self, text="", minimum_width=50, height=40, text_padding=45, text_color="#747474", icon_path="", icon_color="#747474", btn_color="#EFEFEF", btn_hover="#EA7712"):
+    def __init__(self, text="", minimum_width=50, height=36, text_padding=45, icon_path=""):
         super().__init__()
 
         self.setText(text)
@@ -17,11 +20,7 @@ class PageButton(QPushButton):
 
         self.minimum_width = minimum_width
         self.text_padding = text_padding
-        self.text_color = text_color
         self.icon_path = icon_path
-        self.icon_color = icon_color
-        self.btn_color = btn_color
-        self.btn_hover = btn_hover
 
         self.is_hovered = False
         self.setStyle()
@@ -36,31 +35,32 @@ class PageButton(QPushButton):
     def setStyle(self):
         style = f"""
         QPushButton {{
-            color: {self.text_color};
-            background-color: {self.btn_color};
-            padding-right: 10px;
+            color: {BTN_TEXT_COLOR};
+            font-size: 14px;
+            background: qlineargradient(
+                x1: 0, y1: 0,
+                x2: 0, y2: 1,
+                stop: 0 {PRIMARY_COLOR},
+                stop: 1 {PRIMARY_COLOR2}
+            );
+            padding-right: 8px;
             padding-left: {self.text_padding}px;
             text-align: left;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
         }}
         QPushButton:hover {{
-            color: {self.btn_color};
-            background-color: {self.btn_hover};
+            color: {BTN_HOVER_TEXT_COLOR};
+            background: qlineargradient(
+                x1: 0, y1: 0,
+                x2: 0, y2: 1,
+                stop: 0 {SECONDARY_COLOR},
+                stop: 1 {SECONDARY_COLOR2}
+            );
         }}
         """
 
         self.setStyleSheet(style)
-
-    def enterEvent(self, event):
-        self.is_hovered = True
-        self.update()
-        super().enterEvent(event)
-
-    def leaveEvent(self, event):
-        self.is_hovered = False
-        self.update()
-        super().leaveEvent(event)
 
     def paintEvent(self, event):
         # A forma mais simples é deixar o QPushButton desenhar tudo e depois adicionar o ícone.
@@ -71,10 +71,10 @@ class PageButton(QPushButton):
         qp.setRenderHint(QPainter.Antialiasing)
         
         # Define a cor do ícone
-        if self.is_hovered:
-            color = "#FFFFFF" # Cor branca no hover
+        if self.underMouse():
+            color = ICON_HOVER_COLOR # Cor branca no hover
         else:
-            color = self.icon_color # Cor padrão
+            color = ICON_COLOR # Cor padrão
             
         self.drawIcon(qp, self.icon_path, self.minimum_width, color)
         qp.end()
