@@ -1,34 +1,89 @@
 from PySide6.QtWidgets import *
 
+from ..config import CONTENT_COLOR
 from ..widgets import *
 
 from .Dialogs import *
 
-class ServicePage(GroupBox):
-    def __init__(self, title="Consulta de Serviços"):
-        super().__init__(title)
+
+class ServicePage(QWidget):
+    def __init__(self):
+        super().__init__()
 
         layout = QVBoxLayout()
 
-        inputs = self.createInputs()
+        page_title = Label("Painel de Serviços", property="Title", fixed=False)
+        page_subtitle = Label("Gerencie todos os serviços registrados", property="Subtitle", fixed=False)
 
-        layout.addWidget(inputs)
+        search_tab = QTabWidget()
+        search_layout = QVBoxLayout()
+
+        inputs_widget = QWidget()
+        inputs_layout = QHBoxLayout()
+
+        search_label = Label("Pesquise:", property="NormalBolder", fixed=False)
+
+        initial_date = DateEdit()
+        final_date = DateEdit()
+
+        search_button = Button("Pesquisar", property="WithoutBackground")
+        export_button = Button("Exportar", icon_path="download.svg")
+
+        inputs_layout.addWidget(search_label)
+        inputs_layout.addWidget(initial_date);
+        inputs_layout.addWidget(Label(" até "));
+        inputs_layout.addWidget(final_date);
+        inputs_layout.addWidget(search_button)
+        inputs_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum))
+        inputs_layout.addWidget(export_button)
+
+        inputs_widget.setLayout(inputs_layout)
+
+        table = TableWidget(["ID", "Nome", "Estoque", "Preço", "Categoria"])
+
+        search_layout.addWidget(inputs_widget)
+        search_layout.addWidget(table)
+
+        search_tab.setLayout(search_layout)
+
+        filter_tab = TabWidget()
+
+        edit_tab = TabWidget()
+        edit_tab_layout = QVBoxLayout()
+
+        edit_widget = self.createEditInputs()
+        add_buttons_widget = self.createAddButtons()
+
+        edit_tab_layout.addWidget(edit_widget)
+        edit_tab_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding))
+        edit_tab_layout.addWidget(add_buttons_widget)
+
+        edit_tab.setLayout(edit_tab_layout)
+
+        tab = Tab()
+        tab.addTab(search_tab, "Pesquisar vendas")
+        tab.addTab(filter_tab, "Pesquisar com filtros")
+        tab.addTab(edit_tab, "Adicionar/Editar serviços")
+
+        total_label = Label("Total:")
+        total_input = DoubleSpinBox()
+
+        layout.addWidget(page_title)
+        layout.addWidget(page_subtitle)
+        layout.addWidget(tab)
 
         self.setLayout(layout)
 
-    def createOptionsButtons(self):
+    def createAddButtons(self):
         widget = QWidget()
+        widget.setStyleSheet("background: none;")
         layout = QHBoxLayout()
-        layout.setContentsMargins(0, 0, 6, 6)
 
-        add_button = PageButton("Adicionar", icon_path="plus.svg")
-        edit_button = PageButton("Editar", icon_path="edit.svg")
-        remove_button = PageButton("Remover", icon_path="cross.svg")
+        add_button = Button("Salvar", icon_path="disk.svg")
+        edit_button = Button("Novo", icon_path="plus.svg")
+        remove_button = Button("Cancelar", icon_path="cross.svg")
 
-        add_button.clicked.connect(self.addWindow)
-        edit_button.clicked.connect(self.editWindow)
-        remove_button.clicked.connect(self.removeWindow)
-
+        layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum))
         layout.addWidget(add_button)
         layout.addWidget(edit_button)
         layout.addWidget(remove_button)
@@ -37,67 +92,163 @@ class ServicePage(GroupBox):
 
         return widget
 
-    def createInputs(self):
+    def createEditInputs(self):
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setStyleSheet("background: transparent !important;")
+
         widget = QWidget()
+        widget.setStyleSheet("background: transparent !important;")
         layout = QVBoxLayout()
-        layout.setContentsMargins(0, 0, 6, 0)
 
-        inputs_widget = QWidget()
-        inputs_layout = QHBoxLayout()
-        inputs_layout.setContentsMargins(0, 0, 0, 0)
+        client_label = Label("Cliente:", fixed=True)
 
-        intial_date = DateEdit(icon_path="calendar.svg")
-        date_label = QLabel(" Até ")
-        date_label.setStyleSheet("color: #747474")
-        final_date = DateEdit(icon_path="calendar.svg")
-        search_btn = PageButton("Procurar", icon_path="search.svg")
+        client_input = SearchInput("Procure por um cliente:", max_width=1200)
 
-        options_widget = self.createOptionsButtons()
+        tab = Tab()
 
-        inputs_layout.addWidget(intial_date)
-        inputs_layout.addWidget(date_label)
-        inputs_layout.addWidget(final_date)
-        inputs_layout.addWidget(search_btn)
-        inputs_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum))
-        inputs_layout.addWidget(options_widget)
+        product_tab = self.createProductTab()
+        service_tab = self.createServiceTab()
+        payment_tab = self.createPaymentTab()
 
-        inputs_widget.setLayout(inputs_layout)
+        tab.addTab(product_tab, "Produtos")
+        tab.addTab(service_tab, "Serviços")
+        tab.addTab(payment_tab, "Pagamentos")
 
-        table_widget = TableWidget()
+        tab.setCurrentIndex(1)
 
-        row_count = 1000
+        total_widget = QWidget()
+        total_layout = QHBoxLayout()
 
-        table_widget.setRowCount(row_count)
+        total_label = Label("Total:")
+        total_input = DoubleSpinBox()
 
-        for i in range(row_count):
-            table_widget.setItem(i, 0, QTableWidgetItem(f"Serviço {i}"))
-            table_widget.setItem(i, 1, QTableWidgetItem(f"Cliente {i}"))
-            table_widget.setItem(i, 2, QTableWidgetItem(f"{i+1}00,00"))
-            table_widget.setItem(i, 3, QTableWidgetItem("Dinheiro"))
+        total_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum))
+        total_layout.addWidget(total_label)
+        total_layout.addWidget(total_input)
 
-        layout.addWidget(inputs_widget)
-        layout.addWidget(table_widget)
-        layout.addWidget(Label(f"{row_count} serviços encontrados!"))
+        total_widget.setLayout(total_layout)
+
+        layout.addWidget(client_label)
+        layout.addWidget(client_input)
+        layout.addWidget(tab)
+        layout.addWidget(total_widget)
 
         widget.setLayout(layout)
 
-        widget.setStyleSheet("background-color: transparent !important;")
+        scroll_area.setWidget(widget)
+
+        return scroll_area
+
+    def createProductTab(self):
+        widget = QWidget()
+        layout = QGridLayout()
+        widget.setLayout(layout)
+
+        quantity_label = Label("Quantidade:", fixed=False)
+        price_label = Label("Preço:", fixed=False)
+        subtotal_label = Label("Subtotal:", fixed=False)
+
+        search_input = SearchInput("Procure por um produto", max_width=1200)
+        quantity_input = SpinBox()
+        price_input = DoubleSpinBox()
+        subtotal_input = DoubleSpinBox()
+        subtotal_input.setReadOnly(True)
+
+        table_input = TableWidget(["ID", "Nome", "Preço", "Quantidade", "Subtotal"])
+
+        buttons_widget = QWidget()
+        buttons_layout = QHBoxLayout()
+
+        add_button = Button("Adicionar", icon_path="plus.svg")
+        edit_button = Button("Editar", icon_path="edit.svg")
+        remove_button = Button("Remover", icon_path="cross.svg")
+
+        buttons_layout.addWidget(add_button)
+        buttons_layout.addWidget(edit_button)
+        buttons_layout.addWidget(remove_button)
+
+        buttons_widget.setLayout(buttons_layout)
+
+        layout.addWidget(search_input, 0, 0, 1, 8)
+        layout.addWidget(quantity_label, 1, 0)
+        layout.addWidget(quantity_input, 1, 1)
+        layout.addWidget(price_label, 1, 2)
+        layout.addWidget(price_input, 1, 3)
+        layout.addWidget(subtotal_label, 1, 4)
+        layout.addWidget(subtotal_input, 1, 5)
+        layout.addWidget(buttons_widget, 1, 7)
+        layout.addWidget(table_input, 2, 0, 1, 8)
 
         return widget
 
-    def addWindow(self):
-        self.current_win = TransactionDialog(initial_window=1)
+    def createServiceTab(self):
+        widget = QWidget()
+        layout = QGridLayout()
+        widget.setLayout(layout)
 
-        self.current_win.exec()
+        quantity_label = Label("Quantidade:", fixed=False)
+        price_label = Label("Preço:", fixed=False)
+        subtotal_label = Label("Subtotal:", fixed=False)
 
-    def editWindow(self):
-        self.current_win = TransactionDialog(initial_window=1)
+        search_input = SearchInput("Procure por um serviço", max_width=1200)
+        quantity_input = SpinBox()
+        price_input = DoubleSpinBox()
+        subtotal_input = DoubleSpinBox()
+        subtotal_input.setReadOnly(True)
 
-        self.current_win.exec()
-        pass
+        table_input = TableWidget(["ID", "Nome", "Preço", "Quantidade", "Subtotal"])
 
-    def removeWindow(self):
-        self.current_win = BaseDialog()
+        buttons_widget = QWidget()
+        buttons_layout = QHBoxLayout()
 
-        self.current_win.exec()
-        pass
+        add_button = Button("Adicionar", icon_path="plus.svg")
+        edit_button = Button("Editar", icon_path="edit.svg")
+        remove_button = Button("Remover", icon_path="cross.svg")
+
+        buttons_layout.addWidget(add_button)
+        buttons_layout.addWidget(edit_button)
+        buttons_layout.addWidget(remove_button)
+
+        buttons_widget.setLayout(buttons_layout)
+
+        layout.addWidget(search_input, 0, 0, 1, 8)
+        layout.addWidget(quantity_label, 1, 0)
+        layout.addWidget(quantity_input, 1, 1)
+        layout.addWidget(price_label, 1, 2)
+        layout.addWidget(price_input, 1, 3)
+        layout.addWidget(subtotal_label, 1, 4)
+        layout.addWidget(subtotal_input, 1, 5)
+        layout.addWidget(buttons_widget, 1, 7)
+        layout.addWidget(table_input, 2, 0, 1, 8)
+
+        return widget
+
+    def createPaymentTab(self):
+        widget = QWidget()
+        layout = QGridLayout()
+
+        payment_label = Label("Forma de pagamento:", fixed=False)
+        value_label = Label("Valor:", fixed=False)
+
+        payment_input = ComboBox(["Cartão de Crédito", "Cartão de Débito", "Pix", "Dinheiro"])
+        value_input = DoubleSpinBox()
+
+        add_btn = Button("Adicionar", icon_path="plus.svg")
+        edit_btn = Button("Editar", icon_path="edit.svg")
+        remove_btn = Button("Remover", icon_path="cross.svg")
+
+        table_input = TableWidget(["ID", "Data", "Documento", "Valor"])
+
+        layout.addWidget(payment_label, 0, 0)
+        layout.addWidget(payment_input, 0, 1)
+        layout.addWidget(value_label, 0, 2)
+        layout.addWidget(value_input, 0, 3)
+        layout.addWidget(add_btn, 0, 5)
+        layout.addWidget(edit_btn, 0, 6)
+        layout.addWidget(remove_btn, 0, 7)
+        layout.addWidget(table_input, 1, 0, 1, 8)
+
+        widget.setLayout(layout)
+
+        return widget

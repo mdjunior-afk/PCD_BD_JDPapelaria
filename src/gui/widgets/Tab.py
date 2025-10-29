@@ -11,7 +11,6 @@ class Tab(QTabWidget):
         _style = f"""
         QTabWidget::pane {{
             background: {BACKGROUND_COLOR};
-            border: none; 
             border-top-right-radius: 8px;
             border-bottom-left-radius: 8px;
             border-bottom-right-radius: 8px;

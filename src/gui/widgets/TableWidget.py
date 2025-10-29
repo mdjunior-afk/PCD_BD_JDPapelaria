@@ -79,8 +79,8 @@ class TableWidget(QTableWidget):
 
         # Dados de exemplo
 
-        self.table.setRowCount(1000)
-        for row in range(1000):
+        self.table.setRowCount(3)
+        for row in range(3):
             self.table.setItem(row, 0, QTableWidgetItem(f"{row}"))
             self.table.setItem(row, 1, QTableWidgetItem(f"Item {row}"))
             self.table.setItem(row, 2, QTableWidgetItem(f"{row+2}"))

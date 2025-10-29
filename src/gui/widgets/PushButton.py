@@ -26,6 +26,7 @@ class PushButton(QPushButton):
     def setStyle(self):
         base_style = f"""
         QPushButton {{
+            font-size: 12px;
             color: {BTN_TEXT_COLOR};
             background-color: transparent !important;
             padding-left: {self.text_padding}px;
@@ -33,26 +34,16 @@ class PushButton(QPushButton):
             border: none;
         }}
         QPushButton:hover {{
-            background: qlineargradient(
-                x1: 0, y1: 0,
-                x2: 0, y2: 1,
-                stop: 0 {SECONDARY_COLOR},
-                stop: 1 {SECONDARY_COLOR2}
-            );
+            background: {SECONDARY_COLOR};
             color: {BTN_HOVER_TEXT_COLOR}; /* O texto também muda de cor ao hover */
         }}
         """
 
         active_style = f"""
         QPushButton[active="true"] {{
-            background: qlineargradient(
-                x1: 0, y1: 0,
-                x2: 0, y2: 1,
-                stop: 0 {SECONDARY_COLOR},
-                stop: 1 {SECONDARY_COLOR2}
-            );
+            background: {SECONDARY_COLOR};
             color: {BTN_HOVER_TEXT_COLOR};
-            border-right: 5px solid #D9D9D9;
+            border-right: 5px solid {CONTENT_COLOR};
         }}
         """
         
@@ -100,7 +91,7 @@ class PushButton(QPushButton):
         original_icon = QPixmap(icon_path)
         
         # Redimensiona o ícone para caber na área reservada (se precisar)
-        icon_size = 20 # Tamanho fixo do ícone em pixels
+        icon_size = 15 # Tamanho fixo do ícone em pixels
         icon_to_draw = original_icon.scaled(icon_size, icon_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         
         # Cria uma nova QPixmap para colorir o ícone

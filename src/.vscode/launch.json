@@ -1,0 +1,18 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Run",
+            "request": "launch",
+            "mainClass": "Run",
+            "projectName": "src_d9a01c85"
+        },
+        {
+            "name": "Run",
+            "type": "python",
+            "request": "launch",
+            "program": "src/main.py",
+            "console": "integratedTerminal"
+        }
+    ]
+}

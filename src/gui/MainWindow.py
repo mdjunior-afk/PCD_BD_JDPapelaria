@@ -26,12 +26,7 @@ class MainWindow(QMainWindow):
         # START: side_menu
         self.side_menu = QWidget()
         self.side_menu.setStyleSheet(f"""
-            background: qlineargradient(
-                x1: 0, y1: 0,
-                x2: 0, y2: 1,
-                stop: 0 {SIDEMENU_COLOR},
-                stop: 1 {PRIMARY_COLOR2}
-            );
+            background-color: {PRIMARY_COLOR};
         """)
         self.side_menu.setMaximumWidth(50)
 
