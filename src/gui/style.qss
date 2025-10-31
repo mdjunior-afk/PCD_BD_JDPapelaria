@@ -2,6 +2,14 @@
     font-family: "Inter", sans-serif;
 }
 
+/* Buttons Style */
+QPushButton#SideMenuButton {
+    font-size: 12px;
+    padding-left: 55px;
+    text-align: left;
+    border: none;
+}
+
 QLabel[class="Normal"] {
     font-size: 12px;
 }

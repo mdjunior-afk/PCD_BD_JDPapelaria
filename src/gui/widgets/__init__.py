@@ -1,4 +1,4 @@
-from .PushButton import PushButton
+from .SideMenuButton import SideMenuButton
 from .PageButton import PageButton
 from .LineEdit import LineEdit
 from .InfoWidget import InfoWidget
@@ -17,4 +17,4 @@ from .Tab import TabWidget
 from .LineInputs import SearchInput
 from .Button import Button
 
-__all__ = ["PushButton", "PageButton", "LineEdit", "InfoWidget", "TableWidget", "DateEdit", "SpinBox", "DoubleSpinBox", "ReturnData", "ComboBox", "DefaultLineEdit", "GroupBox", "Label", "StockInput", "LineComplement", "Tab", "TabWidget", "SearchInput", "Button"]
+__all__ = ["SideMenuButton", "PageButton", "LineEdit", "InfoWidget", "TableWidget", "DateEdit", "SpinBox", "DoubleSpinBox", "ReturnData", "ComboBox", "DefaultLineEdit", "GroupBox", "Label", "StockInput", "LineComplement", "Tab", "TabWidget", "SearchInput", "Button"]

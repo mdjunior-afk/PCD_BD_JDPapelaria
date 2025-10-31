@@ -358,66 +358,6 @@ class PeopleDialog(BaseDialog):
         self.address_table.setItem(row_index, 4, QTableWidgetItem(self.neighborhood_input.text()))
         self.address_table.setItem(row_index, 5, QTableWidgetItem(self.city_input.currentText()))
         self.address_table.setItem(row_index, 6, QTableWidgetItem(self.estate_input.currentText()))
-    
-    def onIndexChanged(self, index):
-        if index == 0:
-            self.document_input.setInputMask("000.000.000-00;_")
-            self.document_label.setText("CPF")
-            self.document_input.clear()
-        elif index == 1:
-            self.document_input.setInputMask("00.000.000/0000-00;_")
-            self.document_label.setText("CNPJ")
-            self.document_input.clear()
-
-    def searchCEP(self):
-        cep = self.cep_input.text()
-        self.warning_label.setText("Consultando...")
-
-        cep = ''.join(filter(str.isdigit, cep))
-        
-        if len(cep) != 8:
-            print("ERRO")
-            return
-        
-        url = f"https://viacep.com.br/ws/{cep}/json/"
-
-        QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
-
-        try:
-            response = requests.get(url, timeout=10)
-            response.raise_for_status()
-            data = response.json()
-
-            if 'erro' in data and data['erro']:
-                print(f"CEP não encontrado!")
-                return
-            
-            uf_do_cep = data['uf']
-            estate_index = self.estate_input.findData(uf_do_cep)
-
-            if estate_index >= 0:
-                self.estate_input.setCurrentIndex(estate_index)
-                
-                city = data['localidade']
-
-                city_index = self.city_input.findText(city, Qt.MatchFlag.MatchExactly)
-                if city_index >= 0:
-                    self.city_input.setCurrentIndex(city_index)
-                else:
-                    self.city_input.lineEdit().setText(city)
-
-            self.neighborhood_input.setText(data["bairro"])
-            self.street_input.setText(data["logradouro"])
-
-        except requests.exceptions.RequestException as e:
-            print(f"Erro ao consultar o ViaCEP: {e}")
-            return None
-        except json.JSONDecodeError:
-            print("Erro ao decodificar a resposta JSON.")
-            return None
-        finally:
-            self.warning_label.setText("")
-            QApplication.restoreOverrideCursor()
 
 class TransactionDialog(BaseDialog):
     def __init__(self, maximum_width=1000, maximum_height=800, initial_window=0):
