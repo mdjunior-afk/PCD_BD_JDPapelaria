@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import *
 
-from gui.widgets import *
+from ..widgets import *
 
 from . import *
 

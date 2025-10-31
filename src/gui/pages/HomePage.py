@@ -21,24 +21,7 @@ class HomePage(QWidget):
 
         self.search_layout.addWidget(self.search_input)
 
-        self.box_widget = QWidget()
-
-        self.box_layout = QHBoxLayout(self.box_widget)
-        self.box_layout.setContentsMargins(0, 0, 0, 12)
-        self.box_layout.setSpacing(6)
-
-        self.box_left_spacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-        self.box_right_spacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.stock_info = InfoWidget(title="Estoques baixos", info="10")
-        self.birthday_qtd = InfoWidget(title="Aniversáriantes do mês", info="3")
-        self.daily_sell = InfoWidget(title="Vendas de hoje", info="R$1200,00")
-
-        self.box_layout.addItem(self.box_left_spacer)
-        self.box_layout.addWidget(self.stock_info)
-        self.box_layout.addWidget(self.daily_sell)
-        self.box_layout.addWidget(self.birthday_qtd)
-        self.box_layout.addItem(self.box_right_spacer)
+        self.box_widget = self.createBoxInputs()
 
         self.home_spacer = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
@@ -70,3 +53,23 @@ class HomePage(QWidget):
         }
 
         """)
+    def createBoxInputs(self):
+        widget = QWidget()
+
+        layout = QHBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 12)
+        layout.setSpacing(6)
+
+        widget.setLayout(layout)
+
+        stock_info = InfoWidget(title="Estoques baixos", info="10")
+        birthday_info = InfoWidget(title="Aniversáriantes do mês", info="3")
+        sell_info = InfoWidget(title="Vendas de hoje", info="R$1200,00")
+
+        layout.addItem(QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum))
+        layout.addWidget(stock_info)
+        layout.addWidget(sell_info)
+        layout.addWidget(birthday_info)
+        layout.addItem(QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum))
+
+        return widget
