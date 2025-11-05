@@ -47,7 +47,7 @@ Em relação às vendas, elas podem ser realizadas envolvendo tanto produtos qua
 <img width="1451" height="941" alt="DERPapelariaJD drawio" src="https://github.com/user-attachments/assets/9a9c5cfc-1367-4453-b424-36ce9c36afeb" />
 
 ## 4. Projeto Lógico
-**Adicionar a imagem do diagrama**
+<img width="1701" height="881" alt="Diagrama sem nome drawio" src="https://github.com/user-attachments/assets/ce5bcde2-6b41-482b-abd4-fab47b6d336f" />
 
 ## 5. Conclusão
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur vulputate a purus eu gravida. Suspendisse faucibus dictum venenatis. Donec bibendum vehicula condimentum. Ut facilisis velit ante. Vestibulum tellus urna, posuere ut interdum in, cursus eu lectus. Cras dictum augue ut ipsum pretium sodales. Aenean nec nisl non nunc tempor tincidunt. Duis ullamcorper turpis quis nulla feugiat, in lobortis dolor maximus. Morbi turpis est, malesuada porttitor mauris sed, pharetra ornare magna.
