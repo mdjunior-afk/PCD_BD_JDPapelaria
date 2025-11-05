@@ -44,12 +44,9 @@ A papelaria comercializa diversos produtos, identificados por um código de barr
 Em relação às vendas, elas podem ser realizadas envolvendo tanto produtos quanto serviços, ou mesmo ambos na mesma transação. Cada venda deve armazenar a data em que ocorreu e as formas de pagamento utilizadas, sendo possível combinar mais de uma forma de pagamento na mesma venda (por exemplo, parte no cartão e parte em dinheiro). Uma venda pode estar vinculada a um cliente cadastrado ou ser realizada sem identificação do cliente. Os clientes da papelaria podem ser tanto pessoas físicas quanto jurídicas. Para pessoas físicas devem ser armazenados nome, CPF, data de nascimento, endereço, telefone e e-mail. Para pessoas jurídicas devem ser salvos razão social, CNPJ, endereço, telefone e e-mail. Além da comercialização de produtos, a papelaria também oferece serviços, como xerox, impressão de currículos, aluguel de equipamentos e fornecimento de diferentes tipos de papel. Cada serviço possui um tipo, podendo ter preços fixos ou variáveis, dependendo da natureza do serviço. A partir das informações de vendas (produtos e serviços), é possível apurar as receitas da papelaria. As despesas não são lançadas como entidade própria, mas sim calculadas em análises posteriores a partir das movimentações financeiras.
 
  ## 3. Projeto Conceitual
- 
- <img width="1901" height="946" alt="Untitled Diagram drawio(2)" src="https://github.com/user-attachments/assets/fa21f967-a8b7-45af-86cc-d5ce48b24063" />
+<img width="1451" height="941" alt="DERPapelariaJD drawio" src="https://github.com/user-attachments/assets/9a9c5cfc-1367-4453-b424-36ce9c36afeb" />
 
 ## 4. Projeto Lógico
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur vulputate a purus eu gravida. Suspendisse faucibus dictum venenatis. Donec bibendum vehicula condimentum. Ut facilisis velit ante. Vestibulum tellus urna, posuere ut interdum in, cursus eu lectus. Cras dictum augue ut ipsum pretium sodales. Aenean nec nisl non nunc tempor tincidunt. Duis ullamcorper turpis quis nulla feugiat, in lobortis dolor maximus. Morbi turpis est, malesuada porttitor mauris sed, pharetra ornare magna.
-
 **Adicionar a imagem do diagrama**
 
 ## 5. Conclusão
