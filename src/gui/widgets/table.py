@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import *
 from PySide6.QtCore import Qt
 
-from gui.colors import *
+from src.gui.colors import *
 
 class Table(QTableWidget):
     def __init__(self, columns=[]):

@@ -1,6 +1,6 @@
-from gui.widgets.baseWidgets import *
+from src.gui.widgets.baseWidgets import *
 
-from gui.colors import *
+from src.gui.colors import *
 
 class SideMenuButton(ButtonBase):
     def __init__(self, text="", icon_path="", is_active=False):

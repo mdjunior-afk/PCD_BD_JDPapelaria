@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import *
 from PySide6.QtGui import QColor
 
-from gui.widgets import *
+from src.gui.widgets import *
 
 def createShadow() -> QGraphicsDropShadowEffect:
     shadow = QGraphicsDropShadowEffect()

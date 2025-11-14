@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import *
 from PySide6.QtGui import QPainter, Qt, QPixmap
 
-from gui.colors import *
+from src.gui.colors import *
 
 import os
 

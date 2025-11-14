@@ -1,13 +1,13 @@
 from PySide6 import QtWidgets
-from gui.mainWindow import MainWindow
+from src.gui.mainWindow import MainWindow
 
 import sys, os, json
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
 
-    qss_path = os.path.join(os.path.dirname(__file__), "gui", "styles.qss")
-    with open("configuration.json", "r") as f:
+    qss_path = os.path.join(os.path.dirname(__file__), "src/gui", "styles.qss")
+    with open("src/configuration.json", "r") as f:
         config = json.load(f)
     
     with open(qss_path, "r") as f:

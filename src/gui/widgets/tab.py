@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import *
 
-from gui.colors import *
-from gui.utils import *
+from src.gui.colors import *
+from src.gui.utils import *
 
 
 class Tab(QTabWidget):

@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import *
 
-from gui.widgets.baseWidgets import ButtonBase
-from gui.colors import *
+from src.gui.widgets.baseWidgets import ButtonBase
+from src.gui.colors import *
 
 class PushButton(ButtonBase):
     def __init__(self, text="", icon_path="", is_active="", type="WithBackground"):

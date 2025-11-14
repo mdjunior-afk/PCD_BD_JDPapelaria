@@ -1,8 +1,9 @@
 from PySide6.QtWidgets import *
 from PySide6.QtCore import QDate
 
-from gui.widgets import *
-from gui.utils import *
+from src.gui.widgets import *
+from src.gui.utils import *
+from src.controllers import productController
 
 class ProductPage(QWidget):
     def __init__(self):
@@ -48,6 +49,12 @@ class ProductPage(QWidget):
         category_input = ComboBox(["Categoria 1", "Categoria 2", "Categoria 3"])
         search_button = PushButton("Pesquisar", icon_path="search.svg", type="WithoutBackground")
         export_button = PushButton("Exportar", icon_path="download.svg", type="WithBackground")
+
+        data = {
+            "search": search_input.text(),
+            "category": category_input.currentText()
+        }
+        search_button.clicked.connect(lambda i: productController.getProduct(data))
 
         search_layout.addWidget(search_label, 0, 0)
         search_layout.addWidget(category_label, 0, 1)
@@ -95,15 +102,15 @@ class ProductPage(QWidget):
         minimum_stock_label = Label("Estoque mínimo", type="InputLabel")
         current_stock_label = Label("Estoque atual", type="InputLabel")
 
-        name_input = LineEdit()
-        brand_input = ComboBox(["Marca 1", "Marca 2", "Marca 3"])
-        category_input = ComboBox(["Categoria 1", "Categoria 2", "Categoria 3"])
-        barcode_input = LineEdit()
+        self.name_input = LineEdit()
+        self.brand_input = ComboBox(["Marca 1", "Marca 2", "Marca 3"])
+        self.category_input = ComboBox(["Categoria 1", "Categoria 2", "Categoria 3"])
+        self.barcode_input = LineEdit()
         self.purchase_input = DoubleSpinBox()
         self.adjust_input = DoubleSpinBox()
         self.sale_input = DoubleSpinBox()
-        minimum_stock_input = SpinBox()
-        current_stock_input = SpinBox()
+        self.minimum_stock_input = SpinBox()
+        self.current_stock_input = SpinBox()
 
         self.purchase_input.setPrefix("R$ ")
         self.sale_input.setPrefix("R$ ")
@@ -122,15 +129,15 @@ class ProductPage(QWidget):
         info_layout.addWidget(minimum_stock_label, 6, 0)
         info_layout.addWidget(current_stock_label, 6, 1)
 
-        info_layout.addWidget(name_input, 1, 0, 1, 3)
-        info_layout.addWidget(brand_input, 3, 0)
-        info_layout.addWidget(category_input, 3, 1)
-        info_layout.addWidget(barcode_input, 3, 2)
+        info_layout.addWidget(self.name_input, 1, 0, 1, 3)
+        info_layout.addWidget(self.brand_input, 3, 0)
+        info_layout.addWidget(self.category_input, 3, 1)
+        info_layout.addWidget(self.barcode_input, 3, 2)
         info_layout.addWidget(self.purchase_input, 5, 0)
         info_layout.addWidget(self.adjust_input, 5, 1)
         info_layout.addWidget(self.sale_input, 5, 2)
-        info_layout.addWidget(minimum_stock_input, 7, 0)
-        info_layout.addWidget(current_stock_input, 7, 1)
+        info_layout.addWidget(self.minimum_stock_input, 7, 0)
+        info_layout.addWidget(self.current_stock_input, 7, 1)
 
         info_layout.setColumnStretch(0, 1)
         info_layout.setColumnStretch(1, 1)
@@ -168,6 +175,9 @@ class ProductPage(QWidget):
         layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding))
         layout.addWidget(buttons_widget)
 
+        buttons[0].clicked.connect(self.addProduct)
+        buttons[2].clicked.connect(lambda i: productController.removeProduct(0))
+
         scroll_area.setWidget(widget)
 
         return scroll_area
@@ -183,3 +193,18 @@ class ProductPage(QWidget):
         purchase = self.purchase_input.value()
 
         self.adjust_input.setValue(((sell/purchase) - 1) * 100)
+
+    def addProduct(self):
+        data = {
+            "name": self.name_input.text(),
+            "brand": self.brand_input.currentText(),
+            "category": self.category_input.currentText(),
+            "barcode": self.barcode_input.text(),
+            "purchase_price": self.purchase_input.value(),
+            "adjust": self.adjust_input.value(),
+            "sale_price": self.sale_input.value(),
+            "minimum_stock": self.minimum_stock_input.value(),
+            "current_stock": self.current_stock_input.value()
+        }
+
+        productController.addProduct(data)

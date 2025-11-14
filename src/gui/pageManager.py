@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import *
 
-from gui.pages import *
+from src.gui.pages import *
 
 class PageManager(QStackedWidget):
     def __init__(self):

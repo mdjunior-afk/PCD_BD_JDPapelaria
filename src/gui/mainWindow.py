@@ -1,8 +1,8 @@
 from PySide6.QtWidgets import *
 
-from gui.pageManager import *
-from gui.widgets import *
-from gui.colors import *
+from src.gui.pageManager import *
+from src.gui.widgets import *
+from src.gui.colors import *
 
 class MainWindow(QMainWindow):
     def __init__(self):

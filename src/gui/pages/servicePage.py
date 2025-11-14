@@ -1,8 +1,8 @@
 from PySide6.QtWidgets import *
 from PySide6.QtCore import QDate
 
-from gui.widgets import *
-from gui.utils import *
+from src.gui.widgets import *
+from src.gui.utils import *
 
 class ServicePage(QWidget):
     def __init__(self):

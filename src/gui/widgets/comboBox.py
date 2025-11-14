@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import *
 
-from gui.colors import *
+from src.gui.colors import *
 
 class ComboBox(QComboBox):
     def __init__(self, items=[]):

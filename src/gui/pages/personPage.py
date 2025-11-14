@@ -1,9 +1,9 @@
 from PySide6.QtWidgets import *
 from PySide6.QtCore import QDate
 
-from gui.widgets import *
-from gui.utils import *
-from utils import cepAPI, locations
+from src.gui.widgets import *
+from src.gui.utils import *
+from src.utils import cepAPI, locations
 
 class PersonPage(QWidget):
     def __init__(self):

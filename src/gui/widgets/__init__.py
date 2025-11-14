@@ -1,13 +1,13 @@
-from gui.widgets.baseWidgets import ButtonBase
-from gui.widgets.sideMenuButton import SideMenuButton
-from gui.widgets.pushButton import PushButton
-from gui.widgets.label import Label
-from gui.widgets.table import Table
-from gui.widgets.tab import Tab, TabWidget
-from gui.widgets.lineEdit import LineEdit
-from gui.widgets.comboBox import ComboBox
-from gui.widgets.groupBox import GroupBox
-from gui.widgets.spinBox import SpinBox, DoubleSpinBox
+from src.gui.widgets.baseWidgets import ButtonBase
+from src.gui.widgets.sideMenuButton import SideMenuButton
+from src.gui.widgets.pushButton import PushButton
+from src.gui.widgets.label import Label
+from src.gui.widgets.table import Table
+from src.gui.widgets.tab import Tab, TabWidget
+from src.gui.widgets.lineEdit import LineEdit
+from src.gui.widgets.comboBox import ComboBox
+from src.gui.widgets.groupBox import GroupBox
+from src.gui.widgets.spinBox import SpinBox, DoubleSpinBox
 
 __all__ = [
     "ButtonBase", "SideMenuButton", "PushButton", "Label",
