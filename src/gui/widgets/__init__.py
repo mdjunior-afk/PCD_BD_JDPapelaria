@@ -1,20 +1,16 @@
-from .SideMenuButton import SideMenuButton
-from .PageButton import PageButton
-from .LineEdit import LineEdit
-from .InfoWidget import InfoWidget
-from .TableWidget import TableWidget
-from .DateEdit import DateEdit
-from .SpinBox import SpinBox, DoubleSpinBox
-from .ReturnData import ReturnData
-from .ComboBox import ComboBox
-from .DefaultLineEdit import DefaultLineEdit
-from .GroupBox import GroupBox
-from .Label import Label
-from .StockInput import StockInput
-from .LineComplement import LineComplement
-from .Tab import Tab
-from .Tab import TabWidget
-from .LineInputs import SearchInput
-from .Button import Button
+from gui.widgets.baseWidgets import ButtonBase
+from gui.widgets.sideMenuButton import SideMenuButton
+from gui.widgets.pushButton import PushButton
+from gui.widgets.label import Label
+from gui.widgets.table import Table
+from gui.widgets.tab import Tab, TabWidget
+from gui.widgets.lineEdit import LineEdit
+from gui.widgets.comboBox import ComboBox
+from gui.widgets.groupBox import GroupBox
+from gui.widgets.spinBox import SpinBox, DoubleSpinBox
 
-__all__ = ["SideMenuButton", "PageButton", "LineEdit", "InfoWidget", "TableWidget", "DateEdit", "SpinBox", "DoubleSpinBox", "ReturnData", "ComboBox", "DefaultLineEdit", "GroupBox", "Label", "StockInput", "LineComplement", "Tab", "TabWidget", "SearchInput", "Button"]
+__all__ = [
+    "ButtonBase", "SideMenuButton", "PushButton", "Label",
+     "Table", "Tab", "TabWidget", "LineEdit", "ComboBox", "GroupBox",
+     "SpinBox", "DoubleSpinBox"
+]
