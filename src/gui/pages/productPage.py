@@ -3,7 +3,6 @@ from PySide6.QtCore import QDate
 
 from src.gui.widgets import *
 from src.gui.utils import *
-from src.controllers import productController
 
 class ProductPage(QWidget):
     def __init__(self):
@@ -54,7 +53,6 @@ class ProductPage(QWidget):
             "search": search_input.text(),
             "category": category_input.currentText()
         }
-        search_button.clicked.connect(lambda i: productController.getProduct(data))
 
         search_layout.addWidget(search_label, 0, 0)
         search_layout.addWidget(category_label, 0, 1)
@@ -176,7 +174,6 @@ class ProductPage(QWidget):
         layout.addWidget(buttons_widget)
 
         buttons[0].clicked.connect(self.addProduct)
-        buttons[2].clicked.connect(lambda i: productController.removeProduct(0))
 
         scroll_area.setWidget(widget)
 
@@ -206,5 +203,3 @@ class ProductPage(QWidget):
             "minimum_stock": self.minimum_stock_input.value(),
             "current_stock": self.current_stock_input.value()
         }
-
-        productController.addProduct(data)
