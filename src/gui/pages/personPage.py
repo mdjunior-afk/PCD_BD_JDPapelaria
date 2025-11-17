@@ -99,6 +99,7 @@ class PersonPage(QWidget):
         birthday_input.setDisplayFormat("dd/MM/yyyy")
 
         document_input.setInputMask("000.000.000-00;_")
+        document_input.textChanged.connect(lambda x: print(x))
 
         info_layout.addWidget(name_label, 0, 0)
         info_layout.addWidget(type_label, 2, 0)

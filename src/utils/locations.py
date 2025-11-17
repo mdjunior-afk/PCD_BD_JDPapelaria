@@ -4,7 +4,7 @@ import json
 
 class Location():
     def __init__(self, estate_input, city_input):
-        self.filename = "utils/estados-cidades.json"
+        self.filename = "src/utils/estados-cidades.json"
         self.data = {}
 
         self.estate_input = estate_input

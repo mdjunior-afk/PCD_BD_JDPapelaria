@@ -51,13 +51,13 @@ QSpinBox::down-button:hover {{
 }}
 
 QSpinBox::up-arrow {{
-image: url(gui/icons/angle-small-up.svg);
+image: url(src/gui/icons/angle-small-up.svg);
 width: 10px;
 height: 10px;
 }}
 
 QSpinBox::down-arrow {{
-image: url(gui/icons/angle-small-down.svg);
+image: url(src/gui/icons/angle-small-down.svg);
 width: 10px;
 height: 10px;
 }}
@@ -96,13 +96,13 @@ QDoubleSpinBox::down-button:hover {{
 }}
 
 QDoubleSpinBox::up-arrow {{
-image: url(gui/icons/angle-small-up.svg);
+image: url(src/gui/icons/angle-small-up.svg);
 width: 10px;
 height: 10px;
 }}
 
 QDoubleSpinBox::down-arrow {{
-image: url(gui/icons/angle-small-down.svg);
+image: url(src/gui/icons/angle-small-down.svg);
 width: 10px;
 height: 10px;
 }}
@@ -202,7 +202,7 @@ QComboBox::drop-down {{
 }}
 
 QComboBox:down-arrow {{
-    image: url(gui/icons/angle-small-down.svg);
+    image: url(src/gui/icons/angle-small-down.svg);
     width: 14px;
     height: 14px;
 }}
@@ -302,7 +302,7 @@ QCalendarWidget QToolButton {{
 }}
 
 QDateEdit::drop-down {{
-    image: url(gui/icons/calendar.svg);
+    image: url(src/gui/icons/calendar.svg);
     padding-right: 8px;
     subcontrol-origin: margin;
     subcontrol-position: right center;
