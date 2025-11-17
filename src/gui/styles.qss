@@ -1,0 +1,325 @@
+* {{
+    font-family: "Inter", sans-serif;
+}}
+
+/* Menu styles */
+QMenu {{
+    border: 1px solid lightgray;
+    padding: 8px 0;
+    font-size: 14px;
+}}
+
+QMenu::item {{
+    padding: 3px 12px;
+}}
+                    
+QMenu::icon {{
+    padding: 0 6px;
+}}
+
+/* SpinBox */
+QSpinBox {{
+    background-color: transparent !important;
+    border-radius: 8px;
+    padding: 8px 20px 8px 8px;
+    font-size: 12px;
+    border: 1px solid lightgray;
+}}
+
+QSpinBox::up-button {{
+    subcontrol-origin: border;
+    subcontrol-position: top right;
+    width: 20px;
+    border-top-right-radius: 8px;
+    background: transparent !important;
+}}
+
+QSpinBox::up-button:hover {{
+    background-color: lightgray;
+}}
+
+QSpinBox::down-button {{
+    subcontrol-origin: border;
+    subcontrol-position: bottom right;
+    width: 20px;
+    border-bottom-right-radius: 8px;
+    background: transparent !important;
+}}
+
+QSpinBox::down-button:hover {{
+    background-color: lightgray;
+}}
+
+QSpinBox::up-arrow {{
+image: url(src/gui/icons/angle-small-up.svg);
+width: 10px;
+height: 10px;
+}}
+
+QSpinBox::down-arrow {{
+image: url(src/gui/icons/angle-small-down.svg);
+width: 10px;
+height: 10px;
+}}
+
+/* DoubleSpinBox */
+QDoubleSpinBox {{
+    background-color: transparent !important;
+    border-radius: 8px;
+    padding: 8px 20px 8px 8px;
+    font-size: 12px;
+    border: 1px solid lightgray;
+}}
+
+QDoubleSpinBox::up-button {{
+    subcontrol-origin: border;
+    subcontrol-position: top right;
+    width: 20px;
+    border-top-right-radius: 8px;
+    background: transparent !important;
+}}
+
+QDoubleSpinBox::up-button:hover {{
+    background-color: lightgray;
+}}
+
+QDoubleSpinBox::down-button {{
+    subcontrol-origin: border;
+    subcontrol-position: bottom right;
+    width: 20px;
+    border-bottom-right-radius: 8px;
+    background: transparent !important;
+}}
+
+QDoubleSpinBox::down-button:hover {{
+    background-color: lightgray;
+}}
+
+QDoubleSpinBox::up-arrow {{
+image: url(src/gui/icons/angle-small-up.svg);
+width: 10px;
+height: 10px;
+}}
+
+QDoubleSpinBox::down-arrow {{
+image: url(src/gui/icons/angle-small-down.svg);
+width: 10px;
+height: 10px;
+}}
+
+/* Buttons Style */
+QPushButton#SideMenuButton {{
+    font-size: {SIDE_MENU_LABEL_SIZE}px;
+    padding-left: 55px;
+    text-align: left;
+    border: none;
+}}
+
+QPushButton#Button {{
+    font-size: 12px;
+    font-weight: 650;
+    padding: 8px;
+    border-radius: 4px;
+}}
+
+/* Table style */
+QTableWidget {{
+    background-color: transparent !important;
+    gridline-color: lightgray;
+    font-size: 12px;
+}}
+
+QHeaderView::section {{
+    font-size: 12px;
+    border: 1px solid lightgray;
+    padding: 8px 16px;
+    font-weight: 600;
+    color: #555;
+}}
+
+QHeaderView::section:first {{
+    border-top-left-radius: 8px;
+    border-left: 1px solid lightgray;
+}}
+
+QHeaderView::section:last {{
+    border-top-right-radius: 8px;
+}}
+
+QTableWidget::item {{
+    padding: 0 8px;
+}}
+
+QTableWidget::item:first {{
+    border-left: 0.5px solid lightgray;
+}}
+
+QTableWidget::item:focus {{
+    outline: none;
+    border: none;
+}}
+
+/* QScrollBar style */
+QScrollBar:vertical {{
+    border: none;
+    background: #F0F0F0;
+    width: 5px;
+    margin: 0px;
+    border-radius: 5px;
+}}
+
+QScrollBar::handle:vertical {{
+    background: #A0A0A0;
+    min-height: 20px;
+    border-radius: 2px;
+}}
+
+QScrollBar::handle:vertical:hover {{
+    background: #808080;
+}}
+
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
+    height: 0px;
+}}
+
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {{
+    background: none;
+}}
+
+/* ComboBox style*/
+QComboBox {{
+    font-size: 12px;
+    padding: 8px;
+    border-radius: 4px;
+}}
+
+QComboBox::drop-down {{
+    subcontrol-origin: border;
+    subcontrol-position: top right;
+    width: 20px;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}}
+
+QComboBox:down-arrow {{
+    image: url(src/gui/icons/angle-small-down.svg);
+    width: 14px;
+    height: 14px;
+}}
+
+/* Labels type */
+QLabel[type="Normal"]
+{{
+    font-size: {NORMAL_LABEL_SIZE}px;
+}}
+
+QLabel[type="InputLabel"] {{
+    font-size: {INPUT_LABEL_SIZE}px;
+    font-weight: bold;
+}}
+
+QLabel[type="Title"] {{
+    font-size: {TITLE_LABEL_SIZE}px;
+    font-weight: bold;
+}}
+
+QLabel[type="Subtitle"] {{
+    font-size: {SUBTITLE_LABEL_SIZE}px;
+    color: #747474;
+}}
+
+/* Tab style */
+QTabBar {{
+    font-size: 12px;
+}}
+
+QTabBar::tab {{
+    background-color: #D1D1D1;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    padding: 12px 16px;
+    margin-right: 8px;
+}}
+
+QTabBar::tab:selected {{
+    background: #F3F3F3;
+    font-weight: bold;
+}}
+
+/* Groupbox style */
+QGroupBox {{
+        margin-top: 1ex;
+        padding: 1ex;
+
+        font-size: 12px;
+
+        border: 1px solid lightgray;
+        border-radius: 4px;
+}}
+
+QGroupBox::title {{
+        subcontrol-origin: margin;
+        subcontrol-position: top left;
+
+        padding: 0 3px;
+
+        font-weight: bolder;
+}}
+
+QLineEdit {{
+    border: none;
+}}
+
+QLineEdit[type="WithComplement"] {{
+    font-size: {INPUT_LABEL_SIZE}px;
+    padding: 8px;
+
+    border-top-left-radius: 4px;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 0;
+}}
+
+QLineEdit[type="WithoutComplement"] {{
+    font-size: {INPUT_LABEL_SIZE}px;
+    padding: 8px;
+
+    border-radius: 4px;
+}}
+
+QDateEdit {{
+    background-color: transparent !important;
+    border: 1px solid lightgray;
+    border-radius: 4px;
+    font-size: 12px;
+    padding: 8px;
+}}
+
+QCalendarWidget QToolButton {{
+    color: white;
+    font-size: 12px;
+    icon-size: 24px 24px;
+}}
+
+QDateEdit::drop-down {{
+    image: url(src/gui/icons/calendar.svg);
+    padding-right: 8px;
+    subcontrol-origin: margin;
+    subcontrol-position: right center;
+    width: 20px;
+    height: 20px;
+    right: 5px;
+    border: none;
+}}
+
+QCalendarWidget QMenu {{
+    left:20px;
+    color: white;
+    font-size: 12px;
+}}
+
+QCalendarWidget QAbstractItemView:enabled {{
+    font-size:12px;
+    background-color: #FFFFFF;    
+    selection-color: white;
+}}
