@@ -45,7 +45,7 @@ class ProductPage(QWidget):
         category_label = Label("Categoria", type="InputLabel")
 
         search_input = LineEdit("Pesquise por um produto")
-        category_input = ComboBox(["Categoria 1", "Categoria 2", "Categoria 3"])
+        category_input = ComboBox(["Categoria 1", "Car 2", "Categoria 3"])
         search_button = PushButton("Pesquisar", icon_path="search.svg", type="WithoutBackground")
         export_button = PushButton("Exportar", icon_path="download.svg", type="WithBackground")
 
@@ -102,7 +102,7 @@ class ProductPage(QWidget):
 
         self.name_input = LineEdit()
         self.brand_input = ComboBox(["Marca 1", "Marca 2", "Marca 3"])
-        self.category_input = ComboBox(["Categoria 1", "Categoria 2", "Categoria 3"])
+        self.category_input = ComboBox(["Categoria 1", "Car 2", "ASD 3"])
         self.barcode_input = LineEdit()
         self.purchase_input = DoubleSpinBox()
         self.adjust_input = DoubleSpinBox()

@@ -8,6 +8,9 @@ class ComboBox(QComboBox):
 
         self.addItems(items)
 
+        self.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.setMinimumContentsLength(12)
+
         # ComboBox config
         self.setEditable(True)
         self.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)

@@ -1,5 +1,6 @@
 from PySide6.QtWidgets import *
-from PySide6.QtGui import QColor
+from PySide6.QtGui import QColor, QIcon
+from PySide6.QtCore import QPoint
 
 from src.gui.widgets import *
 
@@ -44,3 +45,5 @@ def createTableButtons():
     layout.addWidget(remove_button)
 
     return widget, (add_button, edit_button, remove_button)
+
+
