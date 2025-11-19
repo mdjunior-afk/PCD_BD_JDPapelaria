@@ -18,7 +18,7 @@ if __name__ == "__main__":
             INPUT_LABEL_SIZE=config["INPUT_LABEL_SIZE"],
             TITLE_LABEL_SIZE=config["TITLE_LABEL_SIZE"],
             SUBTITLE_LABEL_SIZE=config["SUBTITLE_LABEL_SIZE"]
-        )
+        )+
 
         app.setStyleSheet(_style)
 
