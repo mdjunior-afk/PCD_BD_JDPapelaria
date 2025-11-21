@@ -45,8 +45,8 @@ class ServicePage(QWidget):
         initial_date_label = Label("Período incial", type="InputLabel")
         final_date_label = Label("Período final", type="InputLabel")
 
-        initial_date = QDateEdit(date=QDate.currentDate())
-        final_date = QDateEdit(date=QDate.currentDate())
+        initial_date = DateEdit(date=QDate.currentDate())
+        final_date = DateEdit(date=QDate.currentDate())
         search_button = PushButton("Pesquisar", icon_path="search.svg", type="WithoutBackground")
         export_button = PushButton("Exportar", icon_path="download.svg", type="WithBackground")
 

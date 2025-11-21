@@ -113,8 +113,7 @@ class PersonPage(QWidget):
         type_input = ComboBox(["Pessoa física", "Pessoa jurídica"])
         document_input = LineEdit()
         sex_input = ComboBox(["Masculino", "Feminino", "Outro"])
-        birthday_input = QDateEdit(date=QDate.currentDate())
-        birthday_input.setDisplayFormat("dd/MM/yyyy")
+        birthday_input = DateEdit(QDate.currentDate())
         fantasy_name_input = LineEdit()
         get_cnpj_button = PushButton("Pesquisar", icon_path="search.svg")
 

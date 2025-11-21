@@ -290,6 +290,7 @@ QLineEdit[type="WithoutComplement"] {{
 QDateEdit {{
     background-color: transparent !important;
     border: 1px solid lightgray;
+    height: 16px;
     border-radius: 4px;
     font-size: 12px;
     padding: 8px;
@@ -302,12 +303,13 @@ QCalendarWidget QToolButton {{
 }}
 
 QDateEdit::drop-down {{
-    image: url(src/gui/icons/calendar.svg);
+    image: url(src/gui/icons/bold_calendar.svg);
+    color: lightgray;
     padding-right: 8px;
     subcontrol-origin: margin;
     subcontrol-position: right center;
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     right: 5px;
     border: none;
 }}
@@ -323,6 +325,7 @@ QCalendarWidget QAbstractItemView:enabled {{
     background-color: #FFFFFF;    
     selection-color: white;
 }}
+
 
 QCheckBox::indicator {{
     width: 10px;

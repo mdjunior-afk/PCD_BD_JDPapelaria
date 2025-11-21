@@ -152,7 +152,7 @@ class ProductPage(QWidget):
         search_input = LineEdit("Pesquise por um fornecedor")
         add_button = PushButton("Adicionar", icon_path="plus.svg", type="WithoutBackground")
         quantity_input = SpinBox()
-        expiration_date_input = QDateEdit(date=QDate.currentDate())
+        expiration_date_input = DateEdit(date=QDate.currentDate())
         expiration_date_input.setDisplayFormat("dd/MM/yyyy")
         supplier_table = Table(["CNPJ", "Razão social", "Data de validade"])
 
