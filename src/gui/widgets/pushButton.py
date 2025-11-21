@@ -1,4 +1,5 @@
 from PySide6.QtWidgets import *
+from PySide6.QtCore import Qt
 
 from src.gui.widgets.baseWidgets import ButtonBase
 from src.gui.colors import *
@@ -8,6 +9,8 @@ class PushButton(ButtonBase):
         super().__init__(text, icon_path, is_active)
 
         self.setObjectName("Button")
+
+        self.setFocusPolicy(Qt.NoFocus)
 
         self.setFixedHeight(36)
 

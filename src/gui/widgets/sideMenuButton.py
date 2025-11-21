@@ -1,4 +1,5 @@
 from src.gui.widgets.baseWidgets import *
+from PySide6.QtCore import Qt
 
 from src.gui.colors import *
 
@@ -8,6 +9,8 @@ class SideMenuButton(ButtonBase):
         self.is_active = is_active
 
         self.setObjectName("SideMenuButton")
+
+        self.setFocusPolicy(Qt.NoFocus)
 
         # Button Size
         self.setMinimumWidth(50)

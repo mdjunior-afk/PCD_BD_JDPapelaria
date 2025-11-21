@@ -4,12 +4,12 @@ from PySide6.QtCore import *
 from src.gui.colors import *
 
 class ItemExplorer(QFrame):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent=parent)
 
         self.targets = None
 
-        self.setWindowFlag(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
+        self.setWindowFlag(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.Popup)
         self.setMinimumWidth(300)
 
         self.setMinimumHeight(200)
@@ -19,6 +19,7 @@ class ItemExplorer(QFrame):
         self.main_layout.setContentsMargins(0, 0, 0, 0)
 
         self.list_widget = QListWidget()
+        self.list_widget.setFocusPolicy(Qt.NoFocus)
         self.list_widget.setStyleSheet("border: none")
 
         self.main_layout.addWidget(self.list_widget)

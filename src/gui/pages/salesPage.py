@@ -11,7 +11,8 @@ class SalesPage(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.item_explorer = ItemExplorer()
+        self.item_explorer = ItemExplorer(self)
+        self.item_explorer.setFixedSize(self.item_explorer.size())
 
         layout = QVBoxLayout()
         self.setLayout(layout)
@@ -236,9 +237,10 @@ class SalesPage(QWidget):
             self.item_explorer.showData(data)
 
             # Posiciona o dropdown
-            pos_global = search_widget.mapToGlobal(QPoint(0, search_widget.height() + 16))
-            pos_local = self.mapFromGlobal(pos_global)
-            self.item_explorer.move(pos_local)
+            pos_global = search_widget.mapToGlobal(QPoint(0, 0))
+            final_pos_global = QPoint(pos_global.x(), pos_global.y() + search_widget.height())
+            
+            self.item_explorer.move(final_pos_global)
             self.item_explorer.setFixedWidth(search_widget.width())
 
 

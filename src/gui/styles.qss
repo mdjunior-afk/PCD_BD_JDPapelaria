@@ -323,3 +323,20 @@ QCalendarWidget QAbstractItemView:enabled {{
     background-color: #FFFFFF;    
     selection-color: white;
 }}
+
+QCheckBox::indicator {{
+    width: 10px;
+    height: 10px;
+    padding: 4px;
+    border: 1px solid lightgray;
+    border-radius: 4px;
+}}
+
+QCheckBox::indicator:checked {{
+    image: url("src/gui/icons/verificar.svg");
+}}
+
+QCheckBox {{
+    spacing: 10px;
+    font-size: 12px;
+}}
