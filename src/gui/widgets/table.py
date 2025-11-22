@@ -25,7 +25,7 @@ class Table(QTableWidget):
             if item:
                 item.setTextAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
 
-        #self.setRowCount(3)
+        self.setRowCount(10)
 
         for i in range(self.rowCount()):
             self.setItem(i, 0, QTableWidgetItem(f"{i}"))

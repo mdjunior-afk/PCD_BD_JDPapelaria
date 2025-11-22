@@ -79,6 +79,7 @@ class PersonPage(QWidget):
 
         widget = TabWidget()
         layout = QVBoxLayout()
+        layout.setContentsMargins(20, 12, 20, 12)
         widget.setLayout(layout)
 
         buttons_widget, buttons = createWindowButtons()

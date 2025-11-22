@@ -4,9 +4,13 @@ from src.gui.pageManager import *
 from src.gui.widgets import *
 from src.gui.colors import *
 
+import os, json
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+
+        self.applyStyle()
 
         # Menu Buttons
         self.home_button = None
@@ -46,7 +50,7 @@ class MainWindow(QMainWindow):
 
         layout = QVBoxLayout()
 
-        page_manager = PageManager()
+        page_manager = PageManager(self)
 
         layout.addWidget(page_manager)
 
@@ -132,6 +136,24 @@ class MainWindow(QMainWindow):
         self.menu_buttons = [self.home_button, self.product_button, self.people_button, self.sell_button, self.services_button, self.settings_button]
 
         return widget
+    
+    def applyStyle(self):
+        qss_path = os.path.join(os.path.dirname(__file__), "styles.qss")
+        
+        with open("src/configuration.json", "r") as f:
+            config = json.load(f)
+        
+        with open(qss_path, "r") as f:
+            _style = f.read()
+            _style = _style.format(
+                SIDE_MENU_LABEL_SIZE=config["SIDE_MENU_LABEL_SIZE"],
+                NORMAL_LABEL_SIZE=config["NORMAL_LABEL_SIZE"],
+                INPUT_LABEL_SIZE=config["INPUT_LABEL_SIZE"],
+                TITLE_LABEL_SIZE=config["TITLE_LABEL_SIZE"],
+                SUBTITLE_LABEL_SIZE=config["SUBTITLE_LABEL_SIZE"]
+            )
+
+            QApplication.instance().setStyleSheet(_style)
 
     def home_page(self):
         for button in self.menu_buttons:
@@ -167,13 +189,13 @@ class MainWindow(QMainWindow):
         for button in self.menu_buttons:
             button.setActive(button is self.invoice_entry_button)
 
-        self.page_manager.setCurrentIndex(5)
+        self.page_manager.setCurrentIndex(8)
 
     def settings_page(self):
         for button in self.menu_buttons:
             button.setActive(button is self.settings_button)
 
-        self.page_manager.setCurrentIndex(6)        
+        self.page_manager.setCurrentIndex(5)        
 
     def toggle_side_menu(self):
         current_width = self.side_menu.width()
