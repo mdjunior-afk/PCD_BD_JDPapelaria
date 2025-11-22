@@ -9,25 +9,12 @@ class LineEdit(QLineEdit):
         super().__init__(placeholderText=placeholder)
 
         self.setProperty("type", type)
-        self.setStyle()
-
-    def setStyle(self):
-        _style = f"""
-        QLineEdit {{
-            background-color: transparent !important;
-            border: 1px solid lightgray;
-        }}
-
-        QLineEdit:focus {{
-            border-color: {PRIMARY_COLOR};
-        }}
-        """
-
-        self.setStyleSheet(_style)
 
 class ColorLineEdit(QLineEdit):
     def __init__(self, initial_color="#0A54C3", parent=None):
         super().__init__(parent=parent)
+
+        self.setInputMask("\#HHHHHH;_")
         
         self.currentColor = QColor(initial_color)
         self.setText(self.currentColor.name().upper())
@@ -47,22 +34,6 @@ class ColorLineEdit(QLineEdit):
         self.editingFinished.connect(self.handleTextChange)
 
         self.setProperty("type", "WithoutComplement")
-        self.setStyle()
-
-    
-    def setStyle(self):
-        _style = f"""
-        QLineEdit {{
-            background-color: transparent !important;
-            border: 1px solid lightgray;
-        }}
-
-        QLineEdit:focus {{
-            border-color: {PRIMARY_COLOR};
-        }}
-        """
-
-        self.setStyleSheet(_style)
 
     # Função para desenhar o ícone de amostra
     def createColorPixmap(self, color: QColor) -> QPixmap:

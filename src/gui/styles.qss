@@ -2,6 +2,11 @@
     font-family: "Inter", sans-serif;
 }}
 
+QWidget#SideMenu
+{{
+    background-color: {PRIMARY_COLOR};
+}}
+
 /* Menu styles */
 QMenu {{
     border: 1px solid lightgray;
@@ -107,6 +112,19 @@ width: 10px;
 height: 10px;
 }}
 
+QPushButton#SideMenuButton {{
+    color: {BTN_TEXT_COLOR};
+}}
+
+QPushButton#SideMenuButton:hover {{
+    color: {BTN_HOVER_TEXT_COLOR};
+}}
+
+QPushButton#SideMenuButton[is_active="true"] {{
+    color: {BTN_HOVER_TEXT_COLOR};
+    border-right: 5px solid {CONTENT_COLOR};
+}}
+
 /* Buttons Style */
 QPushButton#SideMenuButton {{
     font-size: {SIDE_MENU_LABEL_SIZE}px;
@@ -190,7 +208,13 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {{
 QComboBox {{
     font-size: {INPUT_LABEL_SIZE}px;
     padding: 8px;
+    border: 1px solid lightgray;
     border-radius: 4px;
+    background-color: transparent !important;
+}}
+
+QComboBox:focus {{
+    border-color: {PRIMARY_COLOR};
 }}
 
 QComboBox::drop-down {{
@@ -267,7 +291,8 @@ QGroupBox::title {{
 }}
 
 QLineEdit {{
-    border: none;
+    background-color: transparent !important;
+    border: 1px solid lightgray;
 }}
 
 QLineEdit[type="WithComplement"] {{
@@ -278,6 +303,10 @@ QLineEdit[type="WithComplement"] {{
     border-top-right-radius: 0;
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 0;
+}}
+
+QLineEdit:focus {{
+    border-color: {PRIMARY_COLOR};
 }}
 
 QLineEdit[type="WithoutComplement"] {{
@@ -353,7 +382,7 @@ QRadioButton::indicator {{
 }}
 
 QRadioButton::indicator:checked {{
-    background-color: #0A54C3;
+    background-color: {PRIMARY_COLOR};
 }}
 
 QRadioButton {{

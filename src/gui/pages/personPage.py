@@ -231,6 +231,19 @@ class PersonPage(QWidget):
         address_table.setItem(row, 6, QTableWidgetItem(data["estabelecimento"]["estado"]["sigla"]))
         address_table.setItem(row, 7, QTableWidgetItem(data["estabelecimento"]["complemento"] if data["estabelecimento"]["complemento"] != None else ""))
     
+    def applyStyleToDialog(self, dialog: QDialog):
+        """Aplica o estilo global e o estilo local dos botões a uma QDialog."""
+        
+        # 1. Obtém o config atual
+        with open("src/configuration.json", "r") as f:
+            config = json.load(f)
+
+        # 2. Aplica Estilo Local a Botões Customizados DENTRO do diálogo
+        for widget in dialog.findChildren(QPushButton):
+            # Apenas se tiver o método setStyle (se for seu PushButton)
+            if hasattr(widget, 'setStyle'):
+                widget.setStyle(config)
+
     def onIndexChanged(self, index, name, label, input, cpf_inputs: tuple, cnpj_inputs: tuple):
             if index == 0:
                 name.setText("Nome")
@@ -259,6 +272,7 @@ class PersonPage(QWidget):
     def addContactWindow(self):
         print("OPA")
         self.contact_window = ContactWindow(parent=self)
+        self.applyStyleToDialog(self.contact_window)
         self.contact_window.exec()
     
     def editContactWindow(self):
@@ -266,6 +280,7 @@ class PersonPage(QWidget):
             "type": "Celular",
             "value": "(31) 98914-3646"
         })
+        self.applyStyleToDialog(self.contact_window)
         self.contact_window.show()
 
     def removeContactWindow(self):
@@ -273,6 +288,7 @@ class PersonPage(QWidget):
 
     def addAddressWindow(self):
         self.address_window = AddressWindow(parent=self)
+        self.applyStyleToDialog(self.address_window)
         self.address_window.exec()
 
     def editAddressWindow(self):
@@ -283,8 +299,9 @@ class PersonPage(QWidget):
             "neighborhood": "Honório Bicalho",
             "street": "Rua da Máquina",
             "number": "60",
-            "complement": ""    
+            "complement": ""
         })
+        self.applyStyleToDialog(self.address_window)
         self.address_window.show()
 
     def removeAddressWindow(self):

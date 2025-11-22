@@ -3,7 +3,7 @@ from PySide6.QtGui import QPainter, Qt, QPixmap
 
 from src.gui.colors import *
 
-import os
+import os, json
 
 class ButtonBase(QPushButton):
     def __init__(self, text="", icon_path="", is_active=False):
@@ -16,7 +16,10 @@ class ButtonBase(QPushButton):
     def setActive(self, value):
         self.is_active = value
 
-        self.setStyle()
+        with open("src/configuration.json", "r") as f:
+            config = json.load(f)
+
+        self.setStyle(config)
 
     def paintEvent(self, event):
         # A forma mais simples é deixar o QPushButton desenhar tudo e depois adicionar o ícone.

@@ -37,8 +37,6 @@ class Table(QTableWidget):
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.customContextMenuRequested.connect(self.contextMenu)
 
-        self.setStyle()
-
     def contextMenu(self, point):
         menu = QMenu(self)
 
@@ -61,7 +59,7 @@ class Table(QTableWidget):
 
         menu.exec(self.mapToGlobal(point))
 
-    def setStyle(self):
+    def setStyle(self, config):
         _style = f"""
         QWidget {{
             background-color: transparent !important;
@@ -72,7 +70,7 @@ class Table(QTableWidget):
         }}
 
         QTableWidget::item:selected {{
-            background-color: {PRIMARY_COLOR};
+            background-color: {config["PRIMARY_COLOR"]};
         }}
         """
 

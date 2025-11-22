@@ -1,4 +1,5 @@
 from PySide6.QtWidgets import *
+from PySide6.QtCore import Qt
 
 from src.gui.widgets import *
 from src.gui.utils import *
@@ -255,38 +256,96 @@ class SettingsPage(QWidget):
         colors_box.setLayout(colors_box_layout)
 
         primary_color_label = Label("Cor primária", type="InputLabel")
+        primary_color_hover_label = Label("Cor primária (Hover)", type="InputLabel")
         secondary_color_label = Label("Cor secundária", type="InputLabel")
+        secondary_color_hover_label = Label("Cor secundária (Hover)", type="InputLabel")
 
-        self.primary_color_input = ColorLineEdit(initial_color=PRIMARY_COLOR, parent=self)
-        self.secondary_color_input = ColorLineEdit(initial_color=SECONDARY_COLOR, parent=self)
+        self.primary_color_input = ColorLineEdit(initial_color=self.config["PRIMARY_COLOR"], parent=self)
+        self.primary_color_hover_input = ColorLineEdit(initial_color=self.config["PRIMARY_COLOR_HOVER"], parent=self)
+        self.secondary_color_input = ColorLineEdit(initial_color=self.config["SECONDARY_COLOR"], parent=self)
+        self.secondary_color_hover_input = ColorLineEdit(initial_color=self.config["SECONDARY_COLOR_HOVER"], parent=self)
 
         colors_box_layout.addWidget(primary_color_label, 0, 0)
-        colors_box_layout.addWidget(secondary_color_label, 0, 1)
+        colors_box_layout.addWidget(secondary_color_label, 2, 0)
+        colors_box_layout.addWidget(primary_color_hover_label, 0, 1)
+        colors_box_layout.addWidget(secondary_color_hover_label, 2, 1)
 
         colors_box_layout.addWidget(self.primary_color_input, 1, 0)
-        colors_box_layout.addWidget(self.secondary_color_input, 1, 1)
+        colors_box_layout.addWidget(self.secondary_color_input, 3, 0)
+        colors_box_layout.addWidget(self.primary_color_hover_input, 1, 1)
+        colors_box_layout.addWidget(self.secondary_color_hover_input, 3, 1) 
 
         options_box_layout.addWidget(fonts_box)
         options_box_layout.addWidget(colors_box)
         options_box_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding))
 
+        buttons = QWidget()
+        buttons_layout = QHBoxLayout()
+        buttons.setLayout(buttons_layout)
+
+        reset_inputs_button = PushButton("Restaurar valores", icon_path="reset.svg")
+        reset_colors_button = PushButton("Restaurar cores", icon_path="reset.svg")
         apply_button = PushButton("Salvar", icon_path="disk.svg")
 
+        buttons_layout.addWidget(reset_inputs_button)
+        buttons_layout.addWidget(reset_colors_button)
+        buttons_layout.addWidget(apply_button)
+
+        reset_inputs_button.clicked.connect(lambda x: self.resetInputs(sidemenu_input_size, normal_input_size, input_input_size, title_input_size, subtitle_input_size))
+        reset_colors_button.clicked.connect(self.resetColors)
         apply_button.clicked.connect(self.saveConfig)
 
         layout.addWidget(theme_box)
         layout.addWidget(options_box)
-        layout.addWidget(apply_button)
+        layout.addWidget(buttons)
 
         return widget
     
     def saveConfig(self):
         try:
+            self.setCursor(Qt.WaitCursor)
+
+            new_primary = self.primary_color_input.text()
+            new_primary_hover = self.primary_color_hover_input.text()
+            new_secondary = self.secondary_color_input.text()
+            new_secondary_hover = self.secondary_color_hover_input.text()
+
+            self.config["PRIMARY_COLOR"] = new_primary
+            self.config["PRIMARY_COLOR_HOVER"] = new_primary_hover
+            self.config["SECONDARY_COLOR"] = new_secondary
+            self.config["SECONDARY_COLOR_HOVER"] = new_secondary_hover
+
             with open("src/configuration.json", "w") as f:
                 json.dump(self.config, f, indent=4)
 
             self.main_window.applyStyle()
 
+            self.setCursor(Qt.ArrowCursor)
+
             print("Configurações salvas com sucesso!")
         except Exception as e:
             print(f"ERRO ao salvar configurações: {e}")
+
+    def resetInputs(self, sidemenu, normal, input, title, subtitle):
+        sidemenu.setValue(12)
+        normal.setValue(12)
+        input.setValue(12)
+        title.setValue(20)
+        subtitle.setValue(16)
+
+    def resetColors(self):
+        self.primary_color_input.setText("#0A54C3")
+        self.primary_color_input.currentColor = self.primary_color_input.text()
+        self.primary_color_input.editingFinished.emit()
+        
+        self.primary_color_hover_input.setText("#0847A4")
+        self.primary_color_hover_input.currentColor = self.primary_color_hover_input.text()
+        self.primary_color_hover_input.editingFinished.emit()
+        
+        self.secondary_color_input.setText("#EA7712")
+        self.secondary_color_input.currentColor = self.secondary_color_input.text()
+        self.secondary_color_input.editingFinished.emit()
+        
+        self.secondary_color_hover_input.setText("#C9650D")
+        self.secondary_color_hover_input.currentColor = self.secondary_color_hover_input.text()
+        self.secondary_color_hover_input.editingFinished.emit()

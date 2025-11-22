@@ -1,4 +1,5 @@
 from PySide6.QtWidgets import *
+from PySide6.QtCore import Qt
 
 from src.gui.pageManager import *
 from src.gui.widgets import *
@@ -42,7 +43,11 @@ class MainWindow(QMainWindow):
 
         widget.setLayout(layout)
 
+        self.home_page()
+
         self.setCentralWidget(widget)
+
+        self.applyStyle()
 
     def createContent(self):
         widget = QWidget()
@@ -60,7 +65,7 @@ class MainWindow(QMainWindow):
 
     def createSideMenu(self):
         widget = QWidget()
-        widget.setStyleSheet(f"background-color: {PRIMARY_COLOR};")
+        widget.setObjectName("SideMenu")
         widget.setMaximumWidth(50)
 
         layout = QVBoxLayout()
@@ -150,10 +155,46 @@ class MainWindow(QMainWindow):
                 NORMAL_LABEL_SIZE=config["NORMAL_LABEL_SIZE"],
                 INPUT_LABEL_SIZE=config["INPUT_LABEL_SIZE"],
                 TITLE_LABEL_SIZE=config["TITLE_LABEL_SIZE"],
-                SUBTITLE_LABEL_SIZE=config["SUBTITLE_LABEL_SIZE"]
+                SUBTITLE_LABEL_SIZE=config["SUBTITLE_LABEL_SIZE"],
+                
+                PRIMARY_COLOR=config["PRIMARY_COLOR"],
+                PRIMARY_COLOR_HOVER=config["PRIMARY_COLOR_HOVER"],
+
+                SECONDARY_COLOR=config["SECONDARY_COLOR"],
+                SECONDARY_COLOR_HOVER=config["SECONDARY_COLOR_HOVER"],
+                
+                BTN_BACKGROUND_COLOR=config["BTN_BACKGROUND_COLOR"],
+                BTN_TEXT_COLOR=config["BTN_TEXT_COLOR"],
+                BTN_HOVER_BACKGROUND_COLOR=config["BTN_HOVER_BACKGROUND_COLOR"],
+                BTN_HOVER_TEXT_COLOR=config["BTN_HOVER_TEXT_COLOR"],
+
+                CONTENT_COLOR=config["CONTENT_COLOR"],
+
+                LINE_EDIT_BACKGROUND_COLOR=config["LINE_EDIT_BACKGROUND_COLOR"],
+                GROUP_BOX_BACKGROUND_COLOR=config["GROUP_BOX_BACKGROUND_COLOR"],
+
+                BACKGROUND_COLOR=config["BACKGROUND_COLOR"],
+                SHADOW_BACKGROUND_COLOR=config["SHADOW_BACKGROUND_COLOR"],
+
+                TEXT_COLOR=config["TEXT_COLOR"],
+                SUBTITLE_COLOR=config["SUBTITLE_COLOR"],
+
+                ICON_COLOR=config["ICON_COLOR"],
+                ICON_HOVER_COLOR=config["ICON_HOVER_COLOR"]
             )
 
+            for widget in self.findChildren(QPushButton):
+                if widget.objectName() == "SideMenuButton":
+                    widget.setStyle(config)
+                if widget.objectName() == "Button":
+                    widget.setStyle(config)
+
+            for widget in self.findChildren(QTableWidget):
+                widget.setStyle(config)
+
             QApplication.instance().setStyleSheet(_style)
+
+            self.setCursor(Qt.ArrowCursor)
 
     def home_page(self):
         for button in self.menu_buttons:

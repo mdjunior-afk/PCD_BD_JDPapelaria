@@ -10,8 +10,6 @@ class InfoWidget(QFrame):
 
         self.border_radius = border_radius
 
-        self.setCursor(Qt.PointingHandCursor)
-
         layout = QVBoxLayout(self)
         layout.setContentsMargins(15, 10, 15, 10)
         layout.setSpacing(5)

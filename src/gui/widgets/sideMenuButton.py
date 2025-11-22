@@ -18,25 +18,21 @@ class SideMenuButton(ButtonBase):
         
         self.setCursor(Qt.CursorShape.PointingHandCursor)
 
-        self.setStyle()
+    def setStyle(self, config):
+        background_color = config["SECONDARY_COLOR"]
 
-    def setStyle(self):
         base_style = f"""
         QPushButton {{
-            color: {BTN_TEXT_COLOR};
             background-color: transparent !important;
         }}
         QPushButton:hover {{
-            background: {SECONDARY_COLOR};
-            color: {BTN_HOVER_TEXT_COLOR};
+            background: {background_color};
         }}
         """
 
         active_style = f"""
         QPushButton[active="true"] {{
-            background: {SECONDARY_COLOR};
-            color: {BTN_HOVER_TEXT_COLOR};
-            border-right: 5px solid {CONTENT_COLOR};
+            background: {background_color};
         }}
         """
         
