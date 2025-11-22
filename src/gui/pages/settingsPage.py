@@ -192,12 +192,19 @@ class SettingsPage(QWidget):
         theme_box_layout = QHBoxLayout()
         theme_box.setLayout(theme_box_layout)
 
-        light_radio = QRadioButton("Claro")
-        light_radio.setChecked(True)
-        dark_radio = QRadioButton("Escuro")
+        self.light_radio = QRadioButton("Claro")
+        self.dark_radio = QRadioButton("Escuro")
 
-        theme_box_layout.addWidget(light_radio)
-        theme_box_layout.addWidget(dark_radio)
+        if self.config["THEME"] == "dark":
+            self.dark_radio.setChecked(True)
+        else:
+            self.light_radio.setChecked(True)
+
+        self.light_radio.toggled.connect(lambda checked: self.onThemeChanged("light") if checked else None)
+        self.dark_radio.toggled.connect(lambda checked: self.onThemeChanged("dark") if checked else None)
+
+        theme_box_layout.addWidget(self.light_radio)
+        theme_box_layout.addWidget(self.dark_radio)
         theme_box_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum))
         
         options_box = GroupBox("Personalizar")
@@ -300,6 +307,9 @@ class SettingsPage(QWidget):
         layout.addWidget(buttons)
 
         return widget
+    
+    def onThemeChanged(self, theme):
+        self.config["THEME"] = theme
     
     def saveConfig(self):
         try:

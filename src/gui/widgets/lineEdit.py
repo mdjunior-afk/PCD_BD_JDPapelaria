@@ -10,6 +10,15 @@ class LineEdit(QLineEdit):
 
         self.setProperty("type", type)
 
+    def setStyle(self, config):
+        style = f"""
+        QLineEdit {{
+            background-color: {config["CONTENT_COLOR"]};
+        }}
+        """
+
+        self.setStyleSheet(style)
+
 class ColorLineEdit(QLineEdit):
     def __init__(self, initial_color="#0A54C3", parent=None):
         super().__init__(parent=parent)

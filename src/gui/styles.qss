@@ -292,7 +292,7 @@ QGroupBox::title {{
 
 QLineEdit {{
     background-color: transparent !important;
-    border: 1px solid lightgray;
+    border: 1px solid {CONTENT_COLOR};
 }}
 
 QLineEdit[type="WithComplement"] {{

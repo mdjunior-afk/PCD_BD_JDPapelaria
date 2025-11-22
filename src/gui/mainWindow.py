@@ -11,6 +11,8 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        self.content = None
+
         self.applyStyle()
 
         # Menu Buttons
@@ -36,10 +38,10 @@ class MainWindow(QMainWindow):
 
         self.side_menu = self.createSideMenu()
 
-        content, self.page_manager = self.createContent()
+        self.content, self.page_manager = self.createContent()
 
         layout.addWidget(self.side_menu)
-        layout.addWidget(content)
+        layout.addWidget(self.content)
 
         widget.setLayout(layout)
 
@@ -51,7 +53,6 @@ class MainWindow(QMainWindow):
 
     def createContent(self):
         widget = QWidget()
-        widget.setStyleSheet(f"background-color: {CONTENT_COLOR}; color: {TEXT_COLOR};")
 
         layout = QVBoxLayout()
 
@@ -147,6 +148,21 @@ class MainWindow(QMainWindow):
         
         with open("src/configuration.json", "r") as f:
             config = json.load(f)
+
+        theme = config["THEME"]
+
+        if theme == "dark":
+            content_color = config["DARK_CONTENT_COLOR"]
+            text_color = config["DARK_TEXT_COLOR"]
+            subtitle_color = config["DARK_SUBTITLE_COLOR"]
+            background_color = config["DARK_BACKGROUND_COLOR"]
+            content_color = config["DARK_CONTENT_COLOR"]
+        else:
+            content_color = config["LIGHT_CONTENT_COLOR"]
+            text_color = config["LIGHT_TEXT_COLOR"]
+            subtitle_color = config["LIGHT_SUBTITLE_COLOR"]
+            background_color = config["LIGHT_BACKGROUND_COLOR"]
+            content_color = config["LIGHT_CONTENT_COLOR"]
         
         with open(qss_path, "r") as f:
             _style = f.read()
@@ -168,29 +184,42 @@ class MainWindow(QMainWindow):
                 BTN_HOVER_BACKGROUND_COLOR=config["BTN_HOVER_BACKGROUND_COLOR"],
                 BTN_HOVER_TEXT_COLOR=config["BTN_HOVER_TEXT_COLOR"],
 
-                CONTENT_COLOR=config["CONTENT_COLOR"],
+                CONTENT_COLOR=content_color,
+                TEXT_COLOR=text_color,
+                SUBTITLE_COLOR=subtitle_color,
+                BACKGROUND_COLOR=background_color,
 
                 LINE_EDIT_BACKGROUND_COLOR=config["LINE_EDIT_BACKGROUND_COLOR"],
                 GROUP_BOX_BACKGROUND_COLOR=config["GROUP_BOX_BACKGROUND_COLOR"],
-
-                BACKGROUND_COLOR=config["BACKGROUND_COLOR"],
                 SHADOW_BACKGROUND_COLOR=config["SHADOW_BACKGROUND_COLOR"],
-
-                TEXT_COLOR=config["TEXT_COLOR"],
-                SUBTITLE_COLOR=config["SUBTITLE_COLOR"],
 
                 ICON_COLOR=config["ICON_COLOR"],
                 ICON_HOVER_COLOR=config["ICON_HOVER_COLOR"]
             )
 
+            resolved_config = config.copy()
+            resolved_config["CONTENT_COLOR"] = content_color
+            resolved_config["TEXT_COLOR"] = text_color
+            resolved_config["SUBTITLE_COLOR"] = subtitle_color
+            resolved_config["BACKGROUND_COLOR"] = background_color            
+
+            if self.content:
+                self.content.setStyleSheet(f"background-color: {content_color}; color: {text_color};")
+
             for widget in self.findChildren(QPushButton):
                 if widget.objectName() == "SideMenuButton":
-                    widget.setStyle(config)
+                    widget.setStyle(resolved_config)
                 if widget.objectName() == "Button":
-                    widget.setStyle(config)
+                    widget.setStyle(resolved_config)
 
             for widget in self.findChildren(QTableWidget):
-                widget.setStyle(config)
+                widget.setStyle(resolved_config)
+
+            for widget in self.findChildren(InfoWidget):
+                widget.setStyle(resolved_config)
+
+            for widget in self.findChildren(QTabWidget):
+                widget.setStyle(resolved_config)
 
             QApplication.instance().setStyleSheet(_style)
 
