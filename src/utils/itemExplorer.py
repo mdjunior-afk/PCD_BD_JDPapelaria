@@ -9,7 +9,7 @@ class ItemExplorer(QFrame):
 
         self.targets = None
 
-        self.setWindowFlag(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.Popup)
+        self.setWindowFlag(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.ToolTip)
         self.setMinimumWidth(300)
 
         self.setMinimumHeight(200)
