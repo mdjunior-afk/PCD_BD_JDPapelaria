@@ -2,6 +2,11 @@
     font-family: "Inter", sans-serif;
 }}
 
+QWidget#SideMenu
+{{
+    background-color: {PRIMARY_COLOR};
+}}
+
 /* Menu styles */
 QMenu {{
     border: 1px solid lightgray;
@@ -22,7 +27,7 @@ QSpinBox {{
     background-color: transparent !important;
     border-radius: 8px;
     padding: 8px 20px 8px 8px;
-    font-size: 12px;
+    font-size: {INPUT_LABEL_SIZE}px;
     border: 1px solid lightgray;
 }}
 
@@ -67,7 +72,7 @@ QDoubleSpinBox {{
     background-color: transparent !important;
     border-radius: 8px;
     padding: 8px 20px 8px 8px;
-    font-size: 12px;
+    font-size: {INPUT_LABEL_SIZE}px;
     border: 1px solid lightgray;
 }}
 
@@ -107,6 +112,19 @@ width: 10px;
 height: 10px;
 }}
 
+QPushButton#SideMenuButton {{
+    color: {BTN_TEXT_COLOR};
+}}
+
+QPushButton#SideMenuButton:hover {{
+    color: {BTN_HOVER_TEXT_COLOR};
+}}
+
+QPushButton#SideMenuButton[is_active="true"] {{
+    color: {BTN_HOVER_TEXT_COLOR};
+    border-right: 5px solid {CONTENT_COLOR};
+}}
+
 /* Buttons Style */
 QPushButton#SideMenuButton {{
     font-size: {SIDE_MENU_LABEL_SIZE}px;
@@ -116,7 +134,7 @@ QPushButton#SideMenuButton {{
 }}
 
 QPushButton#Button {{
-    font-size: 12px;
+    font-size: {INPUT_LABEL_SIZE}px;
     font-weight: 650;
     padding: 8px;
     border-radius: 4px;
@@ -130,7 +148,7 @@ QTableWidget {{
 }}
 
 QHeaderView::section {{
-    font-size: 12px;
+    font-size: {NORMAL_LABEL_SIZE}px;
     border: 1px solid lightgray;
     padding: 8px 16px;
     font-weight: 600;
@@ -188,9 +206,15 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {{
 
 /* ComboBox style*/
 QComboBox {{
-    font-size: 12px;
+    font-size: {INPUT_LABEL_SIZE}px;
     padding: 8px;
+    border: 1px solid lightgray;
     border-radius: 4px;
+    background-color: transparent !important;
+}}
+
+QComboBox:focus {{
+    border-color: {PRIMARY_COLOR};
 }}
 
 QComboBox::drop-down {{
@@ -230,7 +254,7 @@ QLabel[type="Subtitle"] {{
 
 /* Tab style */
 QTabBar {{
-    font-size: 12px;
+    font-size: {INPUT_LABEL_SIZE}px;
 }}
 
 QTabBar::tab {{
@@ -251,7 +275,7 @@ QGroupBox {{
         margin-top: 1ex;
         padding: 1ex;
 
-        font-size: 12px;
+        font-size: {INPUT_LABEL_SIZE}px;
 
         border: 1px solid lightgray;
         border-radius: 4px;
@@ -261,13 +285,14 @@ QGroupBox::title {{
         subcontrol-origin: margin;
         subcontrol-position: top left;
 
-        padding: 0 3px;
+        font-size: {INPUT_LABEL_SIZE}px;
 
-        font-weight: bolder;
+        padding: 0 3px;
 }}
 
 QLineEdit {{
-    border: none;
+    background-color: transparent !important;
+    border: 1px solid {CONTENT_COLOR};
 }}
 
 QLineEdit[type="WithComplement"] {{
@@ -280,6 +305,10 @@ QLineEdit[type="WithComplement"] {{
     border-bottom-right-radius: 0;
 }}
 
+QLineEdit:focus {{
+    border-color: {PRIMARY_COLOR};
+}}
+
 QLineEdit[type="WithoutComplement"] {{
     font-size: {INPUT_LABEL_SIZE}px;
     padding: 8px;
@@ -290,8 +319,9 @@ QLineEdit[type="WithoutComplement"] {{
 QDateEdit {{
     background-color: transparent !important;
     border: 1px solid lightgray;
+    height: 16px;
     border-radius: 4px;
-    font-size: 12px;
+    font-size: {INPUT_LABEL_SIZE}px;
     padding: 8px;
 }}
 
@@ -302,12 +332,13 @@ QCalendarWidget QToolButton {{
 }}
 
 QDateEdit::drop-down {{
-    image: url(src/gui/icons/calendar.svg);
+    image: url(src/gui/icons/bold_calendar.svg);
+    color: lightgray;
     padding-right: 8px;
     subcontrol-origin: margin;
     subcontrol-position: right center;
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     right: 5px;
     border: none;
 }}
@@ -315,11 +346,46 @@ QDateEdit::drop-down {{
 QCalendarWidget QMenu {{
     left:20px;
     color: white;
-    font-size: 12px;
+    font-size: {INPUT_LABEL_SIZE}px;
 }}
 
 QCalendarWidget QAbstractItemView:enabled {{
     font-size:12px;
     background-color: #FFFFFF;    
     selection-color: white;
+}}
+
+
+QCheckBox::indicator {{
+    width: 10px;
+    height: 10px;
+    padding: 4px;
+    border: 1px solid lightgray;
+    border-radius: 4px;
+}}
+
+QCheckBox::indicator:checked {{
+    image: url("src/gui/icons/verificar.svg");
+}}
+
+QCheckBox {{
+    spacing: 10px;
+    font-size: {INPUT_LABEL_SIZE}px;
+}}
+
+QRadioButton::indicator {{
+    width: 10px;
+    height: 10px;
+    padding: 3px;
+    border: 1px solid lightgray;
+    border-radius: 8px;
+}}
+
+QRadioButton::indicator:checked {{
+    background-color: {PRIMARY_COLOR};
+}}
+
+QRadioButton {{
+    spacing: 5px;
+    font-size: {INPUT_LABEL_SIZE}px;
 }}

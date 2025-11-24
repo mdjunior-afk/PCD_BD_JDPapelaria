@@ -8,23 +8,9 @@ class ComboBox(QComboBox):
 
         self.addItems(items)
 
+        self.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.setMinimumContentsLength(12)
+
         # ComboBox config
         self.setEditable(True)
         self.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
-
-        self.setStyle()
-
-    def setStyle(self):
-        _style = f"""
-        QComboBox {{
-            background-color: transparent !important;
-            border: 1px solid lightgray;
-        }}
-
-        QComboBox:focus {{
-            border-color: {PRIMARY_COLOR};
-        }}
-
-        """
-
-        self.setStyleSheet(_style)

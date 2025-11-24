@@ -3,12 +3,16 @@ from PySide6.QtCore import QDate
 
 from src.gui.widgets import *
 from src.gui.utils import *
-
 from src.gui.colors import *
+
+from src.utils.itemExplorer import *
 
 class SalesPage(QWidget):
     def __init__(self):
         super().__init__()
+
+        self.item_explorer = ItemExplorer(self)
+        self.item_explorer.setFixedSize(self.item_explorer.size())
 
         layout = QVBoxLayout()
         self.setLayout(layout)
@@ -46,8 +50,8 @@ class SalesPage(QWidget):
         initial_date_label = Label("Período incial", type="InputLabel")
         final_date_label = Label("Período final", type="InputLabel")
 
-        initial_date = QDateEdit(date=QDate.currentDate())
-        final_date = QDateEdit(date=QDate.currentDate())
+        initial_date = DateEdit(date=QDate.currentDate())
+        final_date = DateEdit(date=QDate.currentDate())
         search_button = PushButton("Pesquisar", icon_path="search.svg", type="WithoutBackground")
         export_button = PushButton("Exportar", icon_path="download.svg", type="WithBackground")
 
@@ -92,6 +96,12 @@ class SalesPage(QWidget):
             price_input = DoubleSpinBox()
             quantity_input = SpinBox()
             subtotal_input = DoubleSpinBox()
+
+            self.setupSearch(search_input, (price_input, quantity_input, subtotal_input), 
+            [
+                {"nome": "PENDRIVE SAMSUNG 8G", "quantidade": 1, "valor": 39.90},
+                {"nome": "PENDRIVE SANDISK 16GB", "quantidade": 1, "valor": 59.90}
+            ])
 
             table = Table(["ID", "Nome", "Preço", "Quantidade", "Subtotal"])
 
@@ -203,3 +213,44 @@ class SalesPage(QWidget):
         layout.addWidget(tab)
 
         return widget
+    
+    def setupSearch(self, search_widget : QLineEdit, inputs: tuple, data: list[dict]):
+        # Botão de limpar
+        clear_action = search_widget.addAction(QIcon.fromTheme("window-close"), QLineEdit.TrailingPosition)
+        clear_action.triggered.connect(lambda: self.clearFields([search_widget, *inputs]))
+
+        # Conecta textChanged
+        search_widget.textChanged.connect(
+            lambda text: self.searchItems(data,
+                                            {"nome": search_widget,
+                                            "valor": inputs[0],
+                                            "quantidade": inputs[1],
+                                            "subtotal": inputs[2]},
+                                            search_widget))
+
+
+    def searchItems(self, data: list, targets: dict, search_widget: QLineEdit):
+            if not search_widget.text():
+                self.item_explorer.hide()
+                return
+            self.item_explorer.setTarget(targets)
+            self.item_explorer.showData(data)
+
+            # Posiciona o dropdown
+            pos_global = search_widget.mapToGlobal(QPoint(0, 0))
+            final_pos_global = QPoint(pos_global.x(), pos_global.y() + search_widget.height())
+            
+            self.item_explorer.move(final_pos_global)
+            self.item_explorer.setFixedWidth(search_widget.width())
+
+
+    def clearFields(self: QWidget, fields: list):
+        for f in fields:
+            if isinstance(f, QLineEdit):
+                if f.isReadOnly():
+                    f.setReadOnly(False)
+                    f.clear()
+            elif isinstance(f, (QSpinBox, QDoubleSpinBox)):
+                f.setValue(0)
+
+        self.item_explorer.hide()

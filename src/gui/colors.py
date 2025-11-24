@@ -7,6 +7,7 @@ SECONDARY_COLOR_HOVER = "#C9650D"
 
 # Cores do fundo principal
 CONTENT_COLOR = "#DFDFDF"
+DARK_CONTENT_COLOR = "#303030"
 
 # Cores do menu lateral
 SIDEMENU_COLOR = "#2A629A"

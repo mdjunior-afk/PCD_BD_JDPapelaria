@@ -8,9 +8,14 @@ class Tab(QTabWidget):
     def __init__(self):
         super().__init__()
 
+        self.shadow = createShadow()
+        self.setGraphicsEffect(self.shadow)
+
+    def setStyle(self, config):
+
         _style = f"""
         QTabWidget::pane {{
-            background: {BACKGROUND_COLOR};
+            background-color: {config["BACKGROUND_COLOR"]};
             border-top-right-radius: 8px;
             border-bottom-left-radius: 8px;
             border-bottom-right-radius: 8px;
@@ -24,9 +29,6 @@ class Tab(QTabWidget):
         """
 
         self.setStyleSheet(_style)
-
-        self.shadow = createShadow()
-        self.setGraphicsEffect(self.shadow)
 
 class TabWidget(QWidget):
     def __init__(self):

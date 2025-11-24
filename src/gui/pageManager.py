@@ -3,7 +3,7 @@ from PySide6.QtWidgets import *
 from src.gui.pages import *
 
 class PageManager(QStackedWidget):
-    def __init__(self):
+    def __init__(self, main_window):
         super().__init__()
 
         self.home_page = HomePage()
@@ -21,5 +21,5 @@ class PageManager(QStackedWidget):
         self.services_page = ServicePage()
         self.insertWidget(4, self.services_page)
 
-        self.settings_page = SettingsPage()
-        self.insertWidget(6, self.settings_page)
+        self.settings_page = SettingsPage(main_window)
+        self.insertWidget(5, self.settings_page)
