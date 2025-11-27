@@ -95,6 +95,9 @@ class PersonPage(QWidget):
         client_box.setFocusPolicy(Qt.NoFocus)
         supplier_box.setFocusPolicy(Qt.NoFocus)
 
+
+        #teste
+
         person_type_layout.addWidget(client_box)
         person_type_layout.addWidget(supplier_box)
         person_type_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum))
