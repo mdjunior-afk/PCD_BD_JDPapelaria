@@ -75,105 +75,6 @@ class ServicePage(QWidget):
         return widget
     
     def createEditionTab(self):
-        def createProductsTab():
-            widget = TabWidget()
-            layout = QGridLayout()
-            widget.setLayout(layout)
-
-            buttons_widget, buttons = createTableButtons()
-
-            search_label = Label("Pesquisa", type="InputLabel")
-            price_label = Label("Preço", type="InputLabel")
-            quantity_label = Label("Quantidade", type="InputLabel")
-            subtotal_label = Label("Subtotal", type="InputLabel")
-
-            search_input = LineEdit("Pesquise por um produto")
-            price_input = DoubleSpinBox()
-            quantity_input = SpinBox()
-            subtotal_input = DoubleSpinBox()
-
-            table = Table(["ID", "Nome", "Preço", "Quantidade", "Subtotal"])
-
-            price_input.setPrefix("R$ ")
-            subtotal_input.setPrefix("R$ ")
-
-            layout.addWidget(search_label, 0, 0)
-            layout.addWidget(price_label, 2, 0)
-            layout.addWidget(quantity_label, 2, 1)
-            layout.addWidget(subtotal_label, 2, 2)
-
-            layout.addWidget(search_input, 1, 0, 1, 5)
-            layout.addWidget(price_input, 3, 0)
-            layout.addWidget(quantity_input, 3, 1)
-            layout.addWidget(subtotal_input, 3, 2)
-            layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum), 3, 3)
-            layout.addWidget(buttons_widget, 3, 4)
-            layout.addWidget(table, 4, 0, 1, 5)
-
-            return widget
-        def createServicesTab():
-            widget = TabWidget()
-            layout = QGridLayout()
-            widget.setLayout(layout)
-
-            buttons_widget, buttons = createTableButtons()
-
-            search_label = Label("Pesquisa", type="InputLabel")
-            price_label = Label("Preço", type="InputLabel")
-            quantity_label = Label("Quantidade", type="InputLabel")
-            subtotal_label = Label("Subtotal", type="InputLabel")
-
-            search_input = LineEdit("Pesquise por um serviço")
-            price_input = DoubleSpinBox()
-            quantity_input = SpinBox()
-            subtotal_input = DoubleSpinBox()
-
-            table = Table(["ID", "Nome", "Preço", "Quantidade", "Subtotal"])
-
-            price_input.setPrefix("R$ ")
-            subtotal_input.setPrefix("R$ ")
-
-            layout.addWidget(search_label, 0, 0)
-            layout.addWidget(price_label, 2, 0)
-            layout.addWidget(quantity_label, 2, 1)
-            layout.addWidget(subtotal_label, 2, 2)
-
-            layout.addWidget(search_input, 1, 0, 1, 5)
-            layout.addWidget(price_input, 3, 0)
-            layout.addWidget(quantity_input, 3, 1)
-            layout.addWidget(subtotal_input, 3, 2)
-            layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum), 3, 3)
-            layout.addWidget(buttons_widget, 3, 4)
-            layout.addWidget(table, 4, 0, 1, 5)
-
-            return widget
-        def createPaymentTab():
-            widget = TabWidget()
-            layout = QGridLayout()
-            widget.setLayout(layout)
-
-            buttons_widget, buttons = createTableButtons()
-
-            document_label = Label(text="Forma de pagamento", type="InputLabel")
-            value_label = Label(text="Valor", type="InputLabel")
-
-            document_input = ComboBox(["Dinheiro", "Cartão de débito", "Cartão de crédito", "PIX"])
-            value_input = DoubleSpinBox()
-
-            value_input.setPrefix("R$ ")
-
-            table = Table(["Data", "Forma de pagamento", "Valor"])
-
-            layout.addWidget(document_label, 0, 0)
-            layout.addWidget(value_label, 0, 1)
-            
-            layout.addWidget(document_input, 1, 0)
-            layout.addWidget(value_input, 1, 1)
-            layout.addWidget(buttons_widget, 1, 2)
-            layout.addWidget(table, 2, 0, 1, 3)
-
-            return widget
-
         widget = TabWidget()
         layout = QVBoxLayout()
         widget.setLayout(layout)
@@ -182,6 +83,36 @@ class ServicePage(QWidget):
         client_layout = QVBoxLayout()
         client_box.setLayout(client_layout)
 
+        total_box = QWidget()
+        total_box_layout = QHBoxLayout()
+        total_box.setLayout(total_box_layout)
+
+        products_total_label = Label("Produtos:", type="InputLabel")
+        services_total_label = Label("Serviços:", type="InputLabel")
+        total_label = Label("Total:", type="InputLabel")
+        
+        products_total_input = DoubleSpinBox()
+        services_total_input = DoubleSpinBox()        
+        total_input = DoubleSpinBox()
+
+        total_input.setPrefix("R$ ")
+        products_total_input.setPrefix("R$ ")
+        services_total_input.setPrefix("R$ ")
+        
+        total_input.setReadOnly(True)
+        products_total_input.setReadOnly(True)
+        services_total_input.setReadOnly(True)
+
+        total_box_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum))
+        total_box_layout.addWidget(products_total_label)
+        total_box_layout.addWidget(products_total_input)
+        total_box_layout.addWidget(services_total_label)
+        total_box_layout.addWidget(services_total_input)
+        total_box_layout.addWidget(total_label)
+        total_box_layout.addWidget(total_input)
+
+        buttons_widget, buttons = createWindowButtons()
+
         search_client_label = Label(text="Cliente", type="InputLabel")
         
         search_client_input = LineEdit("Pesquise por um cliente")
@@ -189,18 +120,13 @@ class ServicePage(QWidget):
         client_layout.addWidget(search_client_label)
         client_layout.addWidget(search_client_input)
 
-        tab = Tab()
-        tab.setStyleSheet(f"QTabWidget::pane{{ background: #F9F9F9 !important }}")
-
-        product_tab, services_tab, payment_tab = createProductsTab(), createServicesTab(), createPaymentTab()
-
-        tab.addTab(product_tab, "Produtos")
-        tab.addTab(services_tab, "Serviços")
-        tab.addTab(payment_tab, "Pagamentos")
+        tab = TransactionTab(parent=self, inputs=(products_total_input, services_total_input, total_input))
 
         tab.setCurrentIndex(1)
 
         layout.addWidget(client_box)
         layout.addWidget(tab)
+        layout.addWidget(total_box)
+        layout.addWidget(buttons_widget)
 
         return widget
