@@ -11,9 +11,11 @@ from src.gui.widgets.spinBox import SpinBox, DoubleSpinBox
 from src.gui.widgets.infoWidget import InfoWidget
 from src.gui.widgets.dateEdit import DateEdit
 from src.gui.widgets.transactionTab import TransactionTab
+from src.gui.widgets.removeWindow import RemoveDialog
 
 __all__ = [
     "ButtonBase", "SideMenuButton", "PushButton", "Label",
      "Table", "Tab", "TabWidget", "LineEdit", "ComboBox", "GroupBox",
-     "SpinBox", "DoubleSpinBox", "InfoWidget", "DateEdit", "ColorLineEdit", "TransactionTab"
+     "SpinBox", "DoubleSpinBox", "InfoWidget", "DateEdit", "ColorLineEdit", "TransactionTab",
+     "RemoveDialog"
 ]

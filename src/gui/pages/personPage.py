@@ -95,9 +95,6 @@ class PersonPage(QWidget):
         client_box.setFocusPolicy(Qt.NoFocus)
         supplier_box.setFocusPolicy(Qt.NoFocus)
 
-
-        #teste
-
         person_type_layout.addWidget(client_box)
         person_type_layout.addWidget(supplier_box)
         person_type_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum))
@@ -212,14 +209,14 @@ class PersonPage(QWidget):
             contact_table.setRowCount(contact_table.rowCount() + 1)
             contact_table.setItem(row, 0, QTableWidgetItem(str(row)))
             contact_table.setItem(row, 1, QTableWidgetItem("Telefone fixo"))
-            contact_table.setItem(row, 2, QTableWidgetItem(f"({data["estabelecimento"]["ddd1"]}) {data["estabelecimento"]["telefone1"]}"))
+            contact_table.setItem(row, 2, QTableWidgetItem(f"({data['estabelecimento']['ddd1']}) {data['estabelecimento']['telefone1']}"))
             row += 1
         
         if data["estabelecimento"]["telefone2"] != None:
             contact_table.setRowCount(contact_table.rowCount() + 1)
             contact_table.setItem(row, 0, QTableWidgetItem(str(row)))
             contact_table.setItem(row, 1, QTableWidgetItem("Telefone fixo"))
-            contact_table.setItem(row, 2, QTableWidgetItem(f"({data["estabelecimento"]["ddd2"]}) {data["estabelecimento"]["telefone2"]}"))
+            contact_table.setItem(row, 2, QTableWidgetItem(f"({data['estabelecimento']['ddd2']}) {data['estabelecimento']['telefone2']}"))
             row += 1
 
         row = 0

@@ -5,6 +5,8 @@ from src.gui.widgets import *
 from src.gui.utils import *
 from src.gui.colors import *
 
+from src.controllers.salesController import SalesController
+
 from src.utils.itemExplorer import *
 
 class SalesPage(QWidget):
@@ -96,47 +98,75 @@ class SalesPage(QWidget):
         
         search_client_input = LineEdit("Pesquise por um cliente")
 
+        self.setupSearch(search_client_input,
+        [
+            {"id": 0, "nome": "LUIZ FELIPE", "cpf": "999.999.999.99"},
+            {"id": 1, "nome": "MARCIO DOUGLAS CASSEMIRO JUNIOR", "cpf": "150.464.346.10"}
+        ])
+
         client_layout.addWidget(search_client_label)
         client_layout.addWidget(search_client_input)
-
-        tab = TransactionTab(parent=self)
 
         total_box = QWidget()
         total_box_layout = QHBoxLayout()
         total_box.setLayout(total_box_layout)
 
+        products_total_label = Label("Produtos:", type="InputLabel")
+        services_total_label = Label("Serviços:", type="InputLabel")
         total_label = Label("Total:", type="InputLabel")
         
+        products_total_input = DoubleSpinBox()
+        services_total_input = DoubleSpinBox()        
         total_input = DoubleSpinBox()
+
         total_input.setPrefix("R$ ")
+        products_total_input.setPrefix("R$ ")
+        services_total_input.setPrefix("R$ ")
+        
         total_input.setReadOnly(True)
+        products_total_input.setReadOnly(True)
+        services_total_input.setReadOnly(True)
+
+        tab = TransactionTab(parent=self, inputs=(products_total_input, services_total_input, total_input))
+        
+        buttons_widget, buttons = createWindowButtons()
+
+        buttons[0].clicked.connect(lambda: self.saveSale(search_client_input, tab))
+        buttons[2].clicked.connect(lambda: self.clearFields([search_client_input, total_input, products_total_input, services_total_input]))
 
         total_box_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum))
+        total_box_layout.addWidget(products_total_label)
+        total_box_layout.addWidget(products_total_input)
+        total_box_layout.addWidget(services_total_label)
+        total_box_layout.addWidget(services_total_input)
         total_box_layout.addWidget(total_label)
         total_box_layout.addWidget(total_input)
 
         layout.addWidget(client_box)
         layout.addWidget(tab)
         layout.addWidget(total_box)
+        layout.addWidget(buttons_widget)
 
         scroll_area.setWidget(widget)
 
         return scroll_area
     
-    def setupSearch(self, search_widget : QLineEdit, inputs: tuple, data: list[dict]):
+    def saveSale(self, client: LineEdit, tab: Tab):
+        data = {
+            "cliente": client.text(),
+            "id_produto": 0
+        }
+
+        SalesController.saveSale(data)
+    
+    def setupSearch(self, search_widget : QLineEdit, data: list[dict]):
         # Botão de limpar
         clear_action = search_widget.addAction(QIcon.fromTheme("window-close"), QLineEdit.TrailingPosition)
-        clear_action.triggered.connect(lambda: self.clearFields([search_widget, *inputs]))
+        clear_action.triggered.connect(lambda: self.clearFields([search_widget]))
 
         # Conecta textChanged
         search_widget.textChanged.connect(
-            lambda text: self.searchItems(data,
-                                            {"nome": search_widget,
-                                            "valor": inputs[0],
-                                            "quantidade": inputs[1],
-                                            "subtotal": inputs[2]},
-                                            search_widget))
-
+            lambda text: self.searchItems(data, {"nome": search_widget}, search_widget))
 
     def searchItems(self, data: list, targets: dict, search_widget: QLineEdit):
             if not search_widget.text():
