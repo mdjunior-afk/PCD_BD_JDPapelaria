@@ -1,15 +1,15 @@
-from src.models.saleModel import *
+from src.models.serviceModel import *
 
-class SalesController:
+class ServiceController:
     @staticmethod
     def save(data={}):
         print(f"add: {data}")
 
-        addSale(data)
+        addService(data)
 
     @staticmethod
     def get(window, data={}, type="edit"):
-        products = getSale(data)
+        products = getService(data)
 
         if type == "edit":
             window.name_input.setText(products[0]["nome"])
@@ -25,6 +25,6 @@ class SalesController:
 
     @staticmethod
     def remove(window, id):
-        removeSale(id)
+        removeService(id)
 
-        SalesController.get(window, window.search_input.text(), type="search")
+        ServiceController.get(window, window.search_input.text(), type="search")

@@ -1,4 +1,4 @@
-from database import get_connection
+from src.database import get_connection
 
 def getPerson(data={}):
     # Recuperar N pessoas pelo CPF/CNPJ ou Nome, levando em consideração o tipo dela

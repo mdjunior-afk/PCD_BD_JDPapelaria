@@ -1,5 +1,6 @@
 from PySide6.QtWidgets import *
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QAction
 
 from src.gui.colors import *
 
@@ -8,6 +9,10 @@ class Table(QTableWidget):
         super().__init__()
 
         self.setMinimumHeight(150)
+
+        self.add_action = QAction(self.style().standardIcon(QStyle.SP_FileDialogNewFolder), "Adicionar")
+        self.edit_action = QAction(self.style().standardIcon(QStyle.SP_FileDialogContentsView), "Editar")
+        self.remove_action = QAction(self.style().standardIcon(QStyle.SP_TrashIcon), "Remover")
 
         self.setColumnCount(len(columns))
         self.setHorizontalHeaderLabels(columns)
@@ -53,9 +58,9 @@ class Table(QTableWidget):
         }}
         """)
 
-        menu.addAction(self.style().standardIcon(QStyle.SP_FileDialogNewFolder), "Adicionar")
-        menu.addAction(self.style().standardIcon(QStyle.SP_FileDialogContentsView), "Editar")
-        menu.addAction(self.style().standardIcon(QStyle.SP_TrashIcon), "Remover")
+        menu.addAction(self.add_action)
+        menu.addAction(self.edit_action)
+        menu.addAction(self.remove_action)
 
         menu.exec(self.mapToGlobal(point))
 

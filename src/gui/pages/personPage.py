@@ -5,6 +5,8 @@ from src.gui.widgets import *
 from src.gui.utils import *
 from src.utils import cepAPI, locations, CNPJApi
 
+from src.controllers.personController import PersonController
+
 import json
 
 class PersonPage(QWidget):
@@ -25,16 +27,20 @@ class PersonPage(QWidget):
         labels_layout.addWidget(title_label)
         labels_layout.addWidget(subtitle_label)
 
-        tab = Tab()
+        self.tab = Tab()
         
-        search_tab = self.createSearchTab()
+        search_tab, self.search_table = self.createSearchTab()
         edition_tab = self.createEditionTab()
 
-        tab.addTab(search_tab, "Pesquisar", )
-        tab.addTab(edition_tab, "Adicionar/Editar")
+        self.search_table.add_action.triggered.connect(lambda: self.tab.setCurrentIndex(1))
+        self.search_table.edit_action.triggered.connect(lambda: self.editPerson(self.search_table))
+        self.search_table.remove_action.triggered.connect(lambda: self.removePerson(self.search_table))
+
+        self.tab.addTab(search_tab, "Pesquisar", )
+        self.tab.addTab(edition_tab, "Adicionar/Editar")
 
         layout.addWidget(labels_widget)
-        layout.addWidget(tab)
+        layout.addWidget(self.tab)
 
     def createSearchTab(self):
         widget = TabWidget()
@@ -47,16 +53,18 @@ class PersonPage(QWidget):
         search_label = Label("Pesquisar", type="InputLabel")
         type_label = Label("Tipo de pessoa", type="InputLabel")
 
-        search_input = LineEdit("Pesquise por uma pessoa")
-        type_input = ComboBox(["Todos", "Cliente", "Fornecedor"])
+        self.search_input = LineEdit("Pesquise por uma pessoa")
+        self.type_input = ComboBox(["Todos", "Cliente", "Fornecedor"])
         search_button = PushButton("Pesquisar", icon_path="search.svg", type="WithoutBackground")
         export_button = PushButton("Exportar", icon_path="download.svg", type="WithBackground")
+
+        search_button.clicked.connect(lambda: PersonController.get(self, {"procura": self.search_input.text(), "categoria": self.type_input.currentText()}), "search")
 
         search_layout.addWidget(search_label, 0, 0)
         search_layout.addWidget(type_label, 0, 1)
 
-        search_layout.addWidget(search_input, 1, 0)
-        search_layout.addWidget(type_input, 1, 1)
+        search_layout.addWidget(self.search_input, 1, 0)
+        search_layout.addWidget(self.type_input, 1, 1)
         search_layout.addWidget(search_button, 1, 2)
 
         search_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum), 0, 3)
@@ -70,7 +78,7 @@ class PersonPage(QWidget):
         layout.addLayout(search_layout)
         layout.addWidget(table)
 
-        return widget
+        return widget, table
     
     def createEditionTab(self):
         scroll_area = QScrollArea()
@@ -110,20 +118,20 @@ class PersonPage(QWidget):
         birthday_label = Label("Data de nascimento", type="InputLabel")
         fantasy_name_label = Label("Nome fantasia", type="InputLabel")
 
-        name_input = LineEdit()
-        type_input = ComboBox(["Pessoa física", "Pessoa jurídica"])
-        document_input = LineEdit()
-        sex_input = ComboBox(["Masculino", "Feminino", "Outro"])
-        birthday_input = DateEdit(QDate.currentDate())
-        fantasy_name_input = LineEdit()
+        self.name_input = LineEdit()
+        self.type_input = ComboBox(["Pessoa física", "Pessoa jurídica"])
+        self.document_input = LineEdit()
+        self.sex_input = ComboBox(["Masculino", "Feminino", "Outro"])
+        self.birthday_input = DateEdit(QDate.currentDate())
+        self.fantasy_name_input = LineEdit()
         get_cnpj_button = PushButton("Pesquisar", icon_path="search.svg")
 
         fantasy_name_label.setVisible(False)
-        fantasy_name_input.setVisible(False)
+        self.fantasy_name_input.setVisible(False)
         get_cnpj_button.setVisible(False)
 
-        document_input.setInputMask("000.000.000-00;_")
-        document_input.textChanged.connect(lambda x: print(x))
+        self.document_input.setInputMask("000.000.000-00;_")
+        self.document_input.textChanged.connect(lambda x: print(x))
 
         info_layout.addWidget(name_label, 0, 0)
         info_layout.addWidget(type_label, 2, 0)
@@ -132,13 +140,13 @@ class PersonPage(QWidget):
         info_layout.addWidget(birthday_label, 2, 3)
         info_layout.addWidget(fantasy_name_label, 2, 3)
         
-        info_layout.addWidget(name_input, 1, 0, 1, 4)
-        info_layout.addWidget(type_input, 3, 0)
-        info_layout.addWidget(document_input, 3, 1)
+        info_layout.addWidget(self.name_input, 1, 0, 1, 4)
+        info_layout.addWidget(self.type_input, 3, 0)
+        info_layout.addWidget(self.document_input, 3, 1)
         info_layout.addWidget(get_cnpj_button, 3, 2)
-        info_layout.addWidget(sex_input, 3, 2)
-        info_layout.addWidget(birthday_input, 3, 3)
-        info_layout.addWidget(fantasy_name_input, 3, 3)
+        info_layout.addWidget(self.sex_input, 3, 2)
+        info_layout.addWidget(self.birthday_input, 3, 3)
+        info_layout.addWidget(self.fantasy_name_input, 3, 3)
        
         info_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding))
 
@@ -176,15 +184,25 @@ class PersonPage(QWidget):
         layout.addWidget(address_box)
         layout.addWidget(buttons_widget)
 
-        type_input.currentIndexChanged.connect(lambda index: self.onIndexChanged(index, name_label, document_label, document_input, (sex_input, birthday_input, sex_label, birthday_label), (fantasy_name_input, fantasy_name_label, get_cnpj_button)))
+        self.type_input.currentIndexChanged.connect(lambda index: self.onIndexChanged(index, name_label, document_label, self.document_input, (self.sex_input, self.birthday_input, sex_label, birthday_label), (self.fantasy_name_input, fantasy_name_label, get_cnpj_button)))
         get_cnpj_button.clicked.connect(lambda x: self.getCNPJ(
-            document_input, {"razao_social": name_input, "nome_fantasia": fantasy_name_input}, contact_table, address_table
+            self.document_input, {"razao_social": self.name_input, "nome_fantasia": self.fantasy_name_input}, contact_table, address_table
         ))
 
 
         scroll_area.setWidget(widget)
 
         return scroll_area
+    
+    def editPerson(self, table: Table):
+        selectedItems = table.selectedItems()
+
+        PersonController.get(self, {"id": selectedItems}, "edit")
+
+        self.tab.setCurrentIndex(1)
+
+    def removePerson(self, table: Table):
+        pass
     
     def getCNPJ(self, cnpj_input, inputs, contact_table: QTableWidget, address_table: QTableWidget):
         data = CNPJApi.searchCNPJ(cnpj_input)

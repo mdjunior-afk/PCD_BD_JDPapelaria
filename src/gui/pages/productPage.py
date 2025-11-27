@@ -4,11 +4,25 @@ from PySide6.QtCore import QDate, Qt
 from src.gui.widgets import *
 from src.gui.utils import *
 
+from src.controllers import *
+
 from src.utils import itemExplorer
 
 class ProductPage(QWidget):
     def __init__(self):
         super().__init__()
+
+        self.name_input = None
+        self.brand_input = None
+        self.category_input = None
+        self.barcode_input = None
+        self.purchase_input = None
+        self.adjust_input = None
+        self.sale_input = None
+        self.minimum_stock_input = None
+        self.current_stock_input = None
+
+        self.search_input = None
 
         layout = QVBoxLayout()
         self.setLayout(layout)
@@ -27,16 +41,20 @@ class ProductPage(QWidget):
         labels_layout.addWidget(title_label)
         labels_layout.addWidget(subtitle_label)
 
-        tab = Tab()
+        self.tab = Tab()
         
-        search_tab = self.createSearchTab()
+        search_tab, self.search_table = self.createSearchTab()
         edition_tab = self.createEditionTab()
 
-        tab.addTab(search_tab, "Pesquisar", )
-        tab.addTab(edition_tab, "Adicionar/Editar")
+        self.search_table.add_action.triggered.connect(lambda: self.tab.setCurrentIndex(1))
+        self.search_table.edit_action.triggered.connect(lambda: self.editProduct(self.search_table))
+        self.search_table.remove_action.triggered.connect(lambda: self.removeProduct(self.search_table))
+
+        self.tab.addTab(search_tab, "Pesquisar", )
+        self.tab.addTab(edition_tab, "Adicionar/Editar")
 
         layout.addWidget(labels_widget)
-        layout.addWidget(tab)
+        layout.addWidget(self.tab)
 
     def createSearchTab(self):
         widget = TabWidget()
@@ -49,22 +67,17 @@ class ProductPage(QWidget):
         search_label = Label("Pesquisar", type="InputLabel")
         category_label = Label("Categoria", type="InputLabel")
 
-        search_input = LineEdit("Pesquise por um produto")
+        self.search_input = LineEdit("Pesquise por um produto")
         category_input = ComboBox(["Categoria 1", "Car 2", "Categoria 3"])
         search_button = PushButton("Pesquisar", icon_path="search.svg", type="WithoutBackground")
         export_button = PushButton("Exportar", icon_path="download.svg", type="WithBackground")
 
-        data = {
-            "search": search_input.text(),
-            "category": category_input.currentText()
-        }
-
-        search_button.clicked.connect(lambda: self.searchProduct(data))
+        search_button.clicked.connect(lambda: ProductController.get(self, {"procura": self.search_input.text(), "categoria": category_input.currentText()}), "search")
 
         search_layout.addWidget(search_label, 0, 0)
         search_layout.addWidget(category_label, 0, 1)
 
-        search_layout.addWidget(search_input, 1, 0)
+        search_layout.addWidget(self.search_input, 1, 0)
         search_layout.addWidget(category_input, 1, 1)
         search_layout.addWidget(search_button, 1, 2)
 
@@ -73,10 +86,11 @@ class ProductPage(QWidget):
         search_layout.addWidget(export_button, 1, 4)
 
         table = Table(["ID", "Nome", "Estoque", "Preço de compra", "Reajuste", "Preço de venda", "Estoque mínimo", "Marca", "Categoria"])
+
         layout.addLayout(search_layout)
         layout.addWidget(table)
 
-        return widget
+        return widget, (table)
     
     def createEditionTab(self):
         scroll_area = QScrollArea()
@@ -164,7 +178,6 @@ class ProductPage(QWidget):
 
         self.setupSearch(search_input,data)
 
-        add_button = PushButton("Adicionar", icon_path="plus.svg", type="WithoutBackground")
         quantity_input = SpinBox()
         self.has_expiration = QCheckBox()
         self.expiration_date_input = DateEdit(date=QDate.currentDate())
@@ -181,9 +194,9 @@ class ProductPage(QWidget):
 
         table_buttons_widget, table_buttons = createTableButtons()
 
-        table_buttons[0].clicked.connect(lambda: self.addSupplier(supplier_table, search_input, quantity_input, self.expiration_date_input, data))
-        table_buttons[0].clicked.connect(lambda: self.editSupplier(supplier_table, search_input, quantity_input, self.expiration_date_input, data))
-        table_buttons[0].clicked.connect(lambda: self.removeSupplier(supplier_table))
+        table_buttons[0].clicked.connect(lambda: self.addSupplier(supplier_table, search_input, quantity_input, self.expiration_date_input))
+        table_buttons[1].clicked.connect(lambda: self.editSupplier(supplier_table, search_input, quantity_input, self.expiration_date_input))
+        table_buttons[2].clicked.connect(lambda: self.removeSupplier(supplier_table))
 
         supplier_layout.addWidget(search_input, 1, 0, 1, 5)
         supplier_layout.addWidget(quantity_input, 3, 0)
@@ -206,8 +219,15 @@ class ProductPage(QWidget):
 
         return scroll_area
     
-    def searchProduct(self, data):
-        
+    def editProduct(self, table: Table):
+        selectedItems = table.selectedItems()
+
+        ProductController.get(self, {"id": selectedItems}, "edit")
+
+        self.tab.setCurrentIndex(1)
+
+    def removeProduct(self, table: Table):
+        pass
     
     def updateExpirationDate(self, has):
         if has != Qt.CheckState.Checked:
@@ -217,7 +237,7 @@ class ProductPage(QWidget):
             self.expiration_date_label.show()
             self.expiration_date_input.show()
     
-    def addSupplier(self,table: Table, name : LineEdit, quantity: SpinBox, date: DateEdit, data: list):
+    def addSupplier(self,table: Table, name : LineEdit, quantity: SpinBox, date: DateEdit):
         if table:
             if name.text() != "" and quantity.value() > 0:
                 table.setRowCount(table.rowCount() + 1)
@@ -233,22 +253,20 @@ class ProductPage(QWidget):
 
             self.clearFields([name, quantity, date])
 
-    def editSupplier(self, table: Table, name : LineEdit, price: QDoubleSpinBox, quantity: SpinBox, subtotal: QDoubleSpinBox):
+    def editSupplier(self,table: Table, name : LineEdit, quantity: SpinBox, date: DateEdit):
         selectedItems = table.selectedItems()
 
         if table and selectedItems:
             row = 0
             for item in selectedItems:
-
-                if item.column() == 1:
+                if item.column() == 0:
                     row = item.row()
                     name.setText(item.text())
+                elif item.column() == 1:
+                    quantity.setValue(float(item.text()))
+                    self.current_stock_input.setValue(self.current_stock_input.value() - quantity.value())
                 elif item.column() == 2:
-                    price.setValue(float(item.text()))
-                elif item.column() == 3:
-                    quantity.setValue(int(item.text()))
-                elif item.column() == 4:
-                    subtotal.setValue(float(item.text()))
+                    date.setDate(QDate.fromString(item.text(), "dd/MM/yyyy"))
 
             table.removeRow(row)
             self.item_explorer.destroy()
@@ -267,6 +285,7 @@ class ProductPage(QWidget):
             
             # Verifica a resposta do usuário
             if reply == QMessageBox.Yes:
+                self.current_stock_input.setValue(self.current_stock_input.value() - int(table.item(selectedItem[1].row(), selectedItem[1].column()).text()))
                 table.removeRow(selectedItem[0].row())
 
     def setupSearch(self, search_widget : QLineEdit, data: list[dict]):

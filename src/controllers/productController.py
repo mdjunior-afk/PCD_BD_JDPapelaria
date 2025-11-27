@@ -1,15 +1,9 @@
-from src.models.saleModel import *
+from src.models.productModel import *
 
-class SalesController:
-    @staticmethod
-    def save(data={}):
-        print(f"add: {data}")
-
-        addSale(data)
-
+class ProductController:
     @staticmethod
     def get(window, data={}, type="edit"):
-        products = getSale(data)
+        products = getProduct(data)
 
         if type == "edit":
             window.name_input.setText(products[0]["nome"])
@@ -25,6 +19,6 @@ class SalesController:
 
     @staticmethod
     def remove(window, id):
-        removeSale(id)
+        removeProduct(id)
 
-        SalesController.get(window, window.search_input.text(), type="search")
+        ProductController.get(window, window.search_input.text(), type="search")

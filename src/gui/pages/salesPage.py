@@ -30,16 +30,20 @@ class SalesPage(QWidget):
         labels_layout.addWidget(title_label)
         labels_layout.addWidget(subtitle_label)
 
-        tab = Tab()
+        self.tab = Tab()
         
-        search_tab = self.createSearchTab()
+        search_tab, self.search_table = self.createSearchTab()
         edition_tab = self.createEditionTab()
 
-        tab.addTab(search_tab, "Pesquisar", )
-        tab.addTab(edition_tab, "Adicionar/Editar")
+        self.search_table.add_action.triggered.connect(lambda: self.tab.setCurrentIndex(1))
+        self.search_table.edit_action.triggered.connect(lambda: self.editSale(self.search_table))
+        self.search_table.remove_action.triggered.connect(lambda: self.removeSale(self.search_table))
+
+        self.tab.addTab(search_tab, "Pesquisar", )
+        self.tab.addTab(edition_tab, "Adicionar/Editar")
 
         layout.addWidget(labels_widget)
-        layout.addWidget(tab)
+        layout.addWidget(self.tab)
 
     def createSearchTab(self):
         widget = TabWidget()
@@ -52,20 +56,22 @@ class SalesPage(QWidget):
         initial_date_label = Label("Período incial", type="InputLabel")
         final_date_label = Label("Período final", type="InputLabel")
 
-        initial_date = DateEdit(date=QDate.currentDate())
-        final_date = DateEdit(date=QDate.currentDate())
+        self.initial_date = DateEdit(date=QDate.currentDate())
+        self.final_date = DateEdit(date=QDate.currentDate())
         search_button = PushButton("Pesquisar", icon_path="search.svg", type="WithoutBackground")
         export_button = PushButton("Exportar", icon_path="download.svg", type="WithBackground")
 
-        initial_date.setDisplayFormat("dd/MM/yyyy")
-        final_date.setDisplayFormat("dd/MM/yyyy")
+        search_button.clicked.connect(lambda: SalesController.get(self, {"data_inicio": self.initial_date.text(), "data_final": self.final_date.text()}), "search")
+
+        self.initial_date.setDisplayFormat("dd/MM/yyyy")
+        self.final_date.setDisplayFormat("dd/MM/yyyy")
 
         search_layout.addWidget(initial_date_label, 0, 0)
         search_layout.addWidget(Label("Até"), 1, 1)
         search_layout.addWidget(final_date_label, 0, 2)
 
-        search_layout.addWidget(initial_date, 1, 0)
-        search_layout.addWidget(final_date, 1, 2)
+        search_layout.addWidget(self.initial_date, 1, 0)
+        search_layout.addWidget(self.final_date, 1, 2)
         search_layout.addWidget(search_button, 1, 3)
 
         search_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum), 0, 4)
@@ -79,7 +85,7 @@ class SalesPage(QWidget):
         layout.addLayout(search_layout)
         layout.addWidget(table)
 
-        return widget
+        return widget, table
     
     def createEditionTab(self):
         scroll_area = QScrollArea()
@@ -157,7 +163,17 @@ class SalesPage(QWidget):
             "id_produto": 0
         }
 
-        SalesController.saveSale(data)
+        SalesController.save(data)
+
+    def editSale(self, table: Table):
+        selectedItems = table.selectedItems()
+
+        SalesController.get(self, {"id": selectedItems}, "edit")
+
+        self.tab.setCurrentIndex(1)
+
+    def removeSale(self, table: Table):
+        pass
     
     def setupSearch(self, search_widget : QLineEdit, data: list[dict]):
         # Botão de limpar
