@@ -65,10 +65,7 @@ class ProductPage(QWidget):
 
         search_layout.addWidget(export_button, 1, 4)
 
-        table = Table(["ID", "Nome", "Estoque", "Preço"])
-
-        search_layout.addWidget(table, 2, 0, 1, 4)
-        
+        table = Table(["ID", "Nome", "Estoque", "Preço de compra", "Reajuste", "Preço de venda", "Estoque mínimo", "Marca", "Categoria"])
         layout.addLayout(search_layout)
         layout.addWidget(table)
 

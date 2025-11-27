@@ -33,6 +33,7 @@ class SideMenuButton(ButtonBase):
         active_style = f"""
         QPushButton[active="true"] {{
             background: {background_color};
+            border-top-right-radius: -25px;
         }}
         """
         

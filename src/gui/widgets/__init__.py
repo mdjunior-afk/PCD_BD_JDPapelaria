@@ -10,9 +10,10 @@ from src.gui.widgets.groupBox import GroupBox
 from src.gui.widgets.spinBox import SpinBox, DoubleSpinBox
 from src.gui.widgets.infoWidget import InfoWidget
 from src.gui.widgets.dateEdit import DateEdit
+from src.gui.widgets.transactionTab import TransactionTab
 
 __all__ = [
     "ButtonBase", "SideMenuButton", "PushButton", "Label",
      "Table", "Tab", "TabWidget", "LineEdit", "ComboBox", "GroupBox",
-     "SpinBox", "DoubleSpinBox", "InfoWidget", "DateEdit", "ColorLineEdit"
+     "SpinBox", "DoubleSpinBox", "InfoWidget", "DateEdit", "ColorLineEdit", "TransactionTab"
 ]

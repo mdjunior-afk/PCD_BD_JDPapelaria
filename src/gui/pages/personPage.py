@@ -63,7 +63,7 @@ class PersonPage(QWidget):
 
         search_layout.addWidget(export_button, 1, 4)
 
-        table = Table(["ID", "Nome", "CPF/CNPJ", "Preço"])
+        table = Table(["ID", "Nome", "CPF/CNPJ", "Contato", "Endereço", "Sexo", "Data de nascimento"])
 
         search_layout.addWidget(table, 2, 0, 1, 4)
         

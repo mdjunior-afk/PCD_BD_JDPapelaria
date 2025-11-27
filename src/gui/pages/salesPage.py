@@ -80,111 +80,10 @@ class SalesPage(QWidget):
         return widget
     
     def createEditionTab(self):
-        def createProductsTab():
-            widget = TabWidget()
-            layout = QGridLayout()
-            widget.setLayout(layout)
-
-            buttons_widget, buttons = createTableButtons()
-
-            search_label = Label("Pesquisa", type="InputLabel")
-            price_label = Label("Preço", type="InputLabel")
-            quantity_label = Label("Quantidade", type="InputLabel")
-            subtotal_label = Label("Subtotal", type="InputLabel")
-
-            search_input = LineEdit("Pesquise por um produto")
-            price_input = DoubleSpinBox()
-            quantity_input = SpinBox()
-            subtotal_input = DoubleSpinBox()
-
-            self.setupSearch(search_input, (price_input, quantity_input, subtotal_input), 
-            [
-                {"nome": "PENDRIVE SAMSUNG 8G", "quantidade": 1, "valor": 39.90},
-                {"nome": "PENDRIVE SANDISK 16GB", "quantidade": 1, "valor": 59.90}
-            ])
-
-            table = Table(["ID", "Nome", "Preço", "Quantidade", "Subtotal"])
-
-            price_input.setPrefix("R$ ")
-            subtotal_input.setPrefix("R$ ")
-
-            layout.addWidget(search_label, 0, 0)
-            layout.addWidget(price_label, 2, 0)
-            layout.addWidget(quantity_label, 2, 1)
-            layout.addWidget(subtotal_label, 2, 2)
-
-            layout.addWidget(search_input, 1, 0, 1, 5)
-            layout.addWidget(price_input, 3, 0)
-            layout.addWidget(quantity_input, 3, 1)
-            layout.addWidget(subtotal_input, 3, 2)
-            layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum), 3, 3)
-            layout.addWidget(buttons_widget, 3, 4)
-            layout.addWidget(table, 4, 0, 1, 5)
-
-            return widget
-        def createServicesTab():
-            widget = TabWidget()
-            layout = QGridLayout()
-            widget.setLayout(layout)
-            
-            buttons_widget, buttons = createTableButtons()
-
-            search_label = Label("Pesquisa", type="InputLabel")
-            price_label = Label("Preço", type="InputLabel")
-            quantity_label = Label("Quantidade", type="InputLabel")
-            subtotal_label = Label("Subtotal", type="InputLabel")
-
-            search_input = LineEdit("Pesquise por um serviço")
-            price_input = DoubleSpinBox()
-            quantity_input = SpinBox()
-            subtotal_input = DoubleSpinBox()
-
-            table = Table(["ID", "Nome", "Preço", "Quantidade", "Subtotal"])
-
-            price_input.setPrefix("R$ ")
-            subtotal_input.setPrefix("R$ ")
-
-            layout.addWidget(search_label, 0, 0)
-            layout.addWidget(price_label, 2, 0)
-            layout.addWidget(quantity_label, 2, 1)
-            layout.addWidget(subtotal_label, 2, 2)
-
-            layout.addWidget(search_input, 1, 0, 1, 5)
-            layout.addWidget(price_input, 3, 0)
-            layout.addWidget(quantity_input, 3, 1)
-            layout.addWidget(subtotal_input, 3, 2)
-            layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum), 3, 3)
-            layout.addWidget(buttons_widget, 3, 4)
-            layout.addWidget(table, 4, 0, 1, 5)
-
-            return widget
-        def createPaymentTab():
-            widget = TabWidget()
-            layout = QGridLayout()
-            widget.setLayout(layout)
-
-            buttons_widget, buttons = createTableButtons()
-
-            document_label = Label(text="Forma de pagamento", type="InputLabel")
-            value_label = Label(text="Valor", type="InputLabel")
-
-            document_input = ComboBox(["Dinheiro", "Cartão de débito", "Cartão de crédito", "PIX"])
-            value_input = DoubleSpinBox()
-
-            value_input.setPrefix("R$ ")
-
-            table = Table(["Data", "Forma de pagamento", "Valor"])
-
-            layout.addWidget(document_label, 0, 0)
-            layout.addWidget(value_label, 0, 1)
-            
-            layout.addWidget(document_input, 1, 0)
-            layout.addWidget(value_input, 1, 1)
-            layout.addWidget(buttons_widget, 1, 2)
-            layout.addWidget(table, 2, 0, 1, 3)
-
-            return widget
-
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setStyleSheet("background: transparent !important;")
+    
         widget = TabWidget()
         layout = QVBoxLayout()
         widget.setLayout(layout)
@@ -200,19 +99,29 @@ class SalesPage(QWidget):
         client_layout.addWidget(search_client_label)
         client_layout.addWidget(search_client_input)
 
-        tab = Tab()
-        tab.setStyleSheet(f"QTabWidget::pane{{ background: #F9F9F9 !important }}")
+        tab = TransactionTab(parent=self)
 
-        product_tab, services_tab, payment_tab = createProductsTab(), createServicesTab(), createPaymentTab()
+        total_box = QWidget()
+        total_box_layout = QHBoxLayout()
+        total_box.setLayout(total_box_layout)
 
-        tab.addTab(product_tab, "Produtos")
-        tab.addTab(services_tab, "Serviços")
-        tab.addTab(payment_tab, "Pagamentos")
+        total_label = Label("Total:", type="InputLabel")
+        
+        total_input = DoubleSpinBox()
+        total_input.setPrefix("R$ ")
+        total_input.setReadOnly(True)
+
+        total_box_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum))
+        total_box_layout.addWidget(total_label)
+        total_box_layout.addWidget(total_input)
 
         layout.addWidget(client_box)
         layout.addWidget(tab)
+        layout.addWidget(total_box)
 
-        return widget
+        scroll_area.setWidget(widget)
+
+        return scroll_area
     
     def setupSearch(self, search_widget : QLineEdit, inputs: tuple, data: list[dict]):
         # Botão de limpar

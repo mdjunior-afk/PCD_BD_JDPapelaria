@@ -5,8 +5,8 @@ from src.gui.utils import *
 
 
 class Tab(QTabWidget):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent=parent)
 
         self.shadow = createShadow()
         self.setGraphicsEffect(self.shadow)
