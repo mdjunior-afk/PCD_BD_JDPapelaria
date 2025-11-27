@@ -1,5 +1,7 @@
 from src.models.saleModel import *
 
+from PySide6.QtWidgets import *
+
 class SalesController:
     @staticmethod
     def save(data={}):
@@ -9,19 +11,24 @@ class SalesController:
 
     @staticmethod
     def get(window, data={}, type="edit"):
-        products = getSale(data)
+        sales = getSale(data)
 
         if type == "edit":
-            window.name_input.setText(products[0]["nome"])
+            window.name_input.setText(sales[0]["nome"])
             # Adicionar os valores no edit
 
         elif type == "search":
-            for product in products:
-                window.search_table.setRowCount(window.search_table.rowCount() + 1)
+            table = window.search_table
+            table.clearContents()
+            table.setRowCount(0)
 
-                row = window.search_table.rowCount() - 1
+            for sales in sales:
+                table.setRowCount(table.rowCount() + 1)
 
-                # Adicionar os valores na tabela
+                row = table.rowCount() - 1
+
+                for column in range(table.columnCount()):
+                    table.setItem(row, column, QTableWidgetItem(str(sales[column])))
 
     @staticmethod
     def remove(window, id):

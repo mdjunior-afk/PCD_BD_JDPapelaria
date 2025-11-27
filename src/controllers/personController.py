@@ -1,5 +1,7 @@
 from src.models.personModel import *
 
+from PySide6.QtWidgets import *
+
 class PersonController:
     @staticmethod
     def get(window, data={}, type="edit"):
@@ -10,12 +12,17 @@ class PersonController:
             # Adicionar os valores no edit
             
         elif type == "search":
+            table = window.search_table
+            table.clearContents()
+            table.setRowCount(0)
+
             for person in persons:
-                window.search_table.setRowCount(window.search_table.rowCount() + 1)
+                table.setRowCount(table.rowCount() + 1)
 
-                row = window.search_table.rowCount() - 1
+                row = table.rowCount() - 1
 
-                # Adicionar os valores na tabela
+                for column in range(table.columnCount()):
+                    table.setItem(row, column, QTableWidgetItem(str(person[column])))
 
     @staticmethod
     def remove(window, id):

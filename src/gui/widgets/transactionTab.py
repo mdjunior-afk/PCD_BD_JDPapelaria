@@ -131,7 +131,8 @@ class TransactionTab(Tab):
         document_label = Label(text="Forma de pagamento", type="InputLabel")
         value_label = Label(text="Valor", type="InputLabel")
 
-        document_input = ComboBox(["Dinheiro", "Cartão de débito", "Cartão de crédito", "PIX"])
+        document_input = ComboBox()
+        document_input.addItems(["Dinheiro", "Cartão de débito", "Cartão de crédito", "PIX"])
         self.payment_value_input = DoubleSpinBox()
 
         self.payment_value_input.setPrefix("R$ ")

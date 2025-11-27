@@ -61,7 +61,7 @@ class SalesPage(QWidget):
         search_button = PushButton("Pesquisar", icon_path="search.svg", type="WithoutBackground")
         export_button = PushButton("Exportar", icon_path="download.svg", type="WithBackground")
 
-        search_button.clicked.connect(lambda: SalesController.get(self, {"data_inicio": self.initial_date.text(), "data_final": self.final_date.text()}), "search")
+        search_button.clicked.connect(lambda: SalesController.get(self, {"data_inicio": self.initial_date.text(), "data_final": self.final_date.text()}, "search"))
 
         self.initial_date.setDisplayFormat("dd/MM/yyyy")
         self.final_date.setDisplayFormat("dd/MM/yyyy")
@@ -78,7 +78,7 @@ class SalesPage(QWidget):
 
         search_layout.addWidget(export_button, 1, 5)
 
-        table = Table(["ID", "Nome", "Estoque", "Preço"])
+        table = Table(["ID", "Data", "Cliente", "Valor total", "Forma de pagamento"])
 
         search_layout.addWidget(table, 2, 0, 1, 6)
         

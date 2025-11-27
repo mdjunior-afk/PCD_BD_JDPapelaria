@@ -56,6 +56,9 @@ class ProductPage(QWidget):
         layout.addWidget(labels_widget)
         layout.addWidget(self.tab)
 
+        ProductController.getCategories(self)
+        ProductController.getBrands(self)
+
     def createSearchTab(self):
         widget = TabWidget()
         layout = QVBoxLayout()
@@ -68,24 +71,24 @@ class ProductPage(QWidget):
         category_label = Label("Categoria", type="InputLabel")
 
         self.search_input = LineEdit("Pesquise por um produto")
-        category_input = ComboBox(["Categoria 1", "Car 2", "Categoria 3"])
+        self.search_category_input = ComboBox()
         search_button = PushButton("Pesquisar", icon_path="search.svg", type="WithoutBackground")
         export_button = PushButton("Exportar", icon_path="download.svg", type="WithBackground")
 
-        search_button.clicked.connect(lambda: ProductController.get(self, {"procura": self.search_input.text(), "categoria": category_input.currentText()}), "search")
+        search_button.clicked.connect(lambda: ProductController.get(self, {"pesquisa": self.search_input.text(), "categoria": self.search_category_input.currentText()}, "search"))
 
         search_layout.addWidget(search_label, 0, 0)
         search_layout.addWidget(category_label, 0, 1)
 
         search_layout.addWidget(self.search_input, 1, 0)
-        search_layout.addWidget(category_input, 1, 1)
+        search_layout.addWidget(self.search_category_input, 1, 1)
         search_layout.addWidget(search_button, 1, 2)
 
         search_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum), 0, 3)
 
         search_layout.addWidget(export_button, 1, 4)
 
-        table = Table(["ID", "Nome", "Estoque", "Preço de compra", "Reajuste", "Preço de venda", "Estoque mínimo", "Marca", "Categoria"])
+        table = Table(["ID", "Nome", "Estoque", "Preço de compra", "Reajuste", "Preço de venda", "Marca", "Categoria"])
 
         layout.addLayout(search_layout)
         layout.addWidget(table)
@@ -119,8 +122,8 @@ class ProductPage(QWidget):
         current_stock_label = Label("Estoque atual", type="InputLabel")
 
         self.name_input = LineEdit()
-        self.brand_input = ComboBox(["Marca 1", "Marca 2", "Marca 3"])
-        self.category_input = ComboBox(["Categoria 1", "Car 2", "ASD 3"])
+        self.brand_input = ComboBox()
+        self.category_input = ComboBox()
         self.barcode_input = LineEdit()
         self.purchase_input = DoubleSpinBox()
         self.adjust_input = DoubleSpinBox()
@@ -213,16 +216,31 @@ class ProductPage(QWidget):
         layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding))
         layout.addWidget(buttons_widget)
 
-        buttons[0].clicked.connect(self.addProduct)
+        buttons[0].clicked.connect(self.saveProduct)
 
         scroll_area.setWidget(widget)
 
         return scroll_area
     
+    def saveProduct(self):
+        data = {
+            "nome": self.name_input.text(),
+            "id_marca": self.brand_input.currentText(),
+            "id_categoria": self.category_input.currentText(),
+            "cod_barra": self.barcode_input.text(),
+            "preco_compra": self.purchase_input.value(),
+            "reajuste": self.adjust_input.value(),
+            "preco_venda": self.sale_input.value(),
+            "estoque_minimo": self.minimum_stock_input.value(),
+            "estoque_atual": self.current_stock_input.value()
+        }
+
+        ProductController.save(data)
+    
     def editProduct(self, table: Table):
         selectedItems = table.selectedItems()
 
-        ProductController.get(self, {"id": selectedItems}, "edit")
+        ProductController.get(self, {"id_produto": selectedItems[0].text()}, "edit")
 
         self.tab.setCurrentIndex(1)
 
@@ -334,16 +352,3 @@ class ProductPage(QWidget):
         purchase = self.purchase_input.value()
 
         self.adjust_input.setValue(((sell/purchase) - 1) * 100)
-
-    def addProduct(self):
-        data = {
-            "name": self.name_input.text(),
-            "brand": self.brand_input.currentText(),
-            "category": self.category_input.currentText(),
-            "barcode": self.barcode_input.text(),
-            "purchase_price": self.purchase_input.value(),
-            "adjust": self.adjust_input.value(),
-            "sale_price": self.sale_input.value(),
-            "minimum_stock": self.minimum_stock_input.value(),
-            "current_stock": self.current_stock_input.value()
-        }

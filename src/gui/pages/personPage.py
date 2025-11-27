@@ -54,24 +54,25 @@ class PersonPage(QWidget):
         type_label = Label("Tipo de pessoa", type="InputLabel")
 
         self.search_input = LineEdit("Pesquise por uma pessoa")
-        self.type_input = ComboBox(["Todos", "Cliente", "Fornecedor"])
+        self.search_type_input = ComboBox()
+        self.search_type_input.addItems(["Todos", "Pessoa física", "Pessoa jurídica"])
         search_button = PushButton("Pesquisar", icon_path="search.svg", type="WithoutBackground")
         export_button = PushButton("Exportar", icon_path="download.svg", type="WithBackground")
 
-        search_button.clicked.connect(lambda: PersonController.get(self, {"procura": self.search_input.text(), "categoria": self.type_input.currentText()}), "search")
+        search_button.clicked.connect(lambda: PersonController.get(self, {"procura": self.search_input.text(), "tipo": self.search_type_input.currentText()}, "search"))
 
         search_layout.addWidget(search_label, 0, 0)
         search_layout.addWidget(type_label, 0, 1)
 
         search_layout.addWidget(self.search_input, 1, 0)
-        search_layout.addWidget(self.type_input, 1, 1)
+        search_layout.addWidget(self.search_type_input, 1, 1)
         search_layout.addWidget(search_button, 1, 2)
 
         search_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum), 0, 3)
 
         search_layout.addWidget(export_button, 1, 4)
 
-        table = Table(["ID", "Nome", "CPF/CNPJ", "Contato", "Endereço", "Sexo", "Data de nascimento"])
+        table = Table(["ID", "Nome", "CPF/CNPJ", "Contato", "Endereço"])
 
         search_layout.addWidget(table, 2, 0, 1, 4)
         
@@ -119,9 +120,11 @@ class PersonPage(QWidget):
         fantasy_name_label = Label("Nome fantasia", type="InputLabel")
 
         self.name_input = LineEdit()
-        self.type_input = ComboBox(["Pessoa física", "Pessoa jurídica"])
+        self.type_input = ComboBox()
+        self.type_input.addItems(["Pessoa física", "Pessoa jurídica"])
         self.document_input = LineEdit()
-        self.sex_input = ComboBox(["Masculino", "Feminino", "Outro"])
+        self.sex_input = ComboBox()
+        self.sex_input.addItems(["Masculino", "Feminino", "Outro"])
         self.birthday_input = DateEdit(QDate.currentDate())
         self.fantasy_name_input = LineEdit()
         get_cnpj_button = PushButton("Pesquisar", icon_path="search.svg")
