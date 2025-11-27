@@ -4,9 +4,14 @@ from PySide6.QtCore import QDate
 from src.gui.widgets import *
 from src.gui.utils import *
 
+from src.utils import itemExplorer
+
 class ServicePage(QWidget):
     def __init__(self):
         super().__init__()
+
+        self.item_explorer = itemExplorer.ItemExplorer(parent=self)
+        self.item_explorer.setFixedSize(self.item_explorer.size())
 
         layout = QVBoxLayout()
         self.setLayout(layout)
@@ -114,8 +119,14 @@ class ServicePage(QWidget):
         buttons_widget, buttons = createWindowButtons()
 
         search_client_label = Label(text="Cliente", type="InputLabel")
-        
+
         search_client_input = LineEdit("Pesquise por um cliente")
+
+        self.setupSearch(search_client_input,
+        [
+            {"id": 0, "nome": "LUIZ FELIPE", "cpf": "999.999.999.99"},
+            {"id": 1, "nome": "MARCIO DOUGLAS CASSEMIRO JUNIOR", "cpf": "150.464.346.10"}
+        ])
 
         client_layout.addWidget(search_client_label)
         client_layout.addWidget(search_client_input)
@@ -130,3 +141,38 @@ class ServicePage(QWidget):
         layout.addWidget(buttons_widget)
 
         return widget
+
+    def setupSearch(self, search_widget : QLineEdit, data: list[dict]):
+        # Botão de limpar
+        clear_action = search_widget.addAction(QIcon.fromTheme("window-close"), QLineEdit.TrailingPosition)
+        clear_action.triggered.connect(lambda: self.clearFields([search_widget]))
+
+        # Conecta textChanged
+        search_widget.textChanged.connect(
+            lambda text: self.searchItems(data, {"nome": search_widget}, search_widget))
+
+    def searchItems(self, data: list, targets: dict, search_widget: QLineEdit):
+            if not search_widget.text():
+                self.item_explorer.hide()
+                return
+            self.item_explorer.setTarget(targets)
+            self.item_explorer.showData(data)
+
+            # Posiciona o dropdown
+            pos_global = search_widget.mapToGlobal(QPoint(0, 0))
+            final_pos_global = QPoint(pos_global.x(), pos_global.y() + search_widget.height())
+            
+            self.item_explorer.move(final_pos_global)
+            self.item_explorer.setFixedWidth(search_widget.width())
+
+
+    def clearFields(self: QWidget, fields: list):
+        for f in fields:
+            if isinstance(f, QLineEdit):
+                if f.isReadOnly():
+                    f.setReadOnly(False)
+                    f.clear()
+            elif isinstance(f, (QSpinBox, QDoubleSpinBox)):
+                f.setValue(0)
+
+        self.item_explorer.hide()

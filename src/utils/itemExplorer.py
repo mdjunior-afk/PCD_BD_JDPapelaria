@@ -61,6 +61,8 @@ class ItemExplorer(QFrame):
             if "nome" in self.inputs:
                 if "cpf" in data:
                     self.inputs["nome"].setText(data["nome"] + f" {data['cpf']}")
+                elif "cnpj" in data:
+                    self.inputs["nome"].setText(data["nome"] + f" {data['cnpj']}")
                 else:
                     self.inputs["nome"].setText(data["nome"])  
             if "quantidade" in self.inputs:
