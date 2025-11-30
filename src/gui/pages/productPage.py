@@ -121,6 +121,8 @@ class ProductPage(QWidget):
         minimum_stock_label = Label("Estoque mínimo", type="InputLabel")
         current_stock_label = Label("Estoque atual", type="InputLabel")
 
+        self.id_input = SpinBox()
+        self.id_input.setValue(-1)
         self.name_input = LineEdit()
         self.brand_input = ComboBox()
         self.category_input = ComboBox()
@@ -217,6 +219,7 @@ class ProductPage(QWidget):
         layout.addWidget(buttons_widget)
 
         buttons[0].clicked.connect(self.saveProduct)
+        buttons[1].clicked.connect(self.resetInputs)
 
         scroll_area.setWidget(widget)
 
@@ -235,7 +238,24 @@ class ProductPage(QWidget):
             "estoque_atual": self.current_stock_input.value()
         }
 
-        ProductController.save(data)
+        if self.id_input.value() != 0:
+            ProductController.edit(self, self.id_input.value(), data)
+        else:
+            ProductController.save(data)
+
+        self.resetInputs()
+
+    def resetInputs(self):
+        self.id_input.setValue(0)
+        self.name_input.clear()
+        self.brand_input.setCurrentIndex(0)
+        self.category_input.setCurrentIndex(0)
+        self.barcode_input.clear()
+        self.purchase_input.setValue(0)
+        self.adjust_input.setValue(0)
+        self.sale_input.setValue(0)
+        self.minimum_stock_input.setValue(0)
+        self.current_stock_input.setValue(0)
     
     def editProduct(self, table: Table):
         selectedItems = table.selectedItems()
@@ -245,7 +265,11 @@ class ProductPage(QWidget):
         self.tab.setCurrentIndex(1)
 
     def removeProduct(self, table: Table):
-        pass
+        selectedItems = table.selectedItems()
+    
+        ProductController.remove(selectedItems[0].text())
+
+        ProductController.get(self, {}, "search")
     
     def updateExpirationDate(self, has):
         if has != Qt.CheckState.Checked:

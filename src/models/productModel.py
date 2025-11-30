@@ -13,7 +13,7 @@ def getProduct(data={}):
     # 2. Query base (sem WHERE)
     query = """
         SELECT 
-            ProdutoServico.IDProdutoServico, ProdutoServico.Nome, Produto.EstoqueAtual, 
+            ProdutoServico.IDProdutoServico, ProdutoServico.Nome, Produto.EstoqueMinimo, Produto.EstoqueAtual, 
             Produto.PrecoCompra, Produto.Reajuste, Produto.PrecoVenda, Marca.Nome AS Marca, 
             Categoria.Nome AS Categoria, Produto.CodBarra 
         FROM 
@@ -117,21 +117,66 @@ def editProduct(id, data):
     conn = get_connection()
     cursor = conn.cursor()
 
-    query = ""
+    # 1. Update na tabela ProdutoServico (usa o 'id' direto)
+    query_servico = "UPDATE ProdutoServico SET Nome = ? WHERE IDProdutoServico = ?"
+    cursor.execute(query_servico, (data["nome"], id))
 
-    cursor.execute(query)
+    # 2. Obtém o ID da tabela Produto (chave primária/secundária)
+    product_id = getProductID(id)[0]
+
+    if product_id is None:
+        # Se não encontrar o produto, faz um rollback e encerra a operação
+        conn.rollback()
+        conn.close()
+        print(f"Erro: ProdutoServico ID {id} não tem um registro correspondente em Produto.")
+        return
+
+    # 3. Update na tabela Produto (usa o 'product_id' obtido)
+    query_produto = """
+    UPDATE Produto 
+    SET 
+        IDMarca = ?, IDCategoria = ?, CodBarra = ?, PrecoCompra = ?, Reajuste = ?, 
+        PrecoVenda = ?, EstoqueMinimo = ?, EstoqueAtual = ? 
+    WHERE IDProduto = ?
+    """
+
+    params_produto = (
+        data["id_marca"], data["id_categoria"], data["cod_barra"], data["preco_compra"], 
+        data["reajuste"], data["preco_venda"], data["estoque_minimo"], 
+        data["estoque_atual"], product_id,
+    )
+
+    cursor.execute(query_produto, params_produto) 
 
     conn.commit()
     conn.close()
+
+def getProductID(id):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    query = "SELECT Produto.IDProduto FROM Produto INNER JOIN ProdutoServico ON ProdutoServico.IDProdutoServico = Produto.IDProdutoServico WHERE ProdutoServico.IDProdutoServico = ?"
+
+    cursor.execute(query, (id, ))
+
+    return cursor.fetchone()
 
 def removeProduct(id):
     # Remover um produto de ID=id, caso o produto existe em alguma venda. Não poderá ser excluido
     conn = get_connection()
     cursor = conn.cursor()
 
-    query = ""
+    product_id = getProductID(id)[0]
 
-    cursor.execute(query)
+    print(id, product_id)
+
+    query = "DELETE FROM Produto WHERE IDProduto = ?"
+
+    cursor.execute(query, (product_id, ))
+
+    query = "DELETE FROM ProdutoServico WHERE IDProdutoServico = ?"
+
+    cursor.execute(query, (id, ))
 
     conn.commit()
     conn.close()
