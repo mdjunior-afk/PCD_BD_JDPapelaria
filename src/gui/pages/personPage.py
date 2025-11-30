@@ -32,7 +32,7 @@ class PersonPage(QWidget):
         search_tab, self.search_table = self.createSearchTab()
         edition_tab = self.createEditionTab()
 
-        self.search_table.add_action.triggered.connect(lambda: self.tab.setCurrentIndex(1))
+        self.search_table.add_action.triggered.connect(self.addPerson)
         self.search_table.edit_action.triggered.connect(lambda: self.editPerson(self.search_table))
         self.search_table.remove_action.triggered.connect(lambda: self.removePerson(self.search_table))
 
@@ -93,19 +93,21 @@ class PersonPage(QWidget):
 
         buttons_widget, buttons = createWindowButtons()
 
+        buttons[0].clicked.connect(self.addPerson)
+
         person_type_box = GroupBox("Tipo da pessoa")
         person_type_layout = QHBoxLayout()
         person_type_box.setLayout(person_type_layout)
 
-        client_box = QCheckBox("Cliente")
-        client_box.setChecked(True)
-        supplier_box = QCheckBox("Fornecedor")
+        self.client_box = QCheckBox("Cliente")
+        self.client_box.setChecked(True)
+        self.supplier_box = QCheckBox("Fornecedor")
 
-        client_box.setFocusPolicy(Qt.NoFocus)
-        supplier_box.setFocusPolicy(Qt.NoFocus)
+        self.client_box.setFocusPolicy(Qt.NoFocus)
+        self.supplier_box.setFocusPolicy(Qt.NoFocus)
 
-        person_type_layout.addWidget(client_box)
-        person_type_layout.addWidget(supplier_box)
+        person_type_layout.addWidget(self.client_box)
+        person_type_layout.addWidget(self.supplier_box)
         person_type_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum))
 
         info_box = GroupBox("Informações de pessoa")
@@ -119,6 +121,8 @@ class PersonPage(QWidget):
         birthday_label = Label("Data de nascimento", type="InputLabel")
         fantasy_name_label = Label("Nome fantasia", type="InputLabel")
 
+        self.id_input = SpinBox()
+        self.id_input.setValue(0)
         self.name_input = LineEdit()
         self.type_input = ComboBox()
         self.type_input.addItems(["Pessoa física", "Pessoa jurídica"])
@@ -150,7 +154,7 @@ class PersonPage(QWidget):
         info_layout.addWidget(self.sex_input, 3, 2)
         info_layout.addWidget(self.birthday_input, 3, 3)
         info_layout.addWidget(self.fantasy_name_input, 3, 3)
-       
+        
         info_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding))
 
         contact_box = GroupBox("Informações de contato")
@@ -158,28 +162,32 @@ class PersonPage(QWidget):
         contact_box.setLayout(contact_layout)
 
         contact_buttons_widget, contact_buttons, = createTableButtons()
-        contact_table = Table(["ID", "Tipo", "Contato"])
-
+        self.contact_table = Table(["ID", "Tipo", "Contato"]) # Use self.contact_table
+        
         contact_buttons[0].clicked.connect(self.addContactWindow)
+        # CONEXÃO PARA REMOVER CONTATO
+        contact_buttons[2].clicked.connect(self.removeSelectedContact)
+        # TODO: Implementar a lógica de edição para contact_buttons[1]
         contact_buttons[1].clicked.connect(self.editContactWindow)
-        contact_buttons[2].clicked.connect(self.removeContactWindow)
         
         contact_layout.addWidget(contact_buttons_widget)
-        contact_layout.addWidget(contact_table)
+        contact_layout.addWidget(self.contact_table)
 
         address_box = GroupBox("Informações de endereço")
         address_layout = QVBoxLayout()
         address_box.setLayout(address_layout)
 
         address_buttons_widget, address_buttons = createTableButtons()
-        address_table = Table(["ID", "CEP", "Logradouro", "Número", "Bairro", "Cidade", "Estado", "Complemento"])
+        self.address_table = Table(["ID", "CEP", "Logradouro", "Número", "Bairro", "Cidade", "Estado", "Complemento"]) # Use self.address_table
 
         address_buttons[0].clicked.connect(self.addAddressWindow)
+        # CONEXÃO PARA REMOVER ENDEREÇO
+        address_buttons[2].clicked.connect(self.removeSelectedAddress)
+        # TODO: Implementar a lógica de edição para address_buttons[1]
         address_buttons[1].clicked.connect(self.editAddressWindow)
-        address_buttons[2].clicked.connect(self.removeAddressWindow)
         
         address_layout.addWidget(address_buttons_widget)
-        address_layout.addWidget(address_table)
+        address_layout.addWidget(self.address_table)
 
         layout.addWidget(person_type_box)
         layout.addWidget(info_box)
@@ -189,7 +197,7 @@ class PersonPage(QWidget):
 
         self.type_input.currentIndexChanged.connect(lambda index: self.onIndexChanged(index, name_label, document_label, self.document_input, (self.sex_input, self.birthday_input, sex_label, birthday_label), (self.fantasy_name_input, fantasy_name_label, get_cnpj_button)))
         get_cnpj_button.clicked.connect(lambda x: self.getCNPJ(
-            self.document_input, {"razao_social": self.name_input, "nome_fantasia": self.fantasy_name_input}, contact_table, address_table
+            self.document_input, {"razao_social": self.name_input, "nome_fantasia": self.fantasy_name_input}, self.contact_table, self.address_table
         ))
 
 
@@ -197,12 +205,135 @@ class PersonPage(QWidget):
 
         return scroll_area
     
+    def addContactToTable(self, contact_type: str, value: str, row_to_edit=None):
+        """Adiciona ou edita um contato na tabela."""
+        table = self.contact_table
+        
+        # Se row_to_edit for um índice válido, estamos editando
+        if row_to_edit is not None and 0 <= row_to_edit < table.rowCount():
+            row = row_to_edit
+            # O ID deve ser mantido se for uma edição. Assumindo que o ID está na coluna 0.
+            # Se não for uma edição, o ID será atribuído abaixo.
+            item_id = table.item(row, 0).text()
+        else:
+            # Adicionar nova linha
+            row = table.rowCount()
+            table.setRowCount(row + 1)
+            # Atribuir um ID temporário (pode ser o índice da linha ou um contador)
+            # Para este exemplo, usaremos o índice da linha como um ID temporário se não houver ID real do banco de dados
+            item_id = str(row + 1) # ID base 1 para melhor visualização
+            table.setItem(row, 0, QTableWidgetItem(item_id))
+
+        table.setItem(row, 1, QTableWidgetItem(contact_type))
+        table.setItem(row, 2, QTableWidgetItem(value))
+        
+        table.resizeColumnsToContents()
+
+    def removeSelectedContact(self):
+        """Remove a linha selecionada da tabela de contatos."""
+        table = self.contact_table
+        selected_rows = table.selectionModel().selectedRows()
+        
+        # As linhas devem ser removidas em ordem decrescente para não bagunçar os índices
+        for index in sorted(selected_rows, reverse=True):
+            table.removeRow(index.row())
+
+    def addAddressToTable(self, cep: str, logradouro: str, numero: str, bairro: str, cidade: str, estado: str, complemento: str, row_to_edit=None):
+        """Adiciona ou edita um endereço na tabela."""
+        table = self.address_table
+        
+        # Se row_to_edit for um índice válido, estamos editando
+        if row_to_edit is not None and 0 <= row_to_edit < table.rowCount():
+            row = row_to_edit
+            item_id = table.item(row, 0).text()
+        else:
+            # Adicionar nova linha
+            row = table.rowCount()
+            table.setRowCount(row + 1)
+            item_id = str(row + 1)
+            table.setItem(row, 0, QTableWidgetItem(item_id))
+
+        table.setItem(row, 1, QTableWidgetItem(cep))
+        table.setItem(row, 2, QTableWidgetItem(logradouro))
+        table.setItem(row, 3, QTableWidgetItem(numero))
+        table.setItem(row, 4, QTableWidgetItem(bairro))
+        table.setItem(row, 5, QTableWidgetItem(cidade))
+        table.setItem(row, 6, QTableWidgetItem(estado))
+        table.setItem(row, 7, QTableWidgetItem(complemento))
+
+        table.resizeColumnsToContents()
+        
+    def removeSelectedAddress(self):
+        """Remove a linha selecionada da tabela de endereços."""
+        table = self.address_table
+        selected_rows = table.selectionModel().selectedRows()
+        
+        # As linhas devem ser removidas em ordem decrescente para não bagunçar os índices
+        for index in sorted(selected_rows, reverse=True):
+            table.removeRow(index.row())
+
+
+    def addPerson(self):
+        data = {
+            "nome": self.name_input.text(),
+            "type": self.type_input.currentText(),
+            "document": self.document_input.text(),
+            "sex": self.sex_input.currentText(),
+            "birthday": self.birthday_input.text(),
+            "address": self.getAllAddress(),
+            "contact": self.getAllContact(),
+            "is_client": int(self.client_box.isChecked()),
+            "is_supplier": int(self.supplier_box.isChecked())
+        }
+
+        PersonController.add(data, "add")
+
     def editPerson(self, table: Table):
         selectedItems = table.selectedItems()
 
-        PersonController.get(self, {"id": selectedItems}, "edit")
+        PersonController.get(self, {"id_pessoa": selectedItems[0].text()}, "edit")
 
         self.tab.setCurrentIndex(1)
+
+    def getAllAddress(self):     
+        if not hasattr(self, 'address_table') or not isinstance(self.address_table, QTableWidget):
+            return []
+
+        addresses = []
+        table = self.address_table
+        
+        column_names = ["ID", "cep", "logradouro", "numero", "bairro", "cidade", "estado", "complemento"]
+
+        for row in range(table.rowCount()):
+            address_data = {}
+            for col, name in enumerate(column_names):
+                item = table.item(row, col)
+                address_data[name] = item.text() if item is not None else ""
+            
+            address_data.pop("ID", None) 
+            addresses.append(address_data)
+            
+        return addresses
+
+    def getAllContact(self):
+        if not hasattr(self, 'contact_table') or not isinstance(self.contact_table, QTableWidget):
+            return []
+            
+        contacts = []
+        table = self.contact_table
+        
+        column_names = ["ID", "tipo", "contato"]
+        
+        for row in range(table.rowCount()):
+            contact_data = {}
+            for col, name in enumerate(column_names):
+                item = table.item(row, col)
+                contact_data[name] = item.text() if item is not None else ""
+            
+            contact_data.pop("ID", None) 
+            contacts.append(contact_data)
+            
+        return contacts
 
     def removePerson(self, table: Table):
         pass
@@ -291,49 +422,81 @@ class PersonPage(QWidget):
                     i.setVisible(True)
 
     def addContactWindow(self):
-        print("OPA")
-        self.contact_window = ContactWindow(parent=self)
+        # A janela de contato precisa saber qual tabela atualizar (self.contact_table)
+        self.contact_window = ContactWindow(parent=self, parent_page=self, is_editing=False)
         self.applyStyleToDialog(self.contact_window)
         self.contact_window.exec()
     
     def editContactWindow(self):
-        self.contact_window = ContactWindow(data={
-            "type": "Celular",
-            "value": "(31) 98914-3646"
-        })
+        # Implementação de edição simplificada: tenta pegar os dados da linha selecionada
+        selected_rows = self.contact_table.selectionModel().selectedRows()
+        if not selected_rows:
+            # Poderia ser um QMessageBox, mas por simplicidade, apenas retorna
+            return 
+        
+        row_index = selected_rows[0].row()
+        
+        data = {
+            "row_index": row_index,
+            "type": self.contact_table.item(row_index, 1).text(),
+            "value": self.contact_table.item(row_index, 2).text()
+        }
+        
+        self.contact_window = ContactWindow(parent=self, parent_page=self, data=data, is_editing=True)
         self.applyStyleToDialog(self.contact_window)
-        self.contact_window.show()
+        self.contact_window.exec()
+
 
     def removeContactWindow(self):
+        # Já implementado via self.removeSelectedContact, que é conectado ao botão 'Remover'
         pass
 
     def addAddressWindow(self):
-        self.address_window = AddressWindow(parent=self)
+        # A janela de endereço precisa saber qual tabela atualizar (self.address_table)
+        self.address_window = AddressWindow(parent=self, parent_page=self, is_editing=False)
         self.applyStyleToDialog(self.address_window)
         self.address_window.exec()
 
     def editAddressWindow(self):
-        self.address_window = AddressWindow(data={
-            "cep": "34012650",
-            "estate": "MG",
-            "city": "Nova Lima",
-            "neighborhood": "Honório Bicalho",
-            "street": "Rua da Máquina",
-            "number": "60",
-            "complement": ""
-        })
+        # Implementação de edição simplificada: tenta pegar os dados da linha selecionada
+        selected_rows = self.address_table.selectionModel().selectedRows()
+        if not selected_rows:
+            # Poderia ser um QMessageBox, mas por simplicidade, apenas retorna
+            return 
+        
+        row_index = selected_rows[0].row()
+        
+        data = {
+            "row_index": row_index,
+            "cep": self.address_table.item(row_index, 1).text(),
+            "street": self.address_table.item(row_index, 2).text(),
+            "number": self.address_table.item(row_index, 3).text(),
+            "neighborhood": self.address_table.item(row_index, 4).text(),
+            "city": self.address_table.item(row_index, 5).text(),
+            "estate": self.address_table.item(row_index, 6).text(),
+            "complement": self.address_table.item(row_index, 7).text(),
+        }
+
+        self.address_window = AddressWindow(parent=self, parent_page=self, data=data, is_editing=True)
         self.applyStyleToDialog(self.address_window)
-        self.address_window.show()
+        self.address_window.exec()
+
 
     def removeAddressWindow(self):
+        # Já implementado via self.removeSelectedAddress, que é conectado ao botão 'Remover'
         pass
 
+# --- ContactWindow Modificada ---
 class ContactWindow(QDialog):
-    def __init__(self, parent=None, data={}):
+    def __init__(self, parent=None, parent_page=None, data={}, is_editing=False):
         super().__init__(parent=parent)
 
+        self.parent_page = parent_page
+        self.is_editing = is_editing
+        self.row_index = data.get("row_index") # Armazena o índice se for edição
+
         self.setWindowFlag(Qt.Window)
-        self.setWindowTitle("Adicionar/Editar Endereço")
+        self.setWindowTitle("Editar Contato" if is_editing else "Adicionar Contato")
 
         self.setMaximumHeight(200)
         self.setMinimumWidth(500)
@@ -343,38 +506,59 @@ class ContactWindow(QDialog):
         layout = QVBoxLayout()
         self.setLayout(layout)
 
-        box = GroupBox("Cadastro de endereço")
+        box = GroupBox("Cadastro de contato") # Corrigido o título
         box_layout = QGridLayout()
         box.setLayout(box_layout)
 
         buttons_widget, buttons = createWindowButtons()
+        
+        # Conexões dos botões para adicionar/editar
+        buttons[0].setText("Salvar" if is_editing else "Adicionar")
+        buttons[0].clicked.connect(self.save_contact)
+        buttons[1].clicked.connect(self.reject) # Rejeita/fecha o diálogo
 
         type_label = Label("Tipo", "InputLabel")
         value_label = Label("Contato", "InputLabel")
 
-        type_input = ComboBox(["Email", "Celular", "Telefone fixo"])
-        value_input = LineEdit()
+        self.type_input = ComboBox() # Removido argumento posicional
+        self.type_input.addItems(["Email", "Celular", "Telefone fixo"])
+        self.value_input = LineEdit()
 
         box_layout.addWidget(type_label, 0, 0)
         box_layout.addWidget(value_label, 0, 1)
 
-        box_layout.addWidget(type_input, 1, 0)
-        box_layout.addWidget(value_input, 1, 1)
+        box_layout.addWidget(self.type_input, 1, 0)
+        box_layout.addWidget(self.value_input, 1, 1)
 
         layout.addWidget(box)
         layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding))
         layout.addWidget(buttons_widget)
 
-        if data:
-            type_input.setCurrentText(data["type"])
-            value_input.setText(data["value"])
+        if data and is_editing:
+            self.type_input.setCurrentText(data.get("type", ""))
+            self.value_input.setText(data.get("value", ""))
 
+    def save_contact(self):
+        contact_type = self.type_input.currentText()
+        value = self.value_input.text()
+        
+        if self.parent_page:
+            # Chama a função na PersonPage para adicionar/editar o item
+            self.parent_page.addContactToTable(contact_type, value, self.row_index if self.is_editing else None)
+        
+        self.accept() # Fecha o diálogo
+
+# --- AddressWindow Modificada ---
 class AddressWindow(QDialog):
-    def __init__(self, parent=None, data={}):
+    def __init__(self, parent=None, parent_page=None, data={}, is_editing=False):
         super().__init__(parent=parent)
 
+        self.parent_page = parent_page
+        self.is_editing = is_editing
+        self.row_index = data.get("row_index") # Armazena o índice se for edição
+
         self.setWindowFlag(Qt.Window)
-        self.setWindowTitle("Adicionar/Editar Endereço")
+        self.setWindowTitle("Editar Endereço" if is_editing else "Adicionar Endereço")
         
         self.setFixedHeight(300)
 
@@ -391,6 +575,11 @@ class AddressWindow(QDialog):
         box.setLayout(box_layout)
 
         buttons_widget, buttons = createWindowButtons()
+        
+        # Conexões dos botões para adicionar/editar
+        buttons[0].setText("Salvar" if is_editing else "Adicionar")
+        buttons[0].clicked.connect(self.save_address)
+        buttons[1].clicked.connect(self.reject)
 
         cep_label = Label("CEP", "InputLabel")
         estate_label = Label("Estado", "InputLabel")
@@ -400,28 +589,28 @@ class AddressWindow(QDialog):
         number_label = Label("Nº", "InputLabel")
         complement_label = Label("Complemento", "InputLabel")
 
-        cep_input = LineEdit()
+        self.cep_input = LineEdit()
         search_input = PushButton("Procurar", icon_path="search.svg")
-        estate_input = ComboBox()
-        city_input = ComboBox()
-        neighborhood_input = LineEdit()
-        street_input = LineEdit()
-        number_input = LineEdit()
-        complement_input = LineEdit()
+        self.estate_input = ComboBox()
+        self.city_input = ComboBox()
+        self.neighborhood_input = LineEdit()
+        self.street_input = LineEdit()
+        self.number_input = LineEdit()
+        self.complement_input = LineEdit()
 
-        search_input.clicked.connect(lambda x: cepAPI.searchCEP(cep_input,
-        {"estate_input": estate_input, "city_input": city_input,
-         "neighborhood_input": neighborhood_input, "street_input": street_input,
-         "complement_input": complement_input}))
+        search_input.clicked.connect(lambda x: cepAPI.searchCEP(self.cep_input,
+        {"estate_input": self.estate_input, "city_input": self.city_input,
+         "neighborhood_input": self.neighborhood_input, "street_input": self.street_input,
+         "complement_input": self.complement_input}))
 
-        cep_input.setInputMask("00000-000;_")
+        self.cep_input.setInputMask("00000-000;_")
 
-        location = locations.Location(estate_input, city_input)
+        location = locations.Location(self.estate_input, self.city_input)
         location.loadData()
         location.fillEstates()
 
-        estate_input.currentIndexChanged.connect(lambda x: location.filterCities())
-        city_input.lineEdit().editingFinished.connect(location.validateCity)
+        self.estate_input.currentIndexChanged.connect(lambda x: location.filterCities())
+        self.city_input.lineEdit().editingFinished.connect(location.validateCity)
 
         box_layout.addWidget(cep_label, 0, 0)
         box_layout.addWidget(estate_label, 2, 0)
@@ -431,14 +620,14 @@ class AddressWindow(QDialog):
         box_layout.addWidget(number_label, 4, 1)
         box_layout.addWidget(complement_label, 4, 2)
 
-        box_layout.addWidget(cep_input, 1, 0)
+        box_layout.addWidget(self.cep_input, 1, 0)
         box_layout.addWidget(search_input, 1, 1)
-        box_layout.addWidget(estate_input, 3, 0)
-        box_layout.addWidget(city_input, 3, 1)
-        box_layout.addWidget(neighborhood_input, 3, 2)
-        box_layout.addWidget(street_input, 5, 0)
-        box_layout.addWidget(number_input, 5, 1)
-        box_layout.addWidget(complement_input, 5, 2)
+        box_layout.addWidget(self.estate_input, 3, 0)
+        box_layout.addWidget(self.city_input, 3, 1)
+        box_layout.addWidget(self.neighborhood_input, 3, 2)
+        box_layout.addWidget(self.street_input, 5, 0)
+        box_layout.addWidget(self.number_input, 5, 1)
+        box_layout.addWidget(self.complement_input, 5, 2)
 
         box_layout.setColumnStretch(0, 2)
         box_layout.setColumnStretch(1, 2)
@@ -448,11 +637,29 @@ class AddressWindow(QDialog):
         layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding))
         layout.addWidget(buttons_widget)
 
-        if data:
-            cep_input.setText(data["cep"])
-            estate_input.setCurrentText(data["estate"])
-            city_input.setCurrentText(data["city"])
-            neighborhood_input.setText(data["neighborhood"])
-            street_input.setText(data["street"])
-            number_input.setText(data["number"])
-            complement_input.setText(data["complement"])
+        if data and is_editing:
+            self.cep_input.setText(data.get("cep", ""))
+            self.estate_input.setCurrentText(data.get("estate", ""))
+            self.city_input.setCurrentText(data.get("city", ""))
+            self.neighborhood_input.setText(data.get("neighborhood", ""))
+            self.street_input.setText(data.get("street", ""))
+            self.number_input.setText(data.get("number", ""))
+            self.complement_input.setText(data.get("complement", ""))
+            
+    def save_address(self):
+        cep = self.cep_input.text()
+        estate = self.estate_input.currentText()
+        city = self.city_input.currentText()
+        neighborhood = self.neighborhood_input.text()
+        street = self.street_input.text()
+        number = self.number_input.text()
+        complement = self.complement_input.text()
+        
+        if self.parent_page:
+            # Chama a função na PersonPage para adicionar/editar o endereço
+            self.parent_page.addAddressToTable(
+                cep, street, number, neighborhood, city, estate, complement, 
+                self.row_index if self.is_editing else None
+            )
+            
+        self.accept()
