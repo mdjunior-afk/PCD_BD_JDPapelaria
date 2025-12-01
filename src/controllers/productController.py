@@ -22,6 +22,13 @@ class ProductController:
             window.sale_input.setValue(products[0][6])
             window.minimum_stock_input.setValue(products[0][2])
             window.current_stock_input.setValue(products[0][3])
+        elif type == "search_item":
+            data = []
+
+            for product in products:
+                data.append({"nome": product[1], "valor": product[6], "quantidade": 1, "subtotal": product[6]})
+
+            return data
             
         elif type == "search":
             table = window.search_table

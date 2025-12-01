@@ -96,22 +96,26 @@ class SalesPage(QWidget):
         layout = QVBoxLayout()
         widget.setLayout(layout)
 
+        self.id_input = SpinBox()
+        self.id_input.setValue(0)
+        self.id_input.hide()
+
         client_box = GroupBox("Informações do cliente")
         client_layout = QVBoxLayout()
         client_box.setLayout(client_layout)
 
         search_client_label = Label(text="Cliente", type="InputLabel")
         
-        search_client_input = LineEdit("Pesquise por um cliente")
+        self.search_client_input = LineEdit("Pesquise por um cliente")
 
-        self.setupSearch(search_client_input,
+        self.setupSearch(self.search_client_input,
         [
             {"id": 0, "nome": "LUIZ FELIPE", "cpf": "999.999.999.99"},
-            {"id": 1, "nome": "MARCIO DOUGLAS CASSEMIRO JUNIOR", "cpf": "150.464.346.10"}
+            {"id": 1, "nome": "Papelaria Estrela Ltda", "cpf": "150.464.346.10"}
         ])
 
         client_layout.addWidget(search_client_label)
-        client_layout.addWidget(search_client_input)
+        client_layout.addWidget(self.search_client_input)
 
         total_box = QWidget()
         total_box_layout = QHBoxLayout()
@@ -121,35 +125,37 @@ class SalesPage(QWidget):
         services_total_label = Label("Serviços:", type="InputLabel")
         total_label = Label("Total:", type="InputLabel")
         
-        products_total_input = DoubleSpinBox()
+        self.products_total_input = DoubleSpinBox()
         services_total_input = DoubleSpinBox()        
-        total_input = DoubleSpinBox()
+        self.total_input = DoubleSpinBox()
 
-        total_input.setPrefix("R$ ")
-        products_total_input.setPrefix("R$ ")
+        self.total_input.setPrefix("R$ ")
+        self.products_total_input.setPrefix("R$ ")
         services_total_input.setPrefix("R$ ")
         
-        total_input.setReadOnly(True)
-        products_total_input.setReadOnly(True)
+        self.total_input.setReadOnly(True)
+        self.products_total_input.setReadOnly(True)
         services_total_input.setReadOnly(True)
 
-        tab = TransactionTab(parent=self, inputs=(products_total_input, services_total_input, total_input))
+        self.transaction_tab = TransactionTab(parent=self, inputs=(self.products_total_input, services_total_input, self.total_input))
+
+        SalesController.getPaymentMethods(self.transaction_tab.document_input)
         
         buttons_widget, buttons = createWindowButtons()
 
-        buttons[0].clicked.connect(lambda: self.saveSale(search_client_input, tab))
-        buttons[2].clicked.connect(lambda: self.clearFields([search_client_input, total_input, products_total_input, services_total_input]))
+        buttons[0].clicked.connect(lambda: self.saveSale(self.search_client_input, self.transaction_tab))
+        buttons[1].clicked.connect(lambda: self.resetInputs())
 
         total_box_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum))
         total_box_layout.addWidget(products_total_label)
-        total_box_layout.addWidget(products_total_input)
+        total_box_layout.addWidget(self.products_total_input)
         total_box_layout.addWidget(services_total_label)
         total_box_layout.addWidget(services_total_input)
         total_box_layout.addWidget(total_label)
-        total_box_layout.addWidget(total_input)
+        total_box_layout.addWidget(self.total_input)
 
         layout.addWidget(client_box)
-        layout.addWidget(tab)
+        layout.addWidget(self.transaction_tab)
         layout.addWidget(total_box)
         layout.addWidget(buttons_widget)
 
@@ -157,23 +163,43 @@ class SalesPage(QWidget):
 
         return scroll_area
     
-    def saveSale(self, client: LineEdit, tab: Tab):
+    def saveSale(self, client: LineEdit, tab: TransactionTab):
         data = {
             "cliente": client.text(),
-            "id_produto": 0
+            "itens": tab.getAllProducts(),
+            "pagamentos": tab.getAllPayments(),
+            "valor_total": self.total_input.value(),
         }
 
-        SalesController.save(data)
+        if self.id_input.value() == 0:
+            SalesController.save(data)
+        else:
+            SalesController.remove(self.id_input.value())
+            data["id_pedido"] = self.id_input.value()
+            SalesController.save(data)
+
+        self.resetInputs()
+        self.transaction_tab.resetInputs()
+
+    def resetInputs(self):
+        self.search_client_input.setText("")
+        self.transaction_tab.resetInputs()
+        self.total_input.setValue(0)
+        self.products_total_input.setValue(0)
 
     def editSale(self, table: Table):
         selectedItems = table.selectedItems()
 
-        SalesController.get(self, {"id": selectedItems}, "edit")
+        SalesController.get(self, {"id": selectedItems[0].text()}, "edit")
 
         self.tab.setCurrentIndex(1)
 
     def removeSale(self, table: Table):
-        pass
+        selectedItems = table.selectedItems()
+    
+        SalesController.remove(selectedItems[0].text())
+
+        SalesController.get(self, {"data_inicio": self.initial_date.text(), "data_final": self.final_date.text()}, "search")
     
     def setupSearch(self, search_widget : QLineEdit, data: list[dict]):
         # Botão de limpar

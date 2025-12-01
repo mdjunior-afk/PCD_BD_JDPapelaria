@@ -9,7 +9,7 @@ class ItemExplorer(QFrame):
 
         self.targets = None
 
-        self.setWindowFlag(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.Popup)
+        self.setWindowFlag(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.ToolTip)
         self.setMinimumWidth(300)
 
         self.setMinimumHeight(200)
@@ -60,9 +60,9 @@ class ItemExplorer(QFrame):
         if data and self.inputs:
             if "nome" in self.inputs:
                 if "cpf" in data:
-                    self.inputs["nome"].setText(data["nome"] + f" {data['cpf']}")
+                    self.inputs["nome"].setText(data["nome"])
                 elif "cnpj" in data:
-                    self.inputs["nome"].setText(data["nome"] + f" {data['cnpj']}")
+                    self.inputs["nome"].setText(data["nome"])
                 else:
                     self.inputs["nome"].setText(data["nome"])  
             if "quantidade" in self.inputs:
@@ -86,7 +86,6 @@ class ItemExplorer(QFrame):
         
         for obj in data:
             item = QListWidgetItem(obj["nome"])
-            print(item)
             item.setData(Qt.UserRole, obj)
             self.list_widget.addItem(item)
 

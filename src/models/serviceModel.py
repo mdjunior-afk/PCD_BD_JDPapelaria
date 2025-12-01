@@ -4,6 +4,50 @@ import sqlite3
 
 from datetime import datetime
 
+def getServices(data):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    termo_pesquisa = f"%{data.get('pesquisa', '')}%"
+
+    query = """
+    SELECT
+        Servico.IDProdutoServico, ProdutoServico.Nome, Servico.Descricao, Servico.Preco
+    FROM
+        ProdutoServico
+    INNER JOIN
+        Servico ON ProdutoServico.IDProdutoServico = Servico.IDProdutoServico
+    WHERE
+        ProdutoServico.Nome LIKE ?
+    """
+
+    cursor.execute(query, (termo_pesquisa, ))
+
+    return cursor.fetchall()
+
+def getEditService(id):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    query = """
+    SELECT 
+        Pedido.IDPedido, Pedido.DataPedido, Pessoa.Nome, Pedido.ValorTotal, ProdutoServico.Nome, ItemPedido.PrecoUnitario, ItemPedido.Quantidade, ItemPedido.SubTotal
+    FROM
+        Pedido
+    INNER JOIN
+        ItemPedido ON ItemPedido.IDPedido = Pedido.IDPedido
+    INNER JOIN
+        ProdutoServico ON ProdutoServico.IDProdutoServico = ItemPedido.IDProdutoServico
+    INNER JOIN
+        Pessoa ON Pessoa.IDPessoa = Pedido.IDPessoa
+    WHERE
+        Pedido.IDPedido = ?
+    """
+
+    cursor.execute(query, (id, ))
+
+    return cursor.fetchall()
+
 def getService(data={}):
     conn = get_connection()
     cursor = conn.cursor()
@@ -21,26 +65,28 @@ def getService(data={}):
 
     query = """
     SELECT
-        Pedido.IDPedido,
-        Pedido.DataPedido,
-        Pessoa.Nome AS NomeCliente,
-        Pedido.ValorTotal,
-        GROUP_CONCAT(DISTINCT FormaPagamento.Nome) AS FormasPagamento
+        P.IDPedido, 
+        P.DataPedido,
+        Pe.Nome AS NomeCliente, 
+        P.ValorTotal, 
+        PS.Nome AS NomeItem,
+        IP.PrecoUnitario, 
+        IP.Quantidade, 
+        IP.SubTotal,
+        (
+            SELECT GROUP_CONCAT(DISTINCT FormaPagamento.Nome)
+            FROM Pagamento
+            INNER JOIN FormaPagamento ON FormaPagamento.IDFormaPagamento = Pagamento.IDFormaPagamento
+            WHERE Pagamento.IDPedido = P.IDPedido
+        ) AS FormasPagamento
     FROM
-        Pedido
-    INNER JOIN Pessoa ON Pessoa.IDPessoa = Pedido.IDPessoa
-    INNER JOIN Pagamento ON Pagamento.IDPedido = Pedido.IDPedido
-    INNER JOIN FormaPagamento ON Pagamento.IDFormaPagamento = FormaPagamento.IDFormaPagamento
+        Pedido AS P
+    INNER JOIN Pessoa AS Pe ON Pe.IDPessoa = P.IDPessoa
+    INNER JOIN ItemPedido AS IP ON IP.IDPedido = P.IDPedido
+    INNER JOIN ProdutoServico AS PS ON PS.IDProdutoServico = IP.IDProdutoServico
     WHERE
-        (Pedido.DataPedido BETWEEN ? AND ?)
-        AND Pedido.IDPedido IN (
-            SELECT IP.IDPedido
-            FROM ItemPedido AS IP
-            INNER JOIN ProdutoServico AS PS ON PS.IDProdutoServico = IP.IDProdutoServico
-            WHERE PS.Tipagem = 'Servico'
-        )
-    GROUP BY
-        Pedido.IDPedido
+        PS.Tipagem = 'Servico' AND P.DataPedido BETWEEN ? AND ?
+    GROUP BY P.IDPedido
     """
     
     args = [start_date_sql, end_date_sql]
@@ -61,37 +107,181 @@ def getService(data={}):
             conn.close()
 
 def addService(data={}):
-    # Adicionar um serviço levando em consideração todos os serviços prestados e pagamentos dele
     conn = get_connection()
     cursor = conn.cursor()
 
-    query = ""
+    try:
+        # 1. Preparação dos dados e data atual
 
-    cursor.execute(query)
+        id_pessoa = getPersonID(data["cliente"])
+        if id_pessoa:
+            id_pessoa = id_pessoa[0]
+        else:
+            id_pessoa = 1
 
-    conn.commit()
-    conn.close()
+        valor_total = data.get("valor_total", 0.0)
+        itens = data.get("itens", [])
+        pagamentos = data.get("pagamentos", [])
+        
+        # Obter a data atual no formato SQL 'YYYY-MM-DD'
+        data_pedido = datetime.now().strftime('%Y-%m-%d')
 
-def editService(id, data):
-    # Editar algum dado do serviço de ID=id
+        if not id_pessoa or not itens:
+            raise ValueError("ID da Pessoa e Itens são obrigatórios para registrar uma venda.")
+
+        # --- 2. Inserir na tabela Pedido (Venda principal) ---
+        if "id_pedido" not in data:
+            query_pedido = """
+            INSERT INTO Pedido (IDPessoa, DataPedido, ValorTotal) 
+            VALUES (?, ?, ?);
+            """
+
+            cursor.execute(query_pedido, (
+                id_pessoa, 
+                data_pedido, 
+                valor_total
+            ))
+        else:
+            query_pedido = """
+            INSERT INTO Pedido (IDPedido, IDPessoa, DataPedido, ValorTotal) 
+            VALUES (?, ?, ?, ?);
+            """ 
+            cursor.execute(query_pedido, (
+                data["id_pedido"],
+                id_pessoa, 
+                data_pedido, 
+                valor_total
+            ))
+        
+        # Obter o ID do pedido recém-inserido
+        id_pedido = cursor.lastrowid
+        if not id_pedido:
+            raise sqlite3.Error("Falha ao obter o ID do Pedido inserido.")
+
+        # --- 3. Inserir na tabela ItemPedido ---
+        query_item_pedido = """
+        INSERT INTO ItemPedido (IDPedido, IDProdutoServico, Quantidade, PrecoUnitario, Subtotal) 
+        VALUES (?, ?, ?, ?, ?);
+        """
+        for item in itens:
+            cursor.execute(query_item_pedido, (
+                id_pedido, 
+                getServiceID(item["nome"]), 
+                item.get("quantidade"), 
+                item.get("preco"),
+                item.get("subtotal")
+            ))
+
+        # --- 4. Inserir na tabela Pagamento ---
+        query_pagamento = """
+        INSERT INTO Pagamento (IDPedido, IDFormaPagamento, Valor) 
+        VALUES (?, ?, ?);
+        """
+        for pagamento in pagamentos:
+            cursor.execute(query_pagamento, (
+                id_pedido, 
+                getFormaDePagamentoID(pagamento["forma_pagamento"])[0],
+                pagamento.get("valor")
+            ))
+
+        # --- 5. Commit da Transação ---
+        conn.commit()
+        return id_pedido # Retorna o ID da venda inserida
+
+    except sqlite3.Error as e:
+        # Rollback em caso de erro no DB
+        conn.rollback()
+        print(f"Erro ao adicionar venda (Pedido): {e}")
+        return None
+    
+    except ValueError as e:
+        # Rollback em caso de dados inválidos
+        conn.rollback()
+        print(f"Erro de validação: {e}")
+        return None
+
+    finally:
+        if conn:
+            conn.close()
+
+def getAllPaymentMethods():
     conn = get_connection()
     cursor = conn.cursor()
 
-    query = ""
+    query = "SELECT Nome FROM FormaPagamento"
 
     cursor.execute(query)
 
-    conn.commit()
-    conn.close()
+    return cursor.fetchall()
 
 def removeService(id):
-    # Remover um serviço de ID=id
+    # Remover um produto de ID=id, caso o produto existe em alguma venda. Não poderá ser excluido
     conn = get_connection()
     cursor = conn.cursor()
 
-    query = ""
+    query = "DELETE FROM ItemPedido WHERE IDPedido = ?"
 
-    cursor.execute(query)
+    cursor.execute(query, (id, ))
+
+    query = "DELETE FROM Pedido WHERE IDPedido = ?"
+
+    cursor.execute(query, (id, ))
+
+    query = "DELETE FROM Pagamento WHERE IDPedido = ?"
+
+    cursor.execute(query, (id, ))
 
     conn.commit()
     conn.close()
+
+def getPersonID(name):
+    # Remover uma venda de ID=id
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    query = "SELECT IDPessoa FROM Pessoa WHERE Pessoa.Nome = ?"
+
+    cursor.execute(query, (name, ))
+
+    return cursor.fetchone()
+
+def getServiceID(name):
+    # Remover uma venda de ID=id
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    query = "SELECT IDProdutoServico FROM ProdutoServico WHERE ProdutoServico.Nome = ?"
+
+    cursor.execute(query, (name, ))
+
+    return cursor.fetchone()[0]
+
+def getFormaDePagamentoID(name):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    query = "SELECT FormaPagamento.IDFormaPagamento FROM FormaPagamento WHERE FormaPagamento.Nome = ?"
+
+    cursor.execute(query, (name, ))
+
+    return cursor.fetchone()
+
+def getSalePayments(id):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    query = """
+    SELECT 
+        Pagamento.Valor, FormaPagamento.Nome
+    FROM
+        Pagamento
+    INNER JOIN
+        FormaPagamento ON FormaPagamento.IDFormaPagamento = Pagamento.IDFormaPagamento
+    INNER JOIN
+        Pedido ON Pedido.IDPedido = Pagamento.IDPedido
+    WHERE Pedido.IDPedido = ?
+    """
+
+    cursor.execute(query, (id, ))
+
+    return cursor.fetchall()

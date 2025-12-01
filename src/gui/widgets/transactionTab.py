@@ -5,19 +5,28 @@ from src.gui.widgets import *
 from src.gui.utils import *
 from src.utils import itemExplorer
 
+from src.controllers.productController import ProductController
+from src.controllers.serviceController import ServiceController
+
 class TransactionTab(Tab):
-    def __init__(self, parent=None, inputs=()):
+    def __init__(self, parent=None, inputs=(), type="product"):
         super().__init__(parent=parent)
+
+        self.type = type
 
         self.product_total, self.service_total, self.total = inputs
         self.item_explorer = itemExplorer.ItemExplorer(parent=self)
 
         self.setStyleSheet(f"QTabWidget::pane{{ background: #F9F9F9 !important }}")
 
-        product_tab, services_tab, payment_tab = self.createProductsTab(), self.createServicesTab(), self.createPaymentTab()
+        if self.type == "product":
+            product_tab = self.createProductsTab()
+            self.addTab(product_tab, "Produtos")
+        elif self.type == "service":
+            services_tab = self.createServicesTab()
+            self.addTab(services_tab, "Serviços")
 
-        self.addTab(product_tab, "Produtos")
-        self.addTab(services_tab, "Serviços")
+        payment_tab = self.createPaymentTab()
         self.addTab(payment_tab, "Pagamentos")
 
     def createProductsTab(self):
@@ -32,42 +41,38 @@ class TransactionTab(Tab):
         quantity_label = Label("Quantidade", type="InputLabel")
         subtotal_label = Label("Subtotal", type="InputLabel")
 
-        search_input = LineEdit("Pesquise por um produto")
-        price_input = DoubleSpinBox()
-        quantity_input = SpinBox()
-        subtotal_input = DoubleSpinBox()
+        self.product_search_input = LineEdit("Pesquise por um produto")
+        self.product_price_input = DoubleSpinBox()
+        self.product_quantity_input = SpinBox()
+        self.product_subtotal_input = DoubleSpinBox()
 
-        price_input.editingFinished.connect(lambda: subtotal_input.setValue(price_input.value() * quantity_input.value()))
-        quantity_input.editingFinished.connect(lambda: subtotal_input.setValue(price_input.value() * quantity_input.value()))
+        self.product_price_input.editingFinished.connect(lambda: self.product_subtotal_input.setValue(self.product_price_input.value() * self.product_quantity_input.value()))
+        self.product_quantity_input.editingFinished.connect(lambda: self.product_subtotal_input.setValue(self.product_price_input.value() * self.product_quantity_input.value()))
 
-        self.setupSearch(search_input, (price_input, quantity_input, subtotal_input), 
-        [
-            {"nome": "PENDRIVE SAMSUNG 8G", "quantidade": 1, "valor": 39.90},
-            {"nome": "PENDRIVE SANDISK 16GB", "quantidade": 1, "valor": 59.90}
-        ])
+        self.setupSearch(self.product_search_input, (self.product_price_input, self.product_quantity_input, self.product_subtotal_input))
 
-        table = Table(["ID", "Nome", "Preço", "Quantidade", "Subtotal"])
-        table.setObjectName("product")
+        self.products_table = Table(["ID", "Nome", "Preço", "Quantidade", "Subtotal"])
+        self.products_table.setObjectName("product")
 
-        price_input.setPrefix("R$ ")
-        subtotal_input.setPrefix("R$ ")
+        self.product_price_input.setPrefix("R$ ")
+        self.product_subtotal_input.setPrefix("R$ ")
 
-        buttons[0].clicked.connect(lambda: self.add(table, search_input, price_input, quantity_input, subtotal_input))
-        buttons[1].clicked.connect(lambda: self.edit(table, search_input, price_input, quantity_input, subtotal_input))
-        buttons[2].clicked.connect(lambda: self.remove(table))
+        buttons[0].clicked.connect(lambda: self.add(self.products_table, self.product_search_input, self.product_price_input, self.product_quantity_input, self.product_subtotal_input))
+        buttons[1].clicked.connect(lambda: self.edit(self.products_table, self.product_search_input, self.product_price_input, self.product_quantity_input, self.product_subtotal_input))
+        buttons[2].clicked.connect(lambda: self.remove(self.products_table))
 
         layout.addWidget(search_label, 0, 0)
         layout.addWidget(price_label, 2, 0)
         layout.addWidget(quantity_label, 2, 1)
         layout.addWidget(subtotal_label, 2, 2)
 
-        layout.addWidget(search_input, 1, 0, 1, 5)
-        layout.addWidget(price_input, 3, 0)
-        layout.addWidget(quantity_input, 3, 1)
-        layout.addWidget(subtotal_input, 3, 2)
+        layout.addWidget(self.product_search_input, 1, 0, 1, 5)
+        layout.addWidget(self.product_price_input, 3, 0)
+        layout.addWidget(self.product_quantity_input, 3, 1)
+        layout.addWidget(self.product_subtotal_input, 3, 2)
         layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum), 3, 3)
         layout.addWidget(buttons_widget, 3, 4)
-        layout.addWidget(table, 4, 0, 1, 5)
+        layout.addWidget(self.products_table, 4, 0, 1, 5)
 
         return widget
     
@@ -83,42 +88,38 @@ class TransactionTab(Tab):
         quantity_label = Label("Quantidade", type="InputLabel")
         subtotal_label = Label("Subtotal", type="InputLabel")
 
-        search_input = LineEdit("Pesquise por um serviço")
-        price_input = DoubleSpinBox()
-        quantity_input = SpinBox()
-        subtotal_input = DoubleSpinBox()
+        self.service_search_input = LineEdit("Pesquise por um serviço")
+        self.service_price_input = DoubleSpinBox()
+        self.service_quantity_input = SpinBox()
+        self.service_subtotal_input = DoubleSpinBox()
 
-        price_input.editingFinished.connect(lambda: subtotal_input.setValue(price_input.value() * quantity_input.value()))
-        quantity_input.editingFinished.connect(lambda: subtotal_input.setValue(price_input.value() * quantity_input.value()))
+        self.service_price_input.editingFinished.connect(lambda: self.service_subtotal_input.setValue(self.service_price_input.value() * self.service_quantity_input.value()))
+        self.service_quantity_input.editingFinished.connect(lambda: self.service_subtotal_input.setValue(self.service_price_input.value() * self.service_quantity_input.value()))
 
-        self.setupSearch(search_input, (price_input, quantity_input, subtotal_input), 
-        [
-            {"nome": "XEROX", "quantidade": 1, "valor": 0.50},
-            {"nome": "CURRICULO", "quantidade": 1, "valor": 10}
-        ])
+        self.setupSearch(self.service_search_input, (self.service_price_input, self.service_quantity_input, self.service_subtotal_input), "service")
 
-        table = Table(["ID", "Nome", "Preço", "Quantidade", "Subtotal"])
-        table.setObjectName("service")
+        self.services_table = Table(["ID", "Nome", "Preço", "Quantidade", "Subtotal"])
+        self.services_table.setObjectName("service")
 
-        buttons[0].clicked.connect(lambda: self.add(table, search_input, price_input, quantity_input, subtotal_input))
-        buttons[1].clicked.connect(lambda: self.edit(table, search_input, price_input, quantity_input, subtotal_input))
-        buttons[2].clicked.connect(lambda: self.remove(table))
+        buttons[0].clicked.connect(lambda: self.add(self.services_table, self.service_search_input, self.service_price_input, self.service_quantity_input, self.service_subtotal_input))
+        buttons[1].clicked.connect(lambda: self.edit(self.services_table, self.service_search_input, self.service_price_input, self.service_quantity_input, self.service_subtotal_input))
+        buttons[2].clicked.connect(lambda: self.remove(self.services_table))
 
-        price_input.setPrefix("R$ ")
-        subtotal_input.setPrefix("R$ ")
+        self.service_price_input.setPrefix("R$ ")
+        self.service_subtotal_input.setPrefix("R$ ")
 
         layout.addWidget(search_label, 0, 0)
         layout.addWidget(price_label, 2, 0)
         layout.addWidget(quantity_label, 2, 1)
         layout.addWidget(subtotal_label, 2, 2)
 
-        layout.addWidget(search_input, 1, 0, 1, 5)
-        layout.addWidget(price_input, 3, 0)
-        layout.addWidget(quantity_input, 3, 1)
-        layout.addWidget(subtotal_input, 3, 2)
+        layout.addWidget(self.service_search_input, 1, 0, 1, 5)
+        layout.addWidget(self.service_price_input, 3, 0)
+        layout.addWidget(self.service_quantity_input, 3, 1)
+        layout.addWidget(self.service_subtotal_input, 3, 2)
         layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum), 3, 3)
         layout.addWidget(buttons_widget, 3, 4)
-        layout.addWidget(table, 4, 0, 1, 5)
+        layout.addWidget(self.services_table, 4, 0, 1, 5)
 
         return widget
     def createPaymentTab(self):
@@ -131,27 +132,25 @@ class TransactionTab(Tab):
         document_label = Label(text="Forma de pagamento", type="InputLabel")
         value_label = Label(text="Valor", type="InputLabel")
 
-        document_input = ComboBox()
-        document_input.addItems(["Dinheiro", "Cartão de débito", "Cartão de crédito", "PIX"])
+        self.document_input = ComboBox()
         self.payment_value_input = DoubleSpinBox()
 
         self.payment_value_input.setPrefix("R$ ")
-        
 
-        table = Table(["Data", "Forma de pagamento", "Valor"])
-        table.setObjectName("payment")
+        self.payments_table = Table(["Data", "Forma de pagamento", "Valor"])
+        self.payments_table.setObjectName("payment")
 
-        buttons[0].clicked.connect(lambda: self.addPayment(table, document_input, self.payment_value_input))
-        buttons[1].clicked.connect(lambda: self.editPayment(table, document_input, self.payment_value_input))
-        buttons[2].clicked.connect(lambda: self.remove(table))
+        buttons[0].clicked.connect(lambda: self.addPayment(self.payments_table, self.document_input, self.payment_value_input))
+        buttons[1].clicked.connect(lambda: self.editPayment(self.payments_table, self.document_input, self.payment_value_input))
+        buttons[2].clicked.connect(lambda: self.remove(self.payments_table))
 
         layout.addWidget(document_label, 0, 0)
         layout.addWidget(value_label, 0, 1)
         
-        layout.addWidget(document_input, 1, 0)
+        layout.addWidget(self.document_input, 1, 0)
         layout.addWidget(self.payment_value_input, 1, 1)
         layout.addWidget(buttons_widget, 1, 2)
-        layout.addWidget(table, 2, 0, 1, 3)
+        layout.addWidget(self.payments_table, 2, 0, 1, 3)
 
         return widget
     
@@ -259,15 +258,43 @@ class TransactionTab(Tab):
                     total += float(table.item(row, 2).text())
 
                 self.payment_value_input.setValue(self.total.value() - total)
+
+    def updateProductTable(self, name, price, quantity, subtotal):
+        row = self.products_table.rowCount()
+        self.products_table.setRowCount(self.products_table.rowCount() + 1)
+
+        self.products_table.setItem(row, 0, QTableWidgetItem(str(self.products_table.rowCount())))
+        self.products_table.setItem(row, 1, QTableWidgetItem(name))
+        self.products_table.setItem(row, 2, QTableWidgetItem(str(price)))
+        self.products_table.setItem(row, 3, QTableWidgetItem(str(quantity)))
+        self.products_table.setItem(row, 4, QTableWidgetItem(str(subtotal)))
+    
+    def updateServiceTable(self, name, price, quantity, subtotal):
+        row = self.services_table.rowCount()
+        self.services_table.setRowCount(self.services_table.rowCount() + 1)
+
+        self.services_table.setItem(row, 0, QTableWidgetItem(str(self.services_table.rowCount())))
+        self.services_table.setItem(row, 1, QTableWidgetItem(name))
+        self.services_table.setItem(row, 2, QTableWidgetItem(str(price)))
+        self.services_table.setItem(row, 3, QTableWidgetItem(str(quantity)))
+        self.services_table.setItem(row, 4, QTableWidgetItem(str(subtotal)))
+
+    def updatePaymentTable(self, value, method):
+        row = self.payments_table.rowCount()
+        self.payments_table.setRowCount(self.payments_table.rowCount() + 1)
+
+        self.payments_table.setItem(row, 0, QTableWidgetItem(str(self.payments_table.rowCount())))
+        self.payments_table.setItem(row, 1, QTableWidgetItem(method))
+        self.payments_table.setItem(row, 2, QTableWidgetItem(str(value)))
                 
-    def setupSearch(self, search_widget : QLineEdit, inputs: tuple, data: list[dict]):
+    def setupSearch(self, search_widget : QLineEdit, inputs: tuple, type="product"):
         # Botão de limpar
         clear_action = search_widget.addAction(QIcon.fromTheme("window-close"), QLineEdit.TrailingPosition)
         clear_action.triggered.connect(lambda: self.clearFields([search_widget, *inputs]))
 
         # Conecta textChanged
         search_widget.textChanged.connect(
-            lambda text: self.searchItems(data,
+            lambda text: self.searchItems(ProductController.get(self, {"pesquisa": text}, "search_item") if type == "product" else ServiceController.get(self, {"pesquisa": text}, "search_item"),
                                             {"nome": search_widget,
                                             "valor": inputs[0],
                                             "quantidade": inputs[1],
@@ -275,7 +302,7 @@ class TransactionTab(Tab):
                                             search_widget))
 
 
-    def searchItems(self, data: list, targets: dict, search_widget: QLineEdit):
+    def searchItems(self, data, targets: dict, search_widget: QLineEdit):
             if not search_widget.text():
                 self.item_explorer.hide()
                 return
@@ -300,3 +327,128 @@ class TransactionTab(Tab):
                 f.setValue(0)
 
         self.item_explorer.hide()
+
+    def getAllProducts(self) -> list:
+        """Retorna uma lista de dicionários com todos os produtos na tabela."""
+        if not hasattr(self, 'products_table'):
+            return []
+            
+        table = self.products_table
+        
+        # Mapeamento das colunas da tabela para as chaves do dicionário de saída
+        column_map = ["ID", "nome", "preco", "quantidade", "subtotal"]
+        
+        products = []
+        for row in range(table.rowCount()):
+            product_data = {}
+            for col, key in enumerate(column_map):
+                item = table.item(row, col)
+                # Tenta converter valores numéricos para float/int se necessário
+                text = item.text() if item is not None else ""
+                
+                if key in ["preco", "subtotal"]:
+                    # Remove "R$ " e tenta converter para float
+                    text = text.replace("R$ ", "").replace(",", ".") # Ajuste para o formato float
+                    try:
+                        product_data[key] = float(text)
+                    except ValueError:
+                        product_data[key] = 0.0
+                elif key == "quantidade":
+                    try:
+                        product_data[key] = int(text)
+                    except ValueError:
+                        product_data[key] = 0
+                else:
+                    product_data[key] = text
+            
+            # Remove o ID temporário se você não quiser enviá-lo para o DB
+            # product_data.pop("ID", None) 
+            products.append(product_data)
+            
+        return products
+
+    def getAllServices(self) -> list:
+        """Retorna uma lista de dicionários com todos os serviços na tabela."""
+        if not hasattr(self, 'services_table'):
+            return []
+            
+        table = self.services_table
+        
+        # Mapeamento das colunas da tabela para as chaves do dicionário de saída
+        column_map = ["ID", "nome", "preco", "quantidade", "subtotal"]
+        
+        services = []
+        for row in range(table.rowCount()):
+            service_data = {}
+            for col, key in enumerate(column_map):
+                item = table.item(row, col)
+                text = item.text() if item is not None else ""
+                
+                if key in ["preco", "subtotal"]:
+                    text = text.replace("R$ ", "").replace(",", ".")
+                    try:
+                        service_data[key] = float(text)
+                    except ValueError:
+                        service_data[key] = 0.0
+                elif key == "quantidade":
+                    try:
+                        service_data[key] = int(text)
+                    except ValueError:
+                        service_data[key] = 0
+                else:
+                    service_data[key] = text
+            
+            # service_data.pop("ID", None) 
+            services.append(service_data)
+            
+        return services
+
+    def getAllPayments(self) -> list:
+        """Retorna uma lista de dicionários com todos os pagamentos na tabela."""
+        if not hasattr(self, 'payments_table'):
+            return []
+            
+        table = self.payments_table
+        
+        # Mapeamento das colunas da tabela para as chaves do dicionário de saída
+        column_map = ["data", "forma_pagamento", "valor"]
+        
+        payments = []
+        for row in range(table.rowCount()):
+            payment_data = {}
+            for col, key in enumerate(column_map):
+                item = table.item(row, col)
+                text = item.text() if item is not None else ""
+                
+                if key == "valor":
+                    # O valor na tabela é inserido como string de float sem prefixo, 
+                    # então a conversão direta é mais simples.
+                    try:
+                        payment_data[key] = float(text)
+                    except ValueError:
+                        payment_data[key] = 0.0
+                else:
+                    payment_data[key] = text
+            
+            payments.append(payment_data)
+            
+        return payments
+
+    def resetInputs(self):
+        if self.type == "product":
+            self.product_search_input.clear()
+            self.product_price_input.setValue(0)
+            self.product_quantity_input.setValue(0)
+            self.product_subtotal_input.setValue(0)
+            self.products_table.setRowCount(0)
+
+        if self.type == "service":
+            self.service_search_input.clear()
+            self.service_price_input.setValue(0)
+            self.service_quantity_input.setValue(0)
+            self.service_subtotal_input.setValue(0)
+            self.services_table.setRowCount(0)
+
+        self.document_input.setCurrentIndex(0)
+        self.payment_value_input.setValue(0)
+        self.payments_table.setRowCount(0)

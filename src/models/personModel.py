@@ -117,8 +117,6 @@ def addPerson(data={}):
         if data.get("type") == "Pessoa física":
             # Remove formatação do CPF para armazenamento
             cpf_limpo = data.get("document")
-
-            print(cpf_limpo)
             
             query_pf = """
             INSERT INTO PessoaFisica (IDPessoa, CPF, Sexo, DataNascimento) 
