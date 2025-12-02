@@ -51,6 +51,8 @@ class ProductController:
 
         window.category_input.clear()
         window.category_input.addItems(categories_list)
+
+        window.search_category_input.clear()
         window.search_category_input.addItem("Todos")
         window.search_category_input.addItems(categories_list)
 

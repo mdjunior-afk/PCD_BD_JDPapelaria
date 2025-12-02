@@ -226,8 +226,6 @@ class PersonPage(QWidget):
 
         table.setItem(row, 1, QTableWidgetItem(contact_type))
         table.setItem(row, 2, QTableWidgetItem(value))
-        
-        table.resizeColumnsToContents()
 
     def removeSelectedContact(self):
         """Remove a linha selecionada da tabela de contatos."""
@@ -260,8 +258,6 @@ class PersonPage(QWidget):
         table.setItem(row, 5, QTableWidgetItem(cidade))
         table.setItem(row, 6, QTableWidgetItem(estado))
         table.setItem(row, 7, QTableWidgetItem(complemento))
-
-        table.resizeColumnsToContents()
         
     def removeSelectedAddress(self):
         """Remove a linha selecionada da tabela de endereços."""

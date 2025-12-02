@@ -8,9 +8,9 @@ class PersonController:
     def get(window, data={}, type="edit"):
 
         persons = getPerson(data)
+        print(persons)
 
         if type == "search_item":
-            print(persons)
             data = []
 
             for person in persons:
