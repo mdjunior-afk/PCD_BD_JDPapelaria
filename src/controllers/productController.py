@@ -49,6 +49,7 @@ class ProductController:
         
         categories_list = [t[1] for t in categories]
 
+        window.category_input.clear()
         window.category_input.addItems(categories_list)
         window.search_category_input.addItem("Todos")
         window.search_category_input.addItems(categories_list)
@@ -59,6 +60,7 @@ class ProductController:
         
         brand_list = [t[1] for t in brands]
 
+        window.brand_input.clear()
         window.brand_input.addItems(brand_list)
 
     @staticmethod

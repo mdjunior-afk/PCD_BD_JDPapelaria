@@ -2,80 +2,79 @@ from src.database import get_connection
 
 import sqlite3
 
+import sqlite3 # Importação adicionada para que o 'except' funcione
+
 def getPerson(data={}):
-    conn = get_connection()
+    conn = get_connection() # Assumindo que esta função está definida
     cursor = conn.cursor()
     
-    # Prepara o termo de pesquisa de nome (se for o caso)
+    # Prepara o termo de pesquisa de nome (para uso em LIKE)
     termo_pesquisa = f"%{data.get('pesquisa', '')}%"
-    
-    # A lista de argumentos é iniciada vazia e preenchida dinamicamente
     args = []
 
-    query = """
-    SELECT
-        Pessoa.IDPessoa,
-        Pessoa.Nome,
-        Pessoa.Cliente,
-        PessoaFisica.CPF,
-        PessoaJuridica.CNPJ,
-        PessoaJuridica.Fornecedor,
-        PessoaFisica.Sexo,
-        PessoaFisica.DataNascimento,
-        -- Tabela de Contatos (Precisa de JOIN para buscar todos, mas o SELECT é simplificado aqui)
-        Contato.Tipo AS ContatoTipo,
-        Contato.Valor AS ContatoValor,
-        -- Tabela de Endereços (Precisa de JOIN para buscar todos)
-        Endereco.CEP,
-        Endereco.Logradouro, 
-        Endereco.Numero, 
-        Endereco.Bairro, 
-        Endereco.Cidade, 
-        Endereco.Estado,
-        Endereco.Complemento
-    FROM
-        Pessoa
-    LEFT JOIN 
-        PessoaFisica ON Pessoa.IDPessoa = PessoaFisica.IDPessoa
-    LEFT JOIN 
-        PessoaJuridica ON Pessoa.IDPessoa = PessoaJuridica.IDPessoa
-    -- LEFT JOIN para Contato e Endereço, para não eliminar pessoas que ainda não têm esses dados
-    LEFT JOIN 
-        Contato ON Contato.IDPessoa = Pessoa.IDPessoa
-    LEFT JOIN 
-        Endereco ON Endereco.IDPessoa = Pessoa.IDPessoa
+    # Se 'id_pessoa' não está presente, a intenção é LISTAR (agregação é necessária)
+    is_listing = "id_pessoa" not in data
+    
+    # 1. Base da Query: SELECT e FROM/JOINs
+    # Note que a seleção de campos muda. Vamos definir ambos os SELECTs.
+
+    if is_listing:
+        # Query para LISTAGEM (com GROUP_CONCAT para agregar contatos e endereços)
+        select_fields = """
+            Pessoa.IDPessoa, Pessoa.Nome, Pessoa.Cliente, PessoaFisica.CPF, PessoaJuridica.CNPJ, 
+            PessoaJuridica.Fornecedor, PessoaFisica.Sexo, PessoaFisica.DataNascimento, 
+            PessoaJuridica.RazaoSocial, 
+            group_concat(DISTINCT Contato.Valor) AS ContatoValor,
+            CONCAT_WS(' ', Endereco.Logradouro, Endereco.Numero, Endereco.Complemento, 
+            Endereco.Bairro, Endereco.Cidade, Endereco.Estado, Endereco.CEP) AS EnderecoCompleto
+        """
+    else:
+        # Query para BUSCA por ID (sem GROUP_CONCAT, retornará linhas múltiplas se houver
+        # múltiplos contatos/endereços, mas a lógica de tratamento fica fora do DB)
+        select_fields = """
+            Pessoa.IDPessoa, Pessoa.Nome, Pessoa.Cliente, PessoaFisica.CPF, PessoaJuridica.CNPJ, 
+            PessoaJuridica.Fornecedor, PessoaFisica.Sexo, PessoaFisica.DataNascimento, 
+            PessoaJuridica.RazaoSocial, Contato.Tipo, Contato.Valor, Endereco.Logradouro, 
+            Endereco.Numero, Endereco.Complemento, Endereco.Bairro, Endereco.Cidade, 
+            Endereco.Estado, Endereco.CEP
+        """
+
+    query = f"""
+        SELECT {select_fields}
+        FROM Pessoa
+        LEFT JOIN PessoaFisica ON Pessoa.IDPessoa = PessoaFisica.IDPessoa
+        LEFT JOIN PessoaJuridica ON Pessoa.IDPessoa = PessoaJuridica.IDPessoa
+        LEFT JOIN Contato ON Contato.IDPessoa = Pessoa.IDPessoa
+        LEFT JOIN Endereco ON Endereco.IDPessoa = Pessoa.IDPessoa
     """
 
-    # --- Lógica da Cláusula WHERE ---
-    
-    # 1. Busca por IDPessoa (Usada para carregar uma pessoa para edição)
-    if "id_pessoa" in data and data["id_pessoa"]:
+    # 2. Cláusula WHERE
+    if "id_pessoa" in data:
         query += " WHERE Pessoa.IDPessoa = ?"
         args.append(data["id_pessoa"])
-        
-    # 2. Busca por Termo de Pesquisa no Nome (Usada na aba de pesquisa geral)
     elif "pesquisa" in data and data["pesquisa"]:
         query += " WHERE Pessoa.Nome LIKE ?"
         args.append(termo_pesquisa)
         
-    # 3. Filtro Adicional de Tipo (Se for necessário, a depender do seu Front-end)
-    # Exemplo:
-    # if data.get("tipo") == "Pessoa jurídica":
-    #     query += " AND PessoaJuridica.CNPJ IS NOT NULL"
-    # elif data.get("tipo") == "Pessoa física":
-    #     query += " AND PessoaFisica.CPF IS NOT NULL"
+    # 3. Cláusulas GROUP BY e ORDER BY
+    if is_listing:
+        # Lista de campos que NÃO são agregados
+        group_fields = """
+            Pessoa.IDPessoa, Pessoa.Nome, Pessoa.Cliente, PessoaFisica.CPF, PessoaJuridica.CNPJ, 
+            PessoaJuridica.Fornecedor, PessoaFisica.Sexo, PessoaFisica.DataNascimento, 
+            PessoaJuridica.RazaoSocial, EnderecoCompleto
+        """
+        query += f" GROUP BY {group_fields} ORDER BY Pessoa.Nome"
+    else:
+        # Ao buscar por ID, não queremos agregar, mas precisamos ordenar
+        # Nota: Se houver múltiplos resultados (Contatos/Endereços), a ordenação será útil.
+        query += " ORDER BY Contato.Tipo, Endereco.Logradouro" 
 
 
     try:
-        # Nota: Como você está usando LEFT JOIN em Contato/Endereco, 
-        # a query pode retornar múltiplas linhas para a mesma pessoa (uma para cada Contato/Endereco).
-        # Você precisará tratar isso no Python para agrupar os dados corretamente.
         cursor.execute(query, tuple(args))
         
         people_data = cursor.fetchall()
-        
-        # O processamento para agrupar múltiplos contatos/endereços
-        # DEVE ser feito aqui ou no Controller (PersonController)
         
         return people_data
 
@@ -131,11 +130,11 @@ def addPerson(data={}):
             
         elif data.get("type") == "Pessoa jurídica":
             # Remove formatação do CNPJ para armazenamento
-            cnpj_limpo = data.get("document", "").replace('.', '').replace('/', '').replace('-', '')
+            cnpj_limpo = data.get("document", "")
             
             query_pj = """
-            INSERT INTO PessoaJuridica (IDPessoa, CNPJ, NomeFantasia, Fornecedor) 
-            VALUES (?, ?, ?);
+            INSERT INTO PessoaJuridica (IDPessoa, CNPJ, RazaoSocial, Fornecedor) 
+            VALUES (?, ?, ?, ?);
             """
             cursor.execute(query_pj, (
                 id_pessoa, 
@@ -172,7 +171,7 @@ def addPerson(data={}):
                 cursor.execute(query_contato, (
                     id_pessoa,
                     contact.get("tipo"),
-                    contact.get("contato")
+                    contact.get("valor")
                 ))
 
         # 6. Commit (Confirmação) da Transação
@@ -194,21 +193,146 @@ def editPerson(id, data):
     conn = get_connection()
     cursor = conn.cursor()
 
-    query = ""
+    query = "UPDATE Pessoa SET Nome = ?, Cliente = ? WHERE IDPessoa = ?"
 
-    cursor.execute(query)
+    cursor.execute(query, (data["nome"], data["is_client"], id, ))
+
+    if data["type"] == "Pessoa física":
+        query = "UPDATE PessoaFisica SET CPF = ?, Sexo = ?, DataNascimento = ? WHERE IDPessoa = ?"
+        cursor.execute(query, (data["document"], data["sex"], data["birthday"], id, ))
+    else:
+        query = "UPDATE PessoaJuridica SET CNPJ = ?, RazaoSocial = ?, Fornecedor = ? WHERE IDPessoa = ?"
+        cursor.execute(query, (data["document"], data["fantasy_name"], data["is_supplier"], id, ))
+
+    for address in data["address"]:
+        query = "UPDATE Endereco SET Logradouro = ?, Numero = ?, Complemento = ?, Bairro = ?, Cidade = ?, Estado = ?, CEP = ? WHERE IDPessoa = ?"
+        cursor.execute(query, (address["logradouro"], address["numero"], address["complemento"], address["bairro"], address["cidade"], address["estado"], address["cep"], id, )),
+    
+    for contact in data["contact"]:
+        query = "UPDATE Contato SET Tipo = ?, Valor = ? WHERE IDPessoa = ?"
+        cursor.execute(query, (contact["tipo"], contact["valor"], id, ))
 
     conn.commit()
     conn.close()
 
 def removePerson(id):
+    """
+    Remove uma pessoa do banco de dados (ID=id), incluindo seus dados 
+    relacionados (PessoaFisica/Juridica, Endereco, Contato).
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    try:
+        # A ordem das exclusões é importante, mas aqui não há dependência circular.
+        # Excluímos dos dados relacionados primeiro:
+        
+        # 1. Excluir Contatos
+        query_contato = "DELETE FROM Contato WHERE IDPessoa = ?"
+        cursor.execute(query_contato, (id,))
+
+        # 2. Excluir Endereços
+        query_endereco = "DELETE FROM Endereco WHERE IDPessoa = ?"
+        cursor.execute(query_endereco, (id,))
+
+        # 3. Excluir dados específicos (Física e/ou Jurídica)
+        # O SQLite deve permitir a exclusão de ambas, mesmo que apenas uma exista.
+        query_pf = "DELETE FROM PessoaFisica WHERE IDPessoa = ?"
+        cursor.execute(query_pf, (id,))
+        
+        query_pj = "DELETE FROM PessoaJuridica WHERE IDPessoa = ?"
+        cursor.execute(query_pj, (id,))
+
+        # 4. Excluir a Pessoa principal
+        query_pessoa = "DELETE FROM Pessoa WHERE IDPessoa = ?"
+        cursor.execute(query_pessoa, (id,))
+
+        conn.commit()
+        return True
+        
+    except sqlite3.Error as e:
+        conn.rollback()
+        print(f"Erro ao remover pessoa e dados relacionados: {e}")
+        return False
+
+    finally:
+        if conn:
+            conn.close()
+
+def getAllAddress(id):
     # Remover uma pessoa de ID=id
     conn = get_connection()
     cursor = conn.cursor()
 
-    query = ""
+    query = "SELECT * FROM Endereco WHERE IDPessoa = ?"
 
-    cursor.execute(query)
+    cursor.execute(query, (id, ))
 
-    conn.commit()
+    address = cursor.fetchall()
+
     conn.close()
+
+    return address
+
+def getAllContacts(id):
+    # Remover uma pessoa de ID=id
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    query = "SELECT * FROM Contato WHERE IDPessoa = ?"
+
+    cursor.execute(query, (id, ))
+
+    contacts = cursor.fetchall()
+
+    conn.close()
+
+    return contacts
+
+from src.database import get_connection
+import sqlite3
+
+def getSuppliers(data):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    # Prepara o termo de pesquisa, garantindo que a chave exista e o valor seja tratado
+    termo_pesquisa = f"%{data.get('pesquisa', '')}%"
+    
+    # Se você quiser retornar o CNPJ junto com o Nome, adicione-o no SELECT
+    query = """
+    SELECT 
+        Pessoa.Nome
+    FROM 
+        Pessoa 
+    INNER JOIN 
+        PessoaJuridica ON PessoaJuridica.IDPessoa = Pessoa.IDPessoa 
+    WHERE 
+        PessoaJuridica.Fornecedor = 1 AND Pessoa.Nome LIKE ?
+    """
+    
+    try:
+        cursor.execute(query, (termo_pesquisa,))
+        
+        results = cursor.fetchall()
+        
+        # --- Formatação dos resultados em lista de dicionários ---
+        suppliers_list = []
+        
+        # Itera sobre as tuplas retornadas (ex: ('Nome da Empresa',))
+        for row in results:
+            # Pega o primeiro (e único) elemento da tupla, que é o Nome
+            nome_fornecedor = row[0]
+            
+            # Cria o dicionário no formato desejado
+            suppliers_list.append({"nome": nome_fornecedor})
+            
+        return suppliers_list
+
+    except sqlite3.Error as e:
+        print(f"Erro ao buscar fornecedores: {e}")
+        return []
+
+    finally:
+        if conn:
+            conn.close()

@@ -5,6 +5,7 @@ from src.gui.widgets import *
 from src.gui.utils import *
 
 from src.controllers.serviceController import ServiceController
+from src.controllers.personController import PersonController
 
 from src.utils import itemExplorer
 
@@ -133,6 +134,8 @@ class ServicePage(QWidget):
         search_client_label = Label(text="Cliente", type="InputLabel")
 
         self.search_client_input = LineEdit("Pesquise por um cliente")
+
+        self.setupSearch(self.search_client_input, PersonController.get(self, {"pesquisa": self.search_client_input.text()}, "search_item"))
 
         client_layout.addWidget(search_client_label)
         client_layout.addWidget(self.search_client_input)

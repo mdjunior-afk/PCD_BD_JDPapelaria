@@ -52,4 +52,5 @@ class SalesController:
         
         methods_list = [t[0] for t in methods]
 
+        document_input.clear()
         document_input.addItems(methods_list)

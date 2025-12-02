@@ -6,6 +6,7 @@ from src.gui.utils import *
 from src.gui.colors import *
 
 from src.controllers.salesController import SalesController
+from src.controllers.personController import PersonController
 
 from src.utils.itemExplorer import *
 
@@ -108,11 +109,7 @@ class SalesPage(QWidget):
         
         self.search_client_input = LineEdit("Pesquise por um cliente")
 
-        self.setupSearch(self.search_client_input,
-        [
-            {"id": 0, "nome": "LUIZ FELIPE", "cpf": "999.999.999.99"},
-            {"id": 1, "nome": "Papelaria Estrela Ltda", "cpf": "150.464.346.10"}
-        ])
+        self.setupSearch(self.search_client_input, PersonController.get(self, {"pesquisa": self.search_client_input.text()}, "search_item"))
 
         client_layout.addWidget(search_client_label)
         client_layout.addWidget(self.search_client_input)
@@ -138,8 +135,6 @@ class SalesPage(QWidget):
         services_total_input.setReadOnly(True)
 
         self.transaction_tab = TransactionTab(parent=self, inputs=(self.products_total_input, services_total_input, self.total_input))
-
-        SalesController.getPaymentMethods(self.transaction_tab.document_input)
         
         buttons_widget, buttons = createWindowButtons()
 
@@ -201,7 +196,7 @@ class SalesPage(QWidget):
 
         SalesController.get(self, {"data_inicio": self.initial_date.text(), "data_final": self.final_date.text()}, "search")
     
-    def setupSearch(self, search_widget : QLineEdit, data: list[dict]):
+    def setupSearch(self, search_widget : QLineEdit, data):
         # Botão de limpar
         clear_action = search_widget.addAction(QIcon.fromTheme("window-close"), QLineEdit.TrailingPosition)
         clear_action.triggered.connect(lambda: self.clearFields([search_widget]))

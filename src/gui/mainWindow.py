@@ -265,7 +265,7 @@ class MainWindow(QMainWindow):
         for button in self.menu_buttons:
             button.setActive(button is self.settings_button)
 
-        self.page_manager.setCurrentIndex(5)        
+        self.page_manager.setCurrentIndex(5)      
 
     def toggle_side_menu(self):
         current_width = self.side_menu.width()

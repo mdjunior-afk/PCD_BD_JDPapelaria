@@ -56,9 +56,6 @@ class ProductPage(QWidget):
         layout.addWidget(labels_widget)
         layout.addWidget(self.tab)
 
-        ProductController.getCategories(self)
-        ProductController.getBrands(self)
-
     def createSearchTab(self):
         widget = TabWidget()
         layout = QVBoxLayout()
@@ -268,8 +265,6 @@ class ProductPage(QWidget):
         selectedItems = table.selectedItems()
     
         ProductController.remove(selectedItems[0].text())
-
-        ProductController.get(self, {}, "search")
     
     def updateExpirationDate(self, has):
         if has != Qt.CheckState.Checked:

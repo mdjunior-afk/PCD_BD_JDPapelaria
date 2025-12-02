@@ -93,8 +93,6 @@ class PersonPage(QWidget):
 
         buttons_widget, buttons = createWindowButtons()
 
-        buttons[0].clicked.connect(self.addPerson)
-
         person_type_box = GroupBox("Tipo da pessoa")
         person_type_layout = QHBoxLayout()
         person_type_box.setLayout(person_type_layout)
@@ -200,6 +198,8 @@ class PersonPage(QWidget):
             self.document_input, {"razao_social": self.name_input, "nome_fantasia": self.fantasy_name_input}, self.contact_table, self.address_table
         ))
 
+        buttons[0].clicked.connect(self.addPerson)
+        buttons[1].clicked.connect(self.resetInputs)
 
         scroll_area.setWidget(widget)
 
@@ -281,12 +281,18 @@ class PersonPage(QWidget):
             "sex": self.sex_input.currentText(),
             "birthday": self.birthday_input.text(),
             "address": self.getAllAddress(),
-            "contact": self.getAllContact(),
+            "contact": self.getAllContacts(),
+            "fantasy_name": self.fantasy_name_input.text(),
             "is_client": int(self.client_box.isChecked()),
             "is_supplier": int(self.supplier_box.isChecked())
         }
 
-        PersonController.add(data, "add")
+        if self.id_input.value() == 0:
+            PersonController.add(data, "add")
+        else:
+            PersonController.edit(self.id_input.value(), data)
+        
+        self.resetInputs()
 
     def editPerson(self, table: Table):
         selectedItems = table.selectedItems()
@@ -294,6 +300,13 @@ class PersonPage(QWidget):
         PersonController.get(self, {"id_pessoa": selectedItems[0].text()}, "edit")
 
         self.tab.setCurrentIndex(1)
+
+    def removePerson(self, table: Table):
+        selectedItems = table.selectedItems()
+    
+        PersonController.remove(self, selectedItems[0].text())
+
+        PersonController.get(self, {}, "search")
 
     def getAllAddress(self):     
         if not hasattr(self, 'address_table') or not isinstance(self.address_table, QTableWidget):
@@ -314,16 +327,16 @@ class PersonPage(QWidget):
             addresses.append(address_data)
             
         return addresses
-
-    def getAllContact(self):
+    
+    def getAllContacts(self):     
         if not hasattr(self, 'contact_table') or not isinstance(self.contact_table, QTableWidget):
             return []
-            
+
         contacts = []
         table = self.contact_table
         
-        column_names = ["ID", "tipo", "contato"]
-        
+        column_names = ["ID", "tipo", "valor"]
+
         for row in range(table.rowCount()):
             contact_data = {}
             for col, name in enumerate(column_names):
@@ -334,9 +347,6 @@ class PersonPage(QWidget):
             contacts.append(contact_data)
             
         return contacts
-
-    def removePerson(self, table: Table):
-        pass
     
     def getCNPJ(self, cnpj_input, inputs, contact_table: QTableWidget, address_table: QTableWidget):
         data = CNPJApi.searchCNPJ(cnpj_input)
@@ -383,6 +393,18 @@ class PersonPage(QWidget):
         address_table.setItem(row, 6, QTableWidgetItem(data["estabelecimento"]["estado"]["sigla"]))
         address_table.setItem(row, 7, QTableWidgetItem(data["estabelecimento"]["complemento"] if data["estabelecimento"]["complemento"] != None else ""))
     
+    def resetInputs(self):
+        self.id_input.setValue(0)
+        self.name_input.clear()
+        self.type_input.setCurrentIndex(0)
+        self.document_input.setText('')
+        self.sex_input.setCurrentIndex(0)
+        self.birthday_input.setDate(QDate.currentDate())
+        self.fantasy_name_input.setText('')
+
+        self.address_table.setRowCount(0)
+        self.contact_table.setRowCount(0)
+
     def applyStyleToDialog(self, dialog: QDialog):
         """Aplica o estilo global e o estilo local dos botões a uma QDialog."""
         
