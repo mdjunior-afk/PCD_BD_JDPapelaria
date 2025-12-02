@@ -181,27 +181,73 @@ def removeProduct(id):
     conn.commit()
     conn.close()
 
-def getCategories():
-    # Remover um produto de ID=id, caso o produto existe em alguma venda. Não poderá ser excluido
+def getCategories(name=''):
     conn = get_connection()
     cursor = conn.cursor()
 
-    query = "SELECT Nome FROM Categoria"
+    termo_pesquisa = f"%{name}%"
 
-    cursor.execute(query)
+    # 1. Ajuste a query para incluir a contagem de produtos
+    # Usamos LEFT JOIN para incluir marcas que não têm produtos (contagem = 0)
+    base_query = """
+    SELECT 
+        C.IDCategoria, 
+        C.Nome, 
+        COUNT(P.IDProduto) AS QuantidadeProdutos
+    FROM 
+        Categoria C
+    LEFT JOIN 
+        Produto P ON C.IDCategoria = P.IDCategoria
+    """
 
-    return cursor.fetchall()
+    if name == '':
+        query = f"{base_query} GROUP BY C.IDCategoria, C.Nome ORDER BY C.Nome"
+        cursor.execute(query)
+    else:
+        # 2. Adicione a cláusula WHERE para filtragem segura
+        query = f"{base_query} WHERE C.Nome LIKE ? GROUP BY C.IDCategoria, C.Nome ORDER BY C.Nome"
+        # Mantenha a forma segura de passar o parâmetro de filtro
+        cursor.execute(query, (termo_pesquisa, ))
 
-def getBrands():
-    # Remover um produto de ID=id, caso o produto existe em alguma venda. Não poderá ser excluido
+    # Boas práticas: o fetchall() deve vir após o cursor ser fechado
+    results = cursor.fetchall()
+
+    conn.close() # Sempre feche a conexão
+    return results
+
+def getBrands(name=''):
     conn = get_connection()
     cursor = conn.cursor()
 
-    query = "SELECT Nome FROM Marca"
+    termo_pesquisa = f"%{name}%"
 
-    cursor.execute(query)
+    # 1. Ajuste a query para incluir a contagem de produtos
+    # Usamos LEFT JOIN para incluir marcas que não têm produtos (contagem = 0)
+    base_query = """
+    SELECT 
+        M.IDMarca, 
+        M.Nome, 
+        COUNT(P.IDProduto) AS QuantidadeProdutos
+    FROM 
+        Marca M
+    LEFT JOIN 
+        Produto P ON M.IDMarca = P.IDMarca
+    """
 
-    return cursor.fetchall()
+    if name == '':
+        query = f"{base_query} GROUP BY M.IDMarca, M.Nome ORDER BY M.Nome"
+        cursor.execute(query)
+    else:
+        # 2. Adicione a cláusula WHERE para filtragem segura
+        query = f"{base_query} WHERE M.Nome LIKE ? GROUP BY M.IDMarca, M.Nome ORDER BY M.Nome"
+        # Mantenha a forma segura de passar o parâmetro de filtro
+        cursor.execute(query, (termo_pesquisa, ))
+
+    # Boas práticas: o fetchall() deve vir após o cursor ser fechado
+    results = cursor.fetchall()
+
+    conn.close() # Sempre feche a conexão
+    return results
 
 def getCategoryID(name):
     # Remover um produto de ID=id, caso o produto existe em alguma venda. Não poderá ser excluido
@@ -224,3 +270,69 @@ def getBrandID(name):
     cursor.execute(query, (name, ))
 
     return cursor.fetchone()
+
+def addCategory(name):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    query = "INSERT INTO Categoria(Nome) VALUES (?)"
+
+    cursor.execute(query, (name, ))
+
+    conn.commit()
+    conn.close()
+
+def updateCategory(id, name):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    query = "UPDATE Categoria SET Nome = ? WHERE IDCategoria = ?"
+
+    cursor.execute(query, (name, id, ))
+
+    conn.commit()
+    conn.close()
+
+def removeCategory(id):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    query = "DELETE FROM Categoria WHERE IDCategoria = ?"
+
+    cursor.execute(query, (id, ))
+
+    conn.commit()
+    conn.close()
+
+def addBrand(name):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    query = "INSERT INTO Marca(Nome) VALUES (?)"
+
+    cursor.execute(query, (name, ))
+
+    conn.commit()
+    conn.close()
+
+def updateBrand(id, name):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    query = "UPDATE Marca SET Nome = ? WHERE IDMarca = ?"
+
+    cursor.execute(query, (name, id, ))
+
+    conn.commit()
+    conn.close()
+
+def removeBrand(id):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    query = "DELETE FROM Marca WHERE IDMarca = ?"
+
+    cursor.execute(query, (id, ))
+
+    conn.commit()
+    conn.close()

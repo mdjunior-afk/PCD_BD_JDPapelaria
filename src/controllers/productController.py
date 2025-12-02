@@ -45,9 +45,9 @@ class ProductController:
                     
     @staticmethod
     def getCategories(window):
-        categories = getCategories()
+        categories = getCategories(name='')
         
-        categories_list = [t[0] for t in categories]
+        categories_list = [t[1] for t in categories]
 
         window.category_input.addItems(categories_list)
         window.search_category_input.addItem("Todos")
@@ -55,9 +55,9 @@ class ProductController:
 
     @staticmethod
     def getBrands(window):
-        brands = getBrands()
+        brands = getBrands(name='')
         
-        brand_list = [t[0] for t in brands]
+        brand_list = [t[1] for t in brands]
 
         window.brand_input.addItems(brand_list)
 

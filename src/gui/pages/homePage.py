@@ -3,6 +3,8 @@ from PySide6.QtGui import QPixmap
 
 from src.gui.widgets import *
 
+from src.models import utilsModels
+
 class HomePage(QWidget):
     def __init__(self):
         super().__init__()
@@ -22,9 +24,9 @@ class HomePage(QWidget):
         self.box_left_spacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
         self.box_right_spacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
-        self.stock_info = InfoWidget(title="Estoques baixos", info="10")
-        self.birthday_qtd = InfoWidget(title="Aniversáriantes do mês", info="3")
-        self.daily_sell = InfoWidget(title="Vendas de hoje", info="R$1200,00")
+        self.stock_info = InfoWidget(title="Estoques baixos", info=str(utilsModels.getLowerStocks()[0]))
+        self.birthday_qtd = InfoWidget(title="Aniversáriantes do mês", info=str(utilsModels.getAnniversaries()[0]))
+        self.daily_sell = InfoWidget(title="Vendas de hoje", info=str(utilsModels.getTodaySale()[0]))
 
         self.box_layout.addItem(self.box_left_spacer)
         self.box_layout.addWidget(self.stock_info)
