@@ -140,8 +140,12 @@ def removeService(id):
     conn = get_connection()
     cursor = conn.cursor()
 
-    query = "DELETE FROM ProdutoServico WHERE IDProdutoServico = ?"
+    query = "DELETE FROM Servico WHERE IDProdutoServico = ?"
+    
+    cursor.execute(query, (id, ))
 
+    query = "DELETE FROM ProdutoServico WHERE IDProdutoServico = ?"
+    
     cursor.execute(query, (id, ))
 
     conn.commit()

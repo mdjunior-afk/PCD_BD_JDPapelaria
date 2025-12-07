@@ -9,20 +9,24 @@ from src.controllers.productController import ProductController
 from src.controllers.serviceController import ServiceController
 
 class TransactionTab(Tab):
-    def __init__(self, parent=None, inputs=(), type="product"):
+    def __init__(self, parent=None, total=None, type="product"):
         super().__init__(parent=parent)
 
         self.type = type
 
-        self.product_total, self.service_total, self.total = inputs
-        self.item_explorer = itemExplorer.ItemExplorer(parent=self)
-
         self.setStyleSheet(f"QTabWidget::pane{{ background: #F9F9F9 !important }}")
 
+        self.total = total
+
         if self.type == "product":
+            self.item_explorer = itemExplorer.ItemExplorer(parent=self)
+
             product_tab = self.createProductsTab()
             self.addTab(product_tab, "Produtos")
+
         elif self.type == "service":
+            self.item_explorer = itemExplorer.ItemExplorer(parent=self)
+
             services_tab = self.createServicesTab()
             self.addTab(services_tab, "Serviços")
 
@@ -185,12 +189,6 @@ class TransactionTab(Tab):
         for row in range(table.rowCount()):
             total += float(table.item(row, 4).text())
 
-        if table.objectName() == "product":
-            self.product_total.setValue(total)
-        elif table.objectName() == "service":
-            self.service_total.setValue(total)
-
-        total = self.product_total.value() + self.service_total.value()
         self.total.setValue(total)
         self.payment_value_input.setMaximum(total)
         self.payment_value_input.setValue(total)

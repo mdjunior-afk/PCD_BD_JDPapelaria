@@ -8,13 +8,14 @@ class PersonController:
     def get(window, data={}, type="edit"):
 
         persons = getPerson(data)
-        print(persons)
 
         if type == "search_item":
             data = []
 
             for person in persons:
                 data.append({"nome": person[1]})
+
+            print(data)
 
             return data
 
@@ -74,16 +75,15 @@ class PersonController:
 
                 row = table.rowCount() - 1
 
-                table.setItem(row, 0, QTableWidgetItem(str(person[0])))
-                table.setItem(row, 1, QTableWidgetItem(str(person[1])))
-                print(data)
+                table.setItem(row, 0, QTableWidgetItem(str(person[0] if person[0] != None else '')))
+                table.setItem(row, 1, QTableWidgetItem(str(person[1] if person[1] != None else '')))
                 if (person[3] != None):
-                    table.setItem(row, 2, QTableWidgetItem(str(person[3])))
+                    table.setItem(row, 2, QTableWidgetItem(str(person[3] if person[3] != None else '')))
                 else:
-                    table.setItem(row, 2, QTableWidgetItem(str(person[4])))
+                    table.setItem(row, 2, QTableWidgetItem(str(person[4] if person[4] != None else '')))
 
-                table.setItem(row, 3, QTableWidgetItem(str(person[9])))
-                table.setItem(row, 4, QTableWidgetItem(str(person[10])))
+                table.setItem(row, 3, QTableWidgetItem(str(person[9] if person[9] != None else '')))
+                table.setItem(row, 4, QTableWidgetItem(str(person[10] if person[10] != None else '')))
 
     @staticmethod
     def add(data, type):

@@ -7,6 +7,8 @@ class DateEdit(QDateEdit):
         self.setDisplayFormat("dd/MM/yyyy")
         self.setCalendarPopup(True)
 
+        self.setMinimumWidth(self.sizeHint().width() + 30)
+
         self.setStyleSheet(f"""
                            
         QCalendarWidget QAbstractItemView {{

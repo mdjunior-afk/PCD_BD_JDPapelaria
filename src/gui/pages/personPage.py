@@ -5,6 +5,8 @@ from src.gui.widgets import *
 from src.gui.utils import *
 from src.utils import cepAPI, locations, CNPJApi
 
+from src.gui.widgets.removeWindow import *
+
 from src.controllers.personController import PersonController
 
 import json
@@ -164,9 +166,10 @@ class PersonPage(QWidget):
         
         contact_buttons[0].clicked.connect(self.addContactWindow)
         # CONEXÃO PARA REMOVER CONTATO
-        contact_buttons[2].clicked.connect(self.removeSelectedContact)
         # TODO: Implementar a lógica de edição para contact_buttons[1]
         contact_buttons[1].clicked.connect(self.editContactWindow)
+        
+        contact_buttons[2].clicked.connect(self.removeSelectedContact)
         
         contact_layout.addWidget(contact_buttons_widget)
         contact_layout.addWidget(self.contact_table)
@@ -287,6 +290,9 @@ class PersonPage(QWidget):
             PersonController.add(data, "add")
         else:
             PersonController.edit(self.id_input.value(), data)
+
+        message = MessageDialog(self, "Sucesso", message="Pessoa salva com sucesso!", msg_type=MessageDialog.SUCCESS)
+        message.exec()
         
         self.resetInputs()
 
@@ -300,9 +306,22 @@ class PersonPage(QWidget):
     def removePerson(self, table: Table):
         selectedItems = table.selectedItems()
     
-        PersonController.remove(self, selectedItems[0].text())
+        print(selectedItems)
 
-        PersonController.get(self, {}, "search")
+        dialog = RemoveDialog(
+            parent=self,
+            title="Remover Pessoa",
+            item_name=f"Pessoa: {selectedItems[1].text()}"
+        )
+
+        if dialog.exec() == QDialog.Accepted:
+            if (selectedItems[0].text() != "1"):
+                PersonController.remove(self, selectedItems[0].text())
+
+                PersonController.get(self, {}, "search")
+            else:
+                message = MessageDialog(self, "Erro ao remover", message=f"Não é possivel remover a pessoa {selectedItems[1].text()}", msg_type=MessageDialog.ERROR)
+                message.exec()
 
     def getAllAddress(self):     
         if not hasattr(self, 'address_table') or not isinstance(self.address_table, QTableWidget):
@@ -464,11 +483,6 @@ class PersonPage(QWidget):
         self.applyStyleToDialog(self.contact_window)
         self.contact_window.exec()
 
-
-    def removeContactWindow(self):
-        # Já implementado via self.removeSelectedContact, que é conectado ao botão 'Remover'
-        pass
-
     def addAddressWindow(self):
         # A janela de endereço precisa saber qual tabela atualizar (self.address_table)
         self.address_window = AddressWindow(parent=self, parent_page=self, is_editing=False)
@@ -498,11 +512,6 @@ class PersonPage(QWidget):
         self.address_window = AddressWindow(parent=self, parent_page=self, data=data, is_editing=True)
         self.applyStyleToDialog(self.address_window)
         self.address_window.exec()
-
-
-    def removeAddressWindow(self):
-        # Já implementado via self.removeSelectedAddress, que é conectado ao botão 'Remover'
-        pass
 
 # --- ContactWindow Modificada ---
 class ContactWindow(QDialog):
@@ -540,6 +549,10 @@ class ContactWindow(QDialog):
 
         self.type_input = ComboBox() # Removido argumento posicional
         self.type_input.addItems(["Email", "Celular", "Telefone fixo"])
+        self.type_input.updateSize()
+        
+        self.type_input.currentIndexChanged.connect(self.updateInputMask)
+        
         self.value_input = LineEdit()
 
         box_layout.addWidget(type_label, 0, 0)
@@ -555,6 +568,14 @@ class ContactWindow(QDialog):
         if data and is_editing:
             self.type_input.setCurrentText(data.get("type", ""))
             self.value_input.setText(data.get("value", ""))
+
+    def updateInputMask(self):
+        self.value_input.clear()
+
+        if self.type_input.currentText() == "Celular":
+            self.value_input.setInputMask("(00) 00000-0000;_")
+        elif self.type_input.currentText() == "Telefone fixo":
+            self.value_input.setInputMask("(00) 0000-0000;_")
 
     def save_contact(self):
         contact_type = self.type_input.currentText()

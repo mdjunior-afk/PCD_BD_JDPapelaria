@@ -24,9 +24,13 @@ class HomePage(QWidget):
         self.box_left_spacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
         self.box_right_spacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
-        self.stock_info = InfoWidget(title="Estoques baixos", info=str(utilsModels.getLowerStocks()[0]))
-        self.birthday_qtd = InfoWidget(title="Aniversáriantes do mês", info=str(utilsModels.getAnniversaries()[0]))
-        self.daily_sell = InfoWidget(title="Vendas de hoje", info=str(utilsModels.getTodaySale()[0]))
+        lower_stocks = utilsModels.getLowerStocks()
+        anniversaries = utilsModels.getAnniversaries()
+        daily_sale = utilsModels.getTodaySale()
+
+        self.stock_info = InfoWidget(title="Estoques baixos", info=str(lower_stocks[0] if lower_stocks is not None else "0"))
+        self.birthday_qtd = InfoWidget(title="Aniversáriantes do mês", info=str(anniversaries[0] if anniversaries is not None else "0"))
+        self.daily_sell = InfoWidget(title="Vendas de hoje", info=str(daily_sale[0] if daily_sale is not None else "0"))
 
         self.box_layout.addItem(self.box_left_spacer)
         self.box_layout.addWidget(self.stock_info)

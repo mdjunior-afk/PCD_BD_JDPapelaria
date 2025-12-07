@@ -2,6 +2,7 @@ from PySide6.QtWidgets import *
 from PySide6.QtCore import Qt
 
 from src.gui.widgets import *
+from src.gui.widgets.removeWindow import RemoveDialog, MessageDialog
 from src.gui.utils import *
 from src.gui.colors import *
 
@@ -382,9 +383,12 @@ class SettingsPage(QWidget):
                     self.brand_id.setValue(0)
                 self.brand_name_input.clear()
                 self.getBrands() # Recarrega a tabela
-                print(f"Marca '{name}' adicionada com sucesso!")
+                
+                message = MessageDialog(self, "Sucesso", message=f"Marca '{name}' adicionada com sucesso!", msg_type=MessageDialog.SUCCESS)
+                message.exec()
             except Exception as e:
-                print(f"ERRO ao adicionar marca: {e}")
+                message = MessageDialog(self, "Erro", message=f"ERRO ao adicionar marca: {e}", msg_type=MessageDialog.ERROR)
+                message.exec()
         else:
             print("O nome da marca não pode estar vazio.")
 
@@ -410,14 +414,22 @@ class SettingsPage(QWidget):
             
         row = selected_items[0].row()
         brand_id = int(self.brand_table.item(row, 0).text())
+        brand_name = self.brand_table.item(row, 1).text()
         
-        # ⚠️ Adicione aqui uma caixa de confirmação (QMessageBox) antes de remover!
-        try:
-            productModel.removeBrand(brand_id)
-            self.getBrands()
-            print(f"Marca ID {brand_id} removida com sucesso.")
-        except Exception as e:
-            print(f"ERRO ao remover marca: {e}")
+        # Mostra dialog de confirmação
+        dialog = RemoveDialog(
+            parent=self,
+            title="Remover Marca",
+            item_name=f"Marca: {brand_name}"
+        )
+        
+        if dialog.exec() == QDialog.Accepted:
+            try:
+                productModel.removeBrand(brand_id)
+                self.getBrands()
+                print(f"Marca ID {brand_id} removida com sucesso.")
+            except Exception as e:
+                print(f"ERRO ao remover marca: {e}")
 
     # --- Métodos de Categorias (Categories) ---
 
@@ -446,9 +458,12 @@ class SettingsPage(QWidget):
                     self.category_id.setValue(0)
                 self.category_name_input.clear()
                 self.getCategories()
-                print(f"Categoria '{name}' adicionada com sucesso!")
+                
+                message = MessageDialog(self, "Sucesso", message=f"Categoria '{name}' adicionada com sucesso!", msg_type=MessageDialog.SUCCESS)
+                message.exec()
             except Exception as e:
-                print(f"ERRO ao adicionar categoria: {e}")
+                message = MessageDialog(self, "Erro", message=f"ERRO ao adicionar categoria: {e}", msg_type=MessageDialog.ERROR)
+                message.exec()
         else:
             print("O nome da categoria não pode estar vazio.")
 
@@ -474,14 +489,22 @@ class SettingsPage(QWidget):
             
         row = selected_items[0].row()
         category_id = int(self.category_table.item(row, 0).text())
+        category_name = self.category_table.item(row, 1).text()
         
-        # ⚠️ Adicione aqui uma caixa de confirmação (QMessageBox)!
-        try:
-            productModel.removeCategory(category_id)
-            self.getCategories()
-            print(f"Categoria ID {category_id} removida com sucesso.")
-        except Exception as e:
-            print(f"ERRO ao remover categoria: {e}")
+        # Mostra dialog de confirmação
+        dialog = RemoveDialog(
+            parent=self,
+            title="Remover Categoria",
+            item_name=f"Categoria: {category_name}"
+        )
+        
+        if dialog.exec() == QDialog.Accepted:
+            try:
+                productModel.removeCategory(category_id)
+                self.getCategories()
+                print(f"Categoria ID {category_id} removida com sucesso.")
+            except Exception as e:
+                print(f"ERRO ao remover categoria: {e}")
 
     def getPaymentMethods(self, name=''):
         """Carregwa dados de marcas do DB e preenche a tabela."""
@@ -502,7 +525,6 @@ class SettingsPage(QWidget):
         name = self.payment_method_input.text().strip()
         if name:
             try:
-                # Lógica de validação e chamada ao DB
                 if self.payment_method_id.value() == 0:
                     utilsModels.addPaymenthMethod(name)
                 else:
@@ -510,9 +532,13 @@ class SettingsPage(QWidget):
                     self.payment_method_id.setValue(0)
                 self.payment_method_input.clear()
                 self.getPaymentMethods() # Recarrega a tabela
-                print(f"Forma de Pagamento '{name}' adicionada com sucesso!")
+                
+                message = MessageDialog(self, "Sucesso", message=f"Forma de Pagamento '{name}' adicionada com sucesso!", msg_type=MessageDialog.SUCCESS)
+                message.exec()
+
             except Exception as e:
-                print(f"ERRO ao adicionar marca: {e}")
+                message = MessageDialog(self, "ERRO", message=f"ERRO ao adicionar forma de pagamento: {e}", msg_type=MessageDialog.ERROR)
+                message.exec()
         else:
             print("O nome da marca não pode estar vazio.")
 
@@ -539,20 +565,25 @@ class SettingsPage(QWidget):
         row = selected_items[0].row()
         self.payment_method_id.setValue(int(self.payments_table.item(row, 0).text()))
         
-        # ⚠️ Adicione aqui uma caixa de confirmação (QMessageBox) antes de remover!
-        try:
-            utilsModels.removePaymentMethods(self.payment_method_id.value())
-            self.getPaymentMethods()
-            print(f"Marca ID {self.payment_method_id.value()} removida com sucesso.")
-        except Exception as e:
-            print(f"ERRO ao remover marca: {e}")
+        dialog = RemoveDialog(
+            parent=self,
+            title="Remover forma de pagamento",
+            item_name=f"Forma de pagamento: {self.payments_table.item(row, 1).text()}"
+        )
+
+        if dialog.exec() == QDialog.Accepted:
+            try:
+                utilsModels.removePaymentMethods(self.payment_method_id.value())
+                self.getPaymentMethods()
+                print(f"Marca ID {self.payment_method_id.value()} removida com sucesso.")
+            except Exception as e:
+                print(f"ERRO ao remover marca: {e}")
 
     def getServices(self, name=''):
         """Carregwa dados de marcas do DB e preenche a tabela."""
         try:
             # ⚠️ Substitua 'db_manager' pela sua instância de conexão real, se necessário.
             services = utilsModels.getServices(name)
-            print(services)
             self.services_table.setRowCount(0) # Limpa a tabela
             for row, service in enumerate(services):
                 self.services_table.insertRow(row)
@@ -578,11 +609,17 @@ class SettingsPage(QWidget):
                 else:
                     utilsModels.updateService(self.service_id.value(), data)
                     self.service_id.setValue(0)
+                
                 self.service_name_input.clear()
+                self.service_price_input.setValue(0.0)
+                self.service_description_input.clear()
                 self.getServices() # Recarrega a tabela
-                print(f"Forma de Pagamento '{name}' adicionada com sucesso!")
+                
+                message = MessageDialog(self, "Sucesso", message=f"Serviço '{name}' adicionada com sucesso!", msg_type=MessageDialog.SUCCESS)
+                message.exec()
             except Exception as e:
-                print(f"ERRO ao adicionar marca: {e}")
+                message = MessageDialog(self, "ERRO", message=f"ERRO ao adicionar serviço: {e}", msg_type=MessageDialog.ERROR)
+                message.exec()
         else:
             print("O nome da marca não pode estar vazio.")
 
@@ -611,13 +648,20 @@ class SettingsPage(QWidget):
         row = selected_items[0].row()
         self.service_id.setValue(int(self.services_table.item(row, 0).text()))
         
-        # ⚠️ Adicione aqui uma caixa de confirmação (QMessageBox) antes de remover!
-        try:
-            utilsModels.removeService(self.service_id.value())
-            self.getServices()
-            print(f"Marca ID {self.service_id.value()} removida com sucesso.")
-        except Exception as e:
-            print(f"ERRO ao remover marca: {e}")
+        dialog = RemoveDialog(
+            parent=self,
+            title="Remover serviço",
+            item_name=f"Serviço: {self.services_table.item(row, 1).text()}"
+        )
+
+        if dialog.exec() == QDialog.Accepted:
+            try:
+                utilsModels.removeService(self.service_id.value())
+                self.service_id.setValue(0)
+                self.getServices()
+                print(f"Marca ID {self.service_id.value()} removida com sucesso.")
+            except Exception as e:
+                print(f"ERRO ao remover marca: {e}")
     
     def onThemeChanged(self, theme):
         self.config["THEME"] = theme

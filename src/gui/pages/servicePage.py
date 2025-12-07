@@ -105,27 +105,17 @@ class ServicePage(QWidget):
         total_box_layout = QHBoxLayout()
         total_box.setLayout(total_box_layout)
 
-        products_total_label = Label("Produtos:", type="InputLabel")
         services_total_label = Label("Serviços:", type="InputLabel")
         total_label = Label("Total:", type="InputLabel")
-        
-        products_total_input = DoubleSpinBox()
-        self.services_total_input = DoubleSpinBox()        
+  
         self.total_input = DoubleSpinBox()
 
         self.total_input.setPrefix("R$ ")
-        products_total_input.setPrefix("R$ ")
-        self.services_total_input.setPrefix("R$ ")
         
         self.total_input.setReadOnly(True)
-        products_total_input.setReadOnly(True)
-        self.services_total_input.setReadOnly(True)
 
         total_box_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum))
-        total_box_layout.addWidget(products_total_label)
-        total_box_layout.addWidget(products_total_input)
         total_box_layout.addWidget(services_total_label)
-        total_box_layout.addWidget(self.services_total_input)
         total_box_layout.addWidget(total_label)
         total_box_layout.addWidget(self.total_input)
 
@@ -143,10 +133,8 @@ class ServicePage(QWidget):
         buttons[0].clicked.connect(lambda: self.saveService(self.search_client_input, self.transaction_tab))
         buttons[1].clicked.connect(lambda: self.resetInputs())
 
-        self.transaction_tab = TransactionTab(parent=self, inputs=(products_total_input, self.services_total_input, self.total_input), type="service")
+        self.transaction_tab = TransactionTab(parent=self, total=self.total_input, type="service")
         ServiceController.getPaymentMethods(self.transaction_tab.document_input)
-
-        self.transaction_tab.setCurrentIndex(1)
 
         layout.addWidget(client_box)
         layout.addWidget(self.transaction_tab)

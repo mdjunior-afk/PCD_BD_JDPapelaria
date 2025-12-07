@@ -54,3 +54,4 @@ class SalesController:
 
         document_input.clear()
         document_input.addItems(methods_list)
+        document_input.updateSize()

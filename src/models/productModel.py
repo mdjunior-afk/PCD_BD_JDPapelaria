@@ -98,7 +98,18 @@ def addProduct(data={}):
         )
         
         cursor.execute(query_produto, args_produto)
-        
+
+        if "fornecedores" in data:
+            fornece_query = "INSERT INTO Fornece(IDPessoa, DataCompra, ValorTotal) VALUES (?, ?, ?)"
+            cursor.execute(fornece_query, (data["id_pessoa"], data["fornecedores"]["data_compra"], data["fornecedores"]["valor_total"]))
+
+            fornece_id = cursor.lastrowid
+
+            fornecimento_query = "INSERT INTO ItemFornecido(IDFornece, IDProduto, Quantidade, PrecoUnitario, DataValidade) VALUES (?, ?, ?, ?, ?)"
+
+            for forn in data["fornecedores"]["fornecedores"]:
+                cursor.execute(fornecimento_query, (fornece_id, id_produto_servico, forn["quantidade"], forn["valor"], forn["data_validade"]))
+
         # 4. Comitar e Fechar (dentro do bloco try/finally para segurança)
         conn.commit()
         return id_produto_servico

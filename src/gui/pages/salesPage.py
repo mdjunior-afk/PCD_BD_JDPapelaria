@@ -8,6 +8,7 @@ from src.gui.colors import *
 from src.controllers.salesController import SalesController
 from src.controllers.personController import PersonController
 
+from src.gui.widgets.removeWindow import MessageDialog
 from src.utils.itemExplorer import *
 
 class SalesPage(QWidget):
@@ -119,22 +120,15 @@ class SalesPage(QWidget):
         total_box.setLayout(total_box_layout)
 
         products_total_label = Label("Produtos:", type="InputLabel")
-        services_total_label = Label("Serviços:", type="InputLabel")
         total_label = Label("Total:", type="InputLabel")
         
-        self.products_total_input = DoubleSpinBox()
-        services_total_input = DoubleSpinBox()        
         self.total_input = DoubleSpinBox()
 
         self.total_input.setPrefix("R$ ")
-        self.products_total_input.setPrefix("R$ ")
-        services_total_input.setPrefix("R$ ")
         
         self.total_input.setReadOnly(True)
-        self.products_total_input.setReadOnly(True)
-        services_total_input.setReadOnly(True)
 
-        self.transaction_tab = TransactionTab(parent=self, inputs=(self.products_total_input, services_total_input, self.total_input))
+        self.transaction_tab = TransactionTab(parent=self, total=self.total_input)
         
         buttons_widget, buttons = createWindowButtons()
 
@@ -143,9 +137,6 @@ class SalesPage(QWidget):
 
         total_box_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum))
         total_box_layout.addWidget(products_total_label)
-        total_box_layout.addWidget(self.products_total_input)
-        total_box_layout.addWidget(services_total_label)
-        total_box_layout.addWidget(services_total_input)
         total_box_layout.addWidget(total_label)
         total_box_layout.addWidget(self.total_input)
 
@@ -166,21 +157,32 @@ class SalesPage(QWidget):
             "valor_total": self.total_input.value(),
         }
 
-        if self.id_input.value() == 0:
-            SalesController.save(data)
-        else:
-            SalesController.remove(self.id_input.value())
-            data["id_pedido"] = self.id_input.value()
-            SalesController.save(data)
+        try:
+            if self.id_input.value() == 0:
+                SalesController.save(data)
+            else:
+                SalesController.remove(self.id_input.value())
+                data["id_pedido"] = self.id_input.value()
+                SalesController.save(data)
+            
+            message = MessageDialog(self, title="Sucesso", message="Venda salva com sucesso!", msg_type=MessageDialog.SUCCESS)
+            message.exec()
+        except Exception as e:
+            message = MessageDialog(self, title="Erro", message=f"Erro ao salvar a venda: {str(e)}", msg_type=MessageDialog.ERROR)
+            message.exec()
+            return
 
         self.resetInputs()
         self.transaction_tab.resetInputs()
+
+        client.setText("CONSUMIDOR PADRÃO")
+        client.setReadOnly(True)
+        self.item_explorer.hide()
 
     def resetInputs(self):
         self.search_client_input.setText("")
         self.transaction_tab.resetInputs()
         self.total_input.setValue(0)
-        self.products_total_input.setValue(0)
 
     def editSale(self, table: Table):
         selectedItems = table.selectedItems()

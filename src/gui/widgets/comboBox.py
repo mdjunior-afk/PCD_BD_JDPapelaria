@@ -7,8 +7,10 @@ class ComboBox(QComboBox):
         super().__init__()
 
         self.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-        self.setMinimumContentsLength(12)
 
         # ComboBox config
         self.setEditable(True)
         self.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
+
+    def updateSize(self):
+        self.setMinimumWidth(self.sizeHint().width() + 30)

@@ -1,11 +1,14 @@
 from PySide6.QtWidgets import *
 from PySide6.QtCore import QDate, Qt
 
+from src.controllers.personController import PersonController
+from src.models.personModel import getPersonID
 from src.gui.widgets import *
 from src.gui.utils import *
 
 from src.controllers import *
 
+from src.gui.widgets.removeWindow import MessageDialog
 from src.utils import itemExplorer
 
 class ProductPage(QWidget):
@@ -167,46 +170,46 @@ class ProductPage(QWidget):
 
         search_label = Label("Pesquisar", type="InputLabel")
         quantity_label = Label("Quantidade", type="InputLabel")
+        unit_price_label = Label("Preço de compra", type="InputLabel")
         has_expiration_label = Label("Possui data de validade", type="InputLabel")
         self.expiration_date_label = Label("Data de validade", type="InputLabel")
         self.expiration_date_label.hide()
 
-        search_input = LineEdit("Pesquise por um fornecedor")
+        self.search_input = LineEdit("Pesquise por um fornecedor")
 
-        data = [
-            {"id": 0, "nome": "LUIZ FELIPE", "cnpj": "999.999.999.99"},
-            {"id": 1, "nome": "MARCIO DOUGLAS CASSEMIRO JUNIOR", "cnpj": "150.464.346.10"}
-        ]
-
-        self.setupSearch(search_input,data)
+        self.setupSearch(self.search_input, PersonController.getSuppliers({"pesquisa": self.search_input.text()}))
 
         quantity_input = SpinBox()
+        unit_price_input = DoubleSpinBox()
         self.has_expiration = QCheckBox()
         self.expiration_date_input = DateEdit(date=QDate.currentDate())
         self.expiration_date_input.setDisplayFormat("dd/MM/yyyy")
         self.expiration_date_input.hide()
-        supplier_table = Table(["Razão social", "Quantidade", "Data de validade"])
+        supplier_table = Table(["Razão social", "Preço de compra", "Quantidade", "Data de validade"])
+        self.supplier_table = supplier_table
 
         self.has_expiration.checkStateChanged.connect(self.updateExpirationDate)
 
         supplier_layout.addWidget(search_label, 0, 0)
         supplier_layout.addWidget(quantity_label, 2, 0)
-        supplier_layout.addWidget(has_expiration_label, 2, 2)
-        supplier_layout.addWidget(self.expiration_date_label, 2, 1)
+        supplier_layout.addWidget(unit_price_label, 2, 1)
+        supplier_layout.addWidget(has_expiration_label, 2, 3)
+        supplier_layout.addWidget(self.expiration_date_label, 2, 2)
 
         table_buttons_widget, table_buttons = createTableButtons()
 
-        table_buttons[0].clicked.connect(lambda: self.addSupplier(supplier_table, search_input, quantity_input, self.expiration_date_input))
-        table_buttons[1].clicked.connect(lambda: self.editSupplier(supplier_table, search_input, quantity_input, self.expiration_date_input))
+        table_buttons[0].clicked.connect(lambda: self.addSupplier(supplier_table, self.search_input, unit_price_input, quantity_input, self.expiration_date_input))
+        table_buttons[1].clicked.connect(lambda: self.editSupplier(supplier_table,  self.search_input, unit_price_input, quantity_input, self.expiration_date_input))
         table_buttons[2].clicked.connect(lambda: self.removeSupplier(supplier_table))
 
-        supplier_layout.addWidget(search_input, 1, 0, 1, 5)
+        supplier_layout.addWidget( self.search_input, 1, 0, 1, 6)
         supplier_layout.addWidget(quantity_input, 3, 0)
-        supplier_layout.addWidget(self.has_expiration, 3, 2)
-        supplier_layout.addWidget(self.expiration_date_input, 3, 1)
-        supplier_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum), 3, 3)
-        supplier_layout.addWidget(table_buttons_widget, 3, 4)
-        supplier_layout.addWidget(supplier_table, 4, 0, 1, 5)
+        supplier_layout.addWidget(unit_price_input, 3, 1)
+        supplier_layout.addWidget(self.has_expiration, 3, 3)
+        supplier_layout.addWidget(self.expiration_date_input, 3, 2)
+        supplier_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum), 3, 4)
+        supplier_layout.addWidget(table_buttons_widget, 3, 5)
+        supplier_layout.addWidget(supplier_table, 4, 0, 1, 6)
 
         supplier_layout.setColumnStretch(2, 2)
 
@@ -223,24 +226,32 @@ class ProductPage(QWidget):
         return scroll_area
     
     def saveProduct(self):
-        data = {
-            "nome": self.name_input.text(),
-            "id_marca": self.brand_input.currentText(),
-            "id_categoria": self.category_input.currentText(),
-            "cod_barra": self.barcode_input.text(),
-            "preco_compra": self.purchase_input.value(),
-            "reajuste": self.adjust_input.value(),
-            "preco_venda": self.sale_input.value(),
-            "estoque_minimo": self.minimum_stock_input.value(),
-            "estoque_atual": self.current_stock_input.value()
-        }
+        #try:
+            data = {
+                "nome": self.name_input.text(),
+                "id_marca": self.brand_input.currentText(),
+                "id_categoria": self.category_input.currentText(),
+                "cod_barra": self.barcode_input.text(),
+                "preco_compra": self.purchase_input.value(),
+                "reajuste": self.adjust_input.value(),
+                "preco_venda": self.sale_input.value(),
+                "estoque_minimo": self.minimum_stock_input.value(),
+                "estoque_atual": self.current_stock_input.value()
+                #"fornecedores": self.getAllSuppliers()
+            }
 
-        if self.id_input.value() != 0:
-            ProductController.edit(self, self.id_input.value(), data)
-        else:
-            ProductController.save(data)
+            if self.id_input.value() != 0:
+                ProductController.edit(self, self.id_input.value(), data)
+            else:
+                ProductController.save(data)
 
-        self.resetInputs()
+            message = MessageDialog(self, "Sucesso", message="Produto salvo com sucesso!", msg_type=MessageDialog.SUCCESS)
+            message.exec()
+
+            self.resetInputs()
+       # except Exception as e:
+           # message = MessageDialog(self, "Erro", message=f"Erro ao salvar o produto: {str(e)}", msg_type=MessageDialog.ERROR)
+            #message.exec()
 
     def resetInputs(self):
         self.id_input.setValue(0)
@@ -264,7 +275,7 @@ class ProductPage(QWidget):
     def removeProduct(self, table: Table):
         selectedItems = table.selectedItems()
     
-        ProductController.remove(selectedItems[0].text())
+        ProductController.remove(self, selectedItems[0].text())
     
     def updateExpirationDate(self, has):
         if has != Qt.CheckState.Checked:
@@ -274,7 +285,7 @@ class ProductPage(QWidget):
             self.expiration_date_label.show()
             self.expiration_date_input.show()
     
-    def addSupplier(self,table: Table, name : LineEdit, quantity: SpinBox, date: DateEdit):
+    def addSupplier(self,table: Table, name : LineEdit, value: DoubleSpinBox, quantity: SpinBox, date: DateEdit):
         if table:
             if name.text() != "" and quantity.value() > 0:
                 table.setRowCount(table.rowCount() + 1)
@@ -282,13 +293,14 @@ class ProductPage(QWidget):
                 row = table.rowCount() - 1
 
                 table.setItem(row, 0, QTableWidgetItem(name.text()))
-                table.setItem(row, 1, QTableWidgetItem(str(quantity.value())))
+                table.setItem(row, 1, QTableWidgetItem("R$ " + str(value.text())))
+                table.setItem(row, 2, QTableWidgetItem(str(quantity.value())))
                 if self.has_expiration.isChecked():
                     table.setItem(row, 2, QTableWidgetItem(str(date.date().toString("dd/MM/yyyy"))))
 
                 self.current_stock_input.setValue(self.current_stock_input.value() + quantity.value())
 
-            self.clearFields([name, quantity, date])
+            self.clearFields([name, value, quantity, date])
 
     def editSupplier(self,table: Table, name : LineEdit, quantity: SpinBox, date: DateEdit):
         selectedItems = table.selectedItems()
@@ -324,6 +336,35 @@ class ProductPage(QWidget):
             if reply == QMessageBox.Yes:
                 self.current_stock_input.setValue(self.current_stock_input.value() - int(table.item(selectedItem[1].row(), selectedItem[1].column()).text()))
                 table.removeRow(selectedItem[0].row())
+
+    def getAllSuppliers(self):
+        """Coleta todos os fornecedores listados na tabela de fornecedores."""
+        table = self.supplier_table
+
+        suppliers = {"data_compra": QDate.currentDate().toString("yyyy-MM-dd"), "valor_total": 0, "fornecedores": []}
+
+        if not hasattr(self, "supplier_table") or self.supplier_table is None:
+            return suppliers
+
+        for row in range(table.rowCount()):
+            name_item = table.item(row, 0)
+            value_item = table.item(row, 1)
+            qty_item = table.item(row, 2)
+            exp_item = table.item(row, 3)
+
+            name = name_item.text() if name_item else ""
+            value = int(float(value_item.text().replace("R$ ", "").replace(",", "."))) if value_item and value_item.text() else 0.0
+            quantity = int(float(qty_item.text())) if qty_item and qty_item.text() else 0
+            expiration = exp_item.text() if exp_item and exp_item.text() else None
+
+            suppliers["fornecedores"].append({
+                "id_pessoa": getPersonID(name)[0],
+                "valor": quantity,
+                "quantidade": value,
+                "data_validade": expiration,
+            })
+
+        return suppliers
 
     def setupSearch(self, search_widget : QLineEdit, data: list[dict]):
         # Botão de limpar

@@ -4,6 +4,21 @@ import sqlite3
 
 import sqlite3 # Importação adicionada para que o 'except' funcione
 
+def getPersonID(name):
+    # Remover uma pessoa de ID=id
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    query = "SELECT IDPessoa FROM Pessoa WHERE Nome LIKE ?"
+
+    cursor.execute(query, (f"%{name}%", ))
+
+    person = cursor.fetchone()
+
+    conn.close()
+
+    return person
+
 def getPerson(data={}):
     conn = get_connection() # Assumindo que esta função está definida
     cursor = conn.cursor()
@@ -55,7 +70,7 @@ def getPerson(data={}):
     elif "pesquisa" in data and data["pesquisa"]:
         query += " WHERE Pessoa.Nome LIKE ?"
         args.append(termo_pesquisa)
-        
+    
     # 3. Cláusulas GROUP BY e ORDER BY
     if is_listing:
         # Lista de campos que NÃO são agregados

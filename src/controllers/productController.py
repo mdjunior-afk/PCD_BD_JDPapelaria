@@ -5,6 +5,7 @@ from PySide6.QtWidgets import *
 class ProductController:
     @staticmethod
     def save(data):
+
         addProduct(data)
 
     @staticmethod
@@ -55,6 +56,7 @@ class ProductController:
         window.search_category_input.clear()
         window.search_category_input.addItem("Todos")
         window.search_category_input.addItems(categories_list)
+        window.search_category_input.updateSize()
 
     @staticmethod
     def getBrands(window):
@@ -64,6 +66,7 @@ class ProductController:
 
         window.brand_input.clear()
         window.brand_input.addItems(brand_list)
+        window.brand_input.updateSize()
 
     @staticmethod
     def edit(window, id, data):
@@ -73,5 +76,7 @@ class ProductController:
         editProduct(id, data)
 
     @staticmethod
-    def remove(id):
+    def remove(window, id):
         removeProduct(id)
+
+        ProductController.get(window, {"pesquisa": window.search_input.text()}, type="search")
