@@ -237,18 +237,18 @@ class SettingsPage(QWidget):
         theme_box.setLayout(theme_box_layout)
 
         self.light_radio = QRadioButton("Claro")
-        self.dark_radio = QRadioButton("Escuro")
+        #self.dark_radio = QRadioButton("Escuro")
 
         if self.config["THEME"] == "dark":
             self.dark_radio.setChecked(True)
         else:
             self.light_radio.setChecked(True)
 
-        self.light_radio.toggled.connect(lambda checked: self.onThemeChanged("light") if checked else None)
-        self.dark_radio.toggled.connect(lambda checked: self.onThemeChanged("dark") if checked else None)
+        #self.light_radio.toggled.connect(lambda checked: self.onThemeChanged("light") if checked else None)
+        #self.dark_radio.toggled.connect(lambda checked: self.onThemeChanged("dark") if checked else None)
 
         theme_box_layout.addWidget(self.light_radio)
-        theme_box_layout.addWidget(self.dark_radio)
+        #theme_box_layout.addWidget(self.dark_radio)
         theme_box_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum))
         
         options_box = GroupBox("Personalizar")

@@ -36,7 +36,7 @@ def getPerson(data={}):
     if is_listing:
         # Query para LISTAGEM (com GROUP_CONCAT para agregar contatos e endereços)
         select_fields = """
-            Pessoa.IDPessoa, Pessoa.Nome, Pessoa.Cliente, PessoaFisica.CPF, PessoaJuridica.CNPJ, 
+            DISTINCT Pessoa.IDPessoa, Pessoa.Nome, Pessoa.Cliente, PessoaFisica.CPF, PessoaJuridica.CNPJ, 
             PessoaJuridica.Fornecedor, PessoaFisica.Sexo, PessoaFisica.DataNascimento, 
             PessoaJuridica.RazaoSocial, 
             group_concat(DISTINCT Contato.Valor) AS ContatoValor,
@@ -44,14 +44,11 @@ def getPerson(data={}):
             Endereco.Bairro, Endereco.Cidade, Endereco.Estado, Endereco.CEP) AS EnderecoCompleto
         """
     else:
-        # Query para BUSCA por ID (sem GROUP_CONCAT, retornará linhas múltiplas se houver
-        # múltiplos contatos/endereços, mas a lógica de tratamento fica fora do DB)
+        # Query para BUSCA por ID (retorna apenas dados da pessoa, sem duplicatas)
         select_fields = """
-            Pessoa.IDPessoa, Pessoa.Nome, Pessoa.Cliente, PessoaFisica.CPF, PessoaJuridica.CNPJ, 
+            DISTINCT Pessoa.IDPessoa, Pessoa.Nome, Pessoa.Cliente, PessoaFisica.CPF, PessoaJuridica.CNPJ, 
             PessoaJuridica.Fornecedor, PessoaFisica.Sexo, PessoaFisica.DataNascimento, 
-            PessoaJuridica.RazaoSocial, Contato.Tipo, Contato.Valor, Endereco.Logradouro, 
-            Endereco.Numero, Endereco.Complemento, Endereco.Bairro, Endereco.Cidade, 
-            Endereco.Estado, Endereco.CEP
+            PessoaJuridica.RazaoSocial
         """
 
     query = f"""
@@ -81,9 +78,8 @@ def getPerson(data={}):
         """
         query += f" GROUP BY {group_fields} ORDER BY Pessoa.Nome"
     else:
-        # Ao buscar por ID, não queremos agregar, mas precisamos ordenar
-        # Nota: Se houver múltiplos resultados (Contatos/Endereços), a ordenação será útil.
-        query += " ORDER BY Contato.Tipo, Endereco.Logradouro" 
+        # Ao buscar por ID com DISTINCT, não precisa de GROUP BY
+        query += " ORDER BY Pessoa.Nome" 
 
 
     try:
@@ -132,6 +128,7 @@ def addPerson(data={}):
             # Remove formatação do CPF para armazenamento
             cpf_limpo = data.get("document")
             
+            
             query_pf = """
             INSERT INTO PessoaFisica (IDPessoa, CPF, Sexo, DataNascimento) 
             VALUES (?, ?, ?, ?);
@@ -139,7 +136,7 @@ def addPerson(data={}):
             cursor.execute(query_pf, (
                 id_pessoa, 
                 cpf_limpo, 
-                data.get("sex"), 
+                data.get("sex"),
                 data.get("birthday")
             ))
             
@@ -213,8 +210,13 @@ def editPerson(id, data):
     cursor.execute(query, (data["nome"], data["is_client"], id, ))
 
     if data["type"] == "Pessoa física":
+        # Converte birthday para formato SQLite (YYYY-MM-DD)
+        birthday = data.get("birthday")
+        if hasattr(birthday, 'toString'):
+            birthday = birthday.toString('yyyy-MM-dd')
+        
         query = "UPDATE PessoaFisica SET CPF = ?, Sexo = ?, DataNascimento = ? WHERE IDPessoa = ?"
-        cursor.execute(query, (data["document"], data["sex"], data["birthday"], id, ))
+        cursor.execute(query, (data["document"], data["sex"], birthday, id, ))
     else:
         query = "UPDATE PessoaJuridica SET CNPJ = ?, RazaoSocial = ?, Fornecedor = ? WHERE IDPessoa = ?"
         cursor.execute(query, (data["document"], data["fantasy_name"], data["is_supplier"], id, ))

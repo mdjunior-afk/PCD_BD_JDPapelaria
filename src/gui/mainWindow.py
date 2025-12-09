@@ -92,7 +92,7 @@ class MainWindow(QMainWindow):
         self.people_button = SideMenuButton("Pessoas", icon_path="users-alt.svg")
         self.sell_button = SideMenuButton("Vendas", icon_path="shopping-basket.svg")
         self.services_button = SideMenuButton("Serviços", icon_path="print.svg")
-        #self.invoice_entry_button = SideMenuButton("Notas de Entrada", icon_path="document.svg")
+        self.entry_button = SideMenuButton("Entradas", icon_path="document.svg")
 
         # Buttons Connections
         menu_button.clicked.connect(self.toggle_side_menu)
@@ -101,7 +101,7 @@ class MainWindow(QMainWindow):
         self.people_button.clicked.connect(self.people_page)
         self.sell_button.clicked.connect(self.sell_page)
         self.services_button.clicked.connect(self.service_page)
-        #self.invoice_entry_button.clicked.connect(self.invoice_page)
+        self.entry_button.clicked.connect(self.invoice_page)
 
         # Add Top Inputs
         top_layout.addWidget(menu_button)
@@ -110,7 +110,7 @@ class MainWindow(QMainWindow):
         top_layout.addWidget(self.people_button)
         top_layout.addWidget(self.sell_button)
         top_layout.addWidget(self.services_button)
-        #top_layout.addWidget(self.invoice_entry_button)
+        top_layout.addWidget(self.entry_button)
 
         # Bottom Widget
         bottom_widget = QWidget()
@@ -259,7 +259,7 @@ class MainWindow(QMainWindow):
         for button in self.menu_buttons:
             button.setActive(button is self.invoice_entry_button)
 
-        self.page_manager.setCurrentIndex(8)
+        self.page_manager.setCurrentIndex(6)
 
     def settings_page(self):
         for button in self.menu_buttons:

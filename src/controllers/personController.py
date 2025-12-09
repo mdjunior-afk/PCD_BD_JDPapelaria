@@ -15,8 +15,6 @@ class PersonController:
             for person in persons:
                 data.append({"nome": person[1]})
 
-            print(data)
-
             return data
 
         elif type == "edit":

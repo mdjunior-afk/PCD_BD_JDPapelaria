@@ -25,8 +25,6 @@ class ProductPage(QWidget):
         self.minimum_stock_input = None
         self.current_stock_input = None
 
-        self.search_input = None
-
         layout = QVBoxLayout()
         self.setLayout(layout)
 
@@ -70,17 +68,22 @@ class ProductPage(QWidget):
         search_label = Label("Pesquisar", type="InputLabel")
         category_label = Label("Categoria", type="InputLabel")
 
-        self.search_input = LineEdit("Pesquise por um produto")
+        search_input = LineEdit("Pesquise por um produto")
         self.search_category_input = ComboBox()
         search_button = PushButton("Pesquisar", icon_path="search.svg", type="WithoutBackground")
         export_button = PushButton("Exportar", icon_path="download.svg", type="WithBackground")
 
-        search_button.clicked.connect(lambda: ProductController.get(self, {"pesquisa": self.search_input.text(), "categoria": self.search_category_input.currentText()}, "search"))
+        search_input.returnPressed.connect(
+            lambda: ProductController.get(self, {"pesquisa": search_input.text(), "categoria": self.search_category_input.currentText()}, type="search")
+        )
+
+        search_button.clicked.connect(
+            lambda: ProductController.get(self, {"pesquisa": search_input.text(), "categoria": self.search_category_input.currentText()}, type="search"))
 
         search_layout.addWidget(search_label, 0, 0)
         search_layout.addWidget(category_label, 0, 1)
 
-        search_layout.addWidget(self.search_input, 1, 0)
+        search_layout.addWidget(search_input, 1, 0)
         search_layout.addWidget(self.search_category_input, 1, 1)
         search_layout.addWidget(search_button, 1, 2)
 

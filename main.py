@@ -10,14 +10,12 @@ if __name__ == "__main__":
         print("mainwindow")
         try:
             mainwindow = MainWindow()
-            print("MainWindow criada com sucesso")
         except Exception as e:
             print(f"ERRO ao criar MainWindow: {e}")
             import traceback
             traceback.print_exc()
             sys.exit(1)
         
-        print("main.show")
         mainwindow.show()
         
         sys.exit(app.exec())

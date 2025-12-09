@@ -166,7 +166,7 @@ def getAnniversaries():
     cursor = conn.cursor()
 
     query = """SELECT
-    COUNT(T1.Nome)
+    COUNT(T1.Nome) AS total_aniversariantes
     FROM Pessoa AS T1
     JOIN PessoaFisica AS T2 ON T1.IDPessoa = T2.IDPessoa
     WHERE strftime('%m', T2.DataNascimento) = strftime('%m', 'now');

@@ -126,9 +126,11 @@ class PersonPage(QWidget):
         self.name_input = LineEdit()
         self.type_input = ComboBox()
         self.type_input.addItems(["Pessoa física", "Pessoa jurídica"])
+        self.type_input.updateSize()
         self.document_input = LineEdit()
         self.sex_input = ComboBox()
         self.sex_input.addItems(["Masculino", "Feminino", "Outro"])
+        self.sex_input.updateSize()
         self.birthday_input = DateEdit(QDate.currentDate())
         self.fantasy_name_input = LineEdit()
         get_cnpj_button = PushButton("Pesquisar", icon_path="search.svg")
@@ -273,12 +275,16 @@ class PersonPage(QWidget):
 
 
     def addPerson(self):
+        # Converte birthday para formato SQLite (yyyy-MM-dd)
+        birthday_date = self.birthday_input.date()
+        birthday_str = birthday_date.toString('yyyy-MM-dd')
+
         data = {
             "nome": self.name_input.text(),
             "type": self.type_input.currentText(),
             "document": self.document_input.text(),
             "sex": self.sex_input.currentText(),
-            "birthday": self.birthday_input.text(),
+            "birthday": birthday_str,
             "address": self.getAllAddress(),
             "contact": self.getAllContacts(),
             "fantasy_name": self.fantasy_name_input.text(),
@@ -542,7 +548,8 @@ class ContactWindow(QDialog):
         # Conexões dos botões para adicionar/editar
         buttons[0].setText("Salvar" if is_editing else "Adicionar")
         buttons[0].clicked.connect(self.save_contact)
-        buttons[1].clicked.connect(self.reject) # Rejeita/fecha o diálogo
+        buttons[1].clicked.connect(self.clearInputs)
+        buttons[2].clicked.connect(self.reject)
 
         type_label = Label("Tipo", "InputLabel")
         value_label = Label("Contato", "InputLabel")
@@ -587,6 +594,10 @@ class ContactWindow(QDialog):
         
         self.accept() # Fecha o diálogo
 
+    def clearInputs(self):
+        self.type_input.setCurrentIndex(0)
+        self.value_input.clear()
+
 # --- AddressWindow Modificada ---
 class AddressWindow(QDialog):
     def __init__(self, parent=None, parent_page=None, data={}, is_editing=False):
@@ -618,7 +629,8 @@ class AddressWindow(QDialog):
         # Conexões dos botões para adicionar/editar
         buttons[0].setText("Salvar" if is_editing else "Adicionar")
         buttons[0].clicked.connect(self.save_address)
-        buttons[1].clicked.connect(self.reject)
+        buttons[1].clicked.connect(self.clearInputs)
+        buttons[2].clicked.connect(self.reject)
 
         cep_label = Label("CEP", "InputLabel")
         estate_label = Label("Estado", "InputLabel")
@@ -702,3 +714,12 @@ class AddressWindow(QDialog):
             )
             
         self.accept()
+
+    def clearInputs(self):
+        self.cep_input.clear()
+        self.estate_input.setCurrentIndex(0)
+        self.city_input.setCurrentIndex(0)
+        self.neighborhood_input.clear()
+        self.street_input.clear()
+        self.number_input.clear()
+        self.complement_input.clear()

@@ -26,10 +26,17 @@ class PageManager(QStackedWidget):
         self.settings_page = SettingsPage(main_window)
         self.insertWidget(5, self.settings_page)
 
+        self.entry_page = EntryPage()
+        self.insertWidget(6, self.entry_page)
+
         self.currentChanged.connect(self.updateData)
     
     def updateData(self, index):
-        if index == 1:
+        if index == 0:
+            UtilsController.getLowerStocks(self.home_page)
+            UtilsController.getTodaySale(self.home_page)
+            UtilsController.getAnniversaries(self.home_page)
+        elif index == 1:
             ProductController.getCategories(self.product_page)
             ProductController.getBrands(self.product_page)
         elif index == 3:

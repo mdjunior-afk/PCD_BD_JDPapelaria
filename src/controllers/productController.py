@@ -10,7 +10,11 @@ class ProductController:
 
     @staticmethod
     def get(window, data, type):
+        print(data) 
+
         products = getProduct(data)
+
+        print(products)
 
         if type == "edit":
             window.id_input.setValue(products[0][0])
