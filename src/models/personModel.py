@@ -306,9 +306,6 @@ def getAllContacts(id):
 
     return contacts
 
-from src.database import get_connection
-import sqlite3
-
 def getSuppliers(data):
     conn = get_connection()
     cursor = conn.cursor()

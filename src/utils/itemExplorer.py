@@ -4,8 +4,10 @@ from PySide6.QtCore import *
 from src.gui.colors import *
 
 class ItemExplorer(QFrame):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, type="venda"):
         super().__init__(parent=parent)
+
+        self.type = type
 
         self.targets = None
 
@@ -68,7 +70,8 @@ class ItemExplorer(QFrame):
             if "quantidade" in self.inputs:
                 self.inputs["quantidade"].setValue(data["quantidade"])
             if "valor" in self.inputs:
-                self.inputs["valor"].setValue(data["valor"])
+                print(data)
+                self.inputs["valor"].setValue(data["valor"] if self.type == "venda" else data["preco_compra"])
             if "subtotal" in self.inputs:
                 self.inputs["subtotal"].setValue(data["valor"] * data["quantidade"])
 

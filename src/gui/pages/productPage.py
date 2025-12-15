@@ -180,7 +180,7 @@ class ProductPage(QWidget):
 
         self.search_input = LineEdit("Pesquise por um fornecedor")
 
-        self.setupSearch(self.search_input, PersonController.getSuppliers({"pesquisa": self.search_input.text()}))
+        self.setupSearch(self.search_input, PersonController.get_suppliers({"pesquisa": self.search_input.text()}))
 
         quantity_input = SpinBox()
         unit_price_input = DoubleSpinBox()

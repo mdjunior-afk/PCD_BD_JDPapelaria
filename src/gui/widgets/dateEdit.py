@@ -101,4 +101,10 @@ class DateEdit(QDateEdit):
             color: white; /* Cor do texto branco */
             border-radius: 4px; /* Cantos arredondados */
         }}
+                           
+        QDateEdit:disabled {{
+            background-color: #f0f0f0;
+            color: #a0a0a0;
+            border: 1px solid #d0d0d0;
+        }}
         """)

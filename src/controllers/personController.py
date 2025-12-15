@@ -98,5 +98,8 @@ class PersonController:
         PersonController.get(window, {"pesquisa": window.search_input.text()}, type="search")
 
     @staticmethod
-    def getSuppliers(data):
+    def get_suppliers(data):
+        print(data)
         return getSuppliers(data)
+    
+    

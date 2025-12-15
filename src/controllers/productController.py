@@ -14,8 +14,6 @@ class ProductController:
 
         products = getProduct(data)
 
-        print(products)
-
         if type == "edit":
             window.id_input.setValue(products[0][0])
             window.name_input.setText(products[0][1])
@@ -31,7 +29,7 @@ class ProductController:
             data = []
 
             for product in products:
-                data.append({"nome": product[1], "valor": product[6], "quantidade": 1, "subtotal": product[6]})
+                data.append({"nome": product[1], "preco_compra": product[4], "valor": product[6], "quantidade": 1, "subtotal": product[6]})
 
             return data
             
