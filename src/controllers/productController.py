@@ -3,6 +3,8 @@ from src.models.productModel import *
 from PySide6.QtWidgets import *
 from src.gui.widgets import Table
 
+from datetime import datetime
+
 class ProductController:
     @staticmethod
     def save(data):
@@ -34,8 +36,16 @@ class ProductController:
 
                 row = supplier_table.rowCount() - 1
 
+                print(sup)
+
                 for column in range(len(sup)):
-                    supplier_table.setItem(row, column, QTableWidgetItem(str(sup[column] if sup[column] != None else "")))
+                    item = sup[column]
+
+                    if column == 1:
+                        date = datetime.strptime(sup[column], "%Y-%m-%d")
+                        item = datetime.strftime(date, "%d/%m/%Y")
+                    
+                    supplier_table.setItem(row, column, QTableWidgetItem(str(item if item != None else "")))
 
         elif type == "search_item":
             data = []

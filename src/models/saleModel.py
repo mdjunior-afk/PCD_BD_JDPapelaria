@@ -8,8 +8,6 @@ def getEditSale(id):
     conn = get_connection()
     cursor = conn.cursor()
 
-    print(id)
-
     query = """
     SELECT 
         Pedido.IDPedido, Pedido.DataPedido, Pessoa.Nome, Pedido.ValorTotal, ProdutoServico.Nome, ItemPedido.PrecoUnitario, ItemPedido.Quantidade, ItemPedido.SubTotal
