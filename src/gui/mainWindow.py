@@ -139,7 +139,7 @@ class MainWindow(QMainWindow):
 
         widget.setLayout(layout)
 
-        self.menu_buttons = [self.home_button, self.product_button, self.people_button, self.sell_button, self.services_button, self.settings_button]
+        self.menu_buttons = [self.home_button, self.product_button, self.people_button, self.sell_button, self.services_button, self.settings_button, self.entry_button]
 
         return widget
     

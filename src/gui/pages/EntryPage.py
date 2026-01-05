@@ -4,7 +4,10 @@ from PySide6.QtGui import QIcon
 
 from src.controllers.personController import PersonController
 from src.controllers.productController import ProductController
+from src.controllers.utilsController import UtilsController
 from src.gui.widgets import *
+
+from src.models.personModel import getPersonID
 
 from src.gui.utils import createTableButtons, createWindowButtons
 from src.gui.widgets.removeWindow import MessageDialog
@@ -18,6 +21,17 @@ class EntryPage(QWidget):
 
         self.item_explorer = ItemExplorer(self, type="compra")
 
+        self.labels_box = QWidget()
+        self.labels_box_layout = QVBoxLayout()
+
+        self.title = Label("Entrada de notas", type="Title")
+        self.subtitle = Label("Gerencie todas as notas cadastradas", type="Subtitle")
+
+        self.labels_box_layout.addWidget(self.title)
+        self.labels_box_layout.addWidget(self.subtitle)
+
+        self.labels_box.setLayout(self.labels_box_layout)
+
         self.search_tab = self.createSearchTab()
         self.edition_tab = self.createEditionTab()
 
@@ -25,6 +39,7 @@ class EntryPage(QWidget):
         self.tab.addTab(self.search_tab, "Pesquisar entradas")
         self.tab.addTab(self.edition_tab, "Adicionar/Editar entradas")
 
+        self.main_layout.addWidget(self.labels_box)
         self.main_layout.addWidget(self.tab)
         
         self.setLayout(self.main_layout)
@@ -45,7 +60,7 @@ class EntryPage(QWidget):
         search_button = PushButton("Pesquisar", icon_path="search.svg", type="WithoutBackground")
         export_button = PushButton("Exportar", icon_path="download.svg", type="WithBackground")
 
-        search_button.clicked.connect(lambda: SalesController.get(self, {"data_inicio": self.initial_date.text(), "data_final": self.final_date.text()}, "search"))
+        search_button.clicked.connect(lambda: UtilsController.getEntries(self, {"initial_date": self.initial_date.text(), "final_date": self.final_date.text()}))
 
         self.initial_date.setDisplayFormat("dd/MM/yyyy")
         self.final_date.setDisplayFormat("dd/MM/yyyy")
@@ -62,12 +77,16 @@ class EntryPage(QWidget):
 
         search_layout.addWidget(export_button, 1, 5)
 
-        table = Table(["ID", "Data", "Cliente", "Valor total", "Forma de pagamento"])
+        self.search_table = Table(["ID", "Data", "Cliente", "Valor total"])
 
-        search_layout.addWidget(table, 2, 0, 1, 6)
+        self.search_table.add_action.triggered.connect(lambda: self.tab.setCurrentWidget(self.edition_tab))
+        self.search_table.edit_action.triggered.connect(self.editEntry)
+        self.search_table.remove_action.triggered.connect(self.removeEntry)
+
+        search_layout.addWidget(self.search_table, 2, 0, 1, 6)
         
         layout.addLayout(search_layout)
-        layout.addWidget(table)
+        layout.addWidget(self.search_table)
 
         return widget
     
@@ -88,6 +107,10 @@ class EntryPage(QWidget):
         self.product_quantity_label = Label("Quantidade", type="InputLabel")
         self.has_expiration_date_label = Label("Possui data de validade?", type="InputLabel")
         self.expiry_date_label = Label("Data de validade", type="InputLabel")
+
+        self.entry_id = SpinBox()
+        self.entry_id.setReadOnly(True)
+        self.entry_id.hide()
 
         self.supplier_search_input = LineEdit(placeholder="Procure por um fornecedor...")
         self.product_search_input = LineEdit(placeholder="Procure por um produto...")
@@ -122,6 +145,10 @@ class EntryPage(QWidget):
 
         self.windowb_widgets, self.window_buttons = createWindowButtons()
 
+        self.window_buttons[0].clicked.connect(self.saveEntry)
+        self.window_buttons[1].clicked.connect(lambda: self.clearFields())
+        self.window_buttons[2].clicked.connect(lambda: print("Cancelar entrada"))
+
         self.entry_layout.addWidget(self.supplier_search_label, 0, 0)
         self.entry_layout.addWidget(self.product_search_label, 2, 0)
         self.entry_layout.addWidget(self.product_current_price_label, 4, 0)
@@ -144,6 +171,77 @@ class EntryPage(QWidget):
         self.form_layout.addWidget(self.windowb_widgets)
 
         return self.form_widget
+    
+    def saveEntry(self):
+        try:
+            items = self.getAllItems()
+
+            data = {"fornecedor": getPersonID(self.supplier_search_input.text())[0],
+                    "itens": items,
+                    "data": QDate.currentDate().toString("yyyy-MM-dd"),
+                    "valor_total": sum([item["preco_compra"] * item["quantidade"] for item in items])}
+            
+            if self.entry_id.value() != 0:
+                UtilsController.editEntry(self.entry_id.value(), data)
+            else:
+                UtilsController.addEntry(data)
+
+            self.table.setRowCount(0)
+            self.clearFields([self.supplier_search_input, self.product_search_input, self.product_price_input, self.product_quantity_input, self.has_expiration_date_input, self.expiry_date_input])
+
+            msg = MessageDialog(self, title="Sucesso", message="Entrada salva com sucesso!", msg_type=MessageDialog.SUCCESS)
+            msg.exec()
+        except Exception as e:
+            msg = MessageDialog(self, title="Erro", message=f"Ocorreu um erro ao salvar a entrada: {str(e)}", msg_type=MessageDialog.ERROR)
+            msg.exec()
+            return
+        
+    def editEntry(self):
+        selected_items = self.search_table.selectedItems()
+        if not selected_items:
+            msg = MessageDialog(self, title="Erro", message="Por favor, selecione uma entrada para editar.", msg_type=MessageDialog.ERROR)
+            msg.exec()
+            return
+
+        entry_id = selected_items[0].text()
+
+        items = UtilsController.getEntryByID(entry_id)
+
+        self.supplier_search_input.setText(items[0][0])
+        self.supplier_search_input.setReadOnly(True)
+        self.entry_id.setValue(items[0][5])
+
+        for item in items:
+            self.table.insertRow(self.table.rowCount())
+            self.table.setItem(self.table.rowCount() - 1, 0, QTableWidgetItem(str(self.table.rowCount() - 1)))
+            self.table.setItem(self.table.rowCount() - 1, 1, QTableWidgetItem(item[1]))
+            self.table.setItem(self.table.rowCount() - 1, 2, QTableWidgetItem(f"R$ {item[3]:.2f}"))
+            self.table.setItem(self.table.rowCount() - 1, 3, QTableWidgetItem(str(item[2])))
+            self.table.setItem(self.table.rowCount() - 1, 4, QTableWidgetItem(item[4] if item[4] != None else ""))
+
+        self.tab.setCurrentWidget(self.edition_tab)
+        self.item_explorer.hide()
+
+    def removeEntry(self):
+        selected_items = self.search_table.selectedItems()
+        if not selected_items:
+            msg = MessageDialog(self, title="Erro", message="Por favor, selecione uma entrada para remover.", msg_type=MessageDialog.ERROR)
+            msg.exec()
+            return
+        
+        entry_id = selected_items[0].text()
+    
+    def getAllItems(self):
+        items = []
+        for row in range(self.table.rowCount()):
+            item = {
+                "nome": self.table.item(row, 1).text(),
+                "preco_compra": float(self.table.item(row, 2).text().replace("R$ ", "")),
+                "quantidade": int(self.table.item(row, 3).text()),
+                "data_validade": self.table.item(row, 4).text() if self.table.item(row, 4).text() != "" else None
+            }
+            items.append(item)
+        return items
 
     def setupSearch(self, search_widget : QLineEdit, controller):
         # Botão de limpar

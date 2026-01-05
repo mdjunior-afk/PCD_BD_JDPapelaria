@@ -1,6 +1,9 @@
 from src.database import get_connection
+from src.controllers.productController import ProductController
 
 from PySide6.QtCore import QDate
+
+from datetime import datetime
 
 def getPaymentsMethods(name):
     conn = get_connection()
@@ -192,3 +195,217 @@ def getTodaySale():
     cursor.execute(query, (QDate.currentDate().toString('yyyy-MM-dd'), ))
 
     return cursor.fetchone()
+
+def getProductID(name):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    query = "SELECT IDProduto FROM Produto JOIN ProdutoServico ON Produto.IDProdutoServico = ProdutoServico.IDProdutoServico WHERE ProdutoServico.Nome = ?"
+
+    cursor.execute(query, (name, ))
+
+    return cursor.fetchone()
+
+def getEntries(data):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    start_date_obj = datetime.strptime(data["initial_date"], '%d/%m/%Y')
+    end_date_obj = datetime.strptime(data["final_date"], '%d/%m/%Y')
+
+    # 3. Formata para o padrão SQL YYYY-MM-DD
+    start_date_sql = start_date_obj.strftime('%Y-%m-%d')  # Resultado: '2025-11-27'
+    end_date_sql = end_date_obj.strftime('%Y-%m-%d')
+
+    query = """
+    SELECT 
+        Fornece.IDFornece,
+        Fornece.DataCompra,
+        Pessoa.Nome,
+        Fornece.ValorTotal
+    FROM 
+        Fornece
+    INNER JOIN 
+        Pessoa ON Fornece.IDPessoa = Pessoa.IDPessoa
+    WHERE
+        Fornece.DataCompra BETWEEN ? AND ?
+    ORDER BY 
+        Fornece.DataCompra DESC
+    """
+
+    cursor.execute(query, (start_date_sql, end_date_sql, ))
+
+    results = cursor.fetchall()
+
+    conn.close()
+
+    return results
+
+def getEntryByID(entry_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    query = """
+    SELECT 
+        Pessoa.Nome,
+        ProdutoServico.Nome,
+        ItemFornecido.Quantidade,
+        ItemFornecido.PrecoUnitario,
+        ItemFornecido.DataValidade,
+        Fornece.IDFornece
+    FROM 
+        Fornece
+    INNER JOIN 
+        Pessoa ON Fornece.IDPessoa = Pessoa.IDPessoa
+    INNER JOIN
+        ItemFornecido ON ItemFornecido.IDFornece = Fornece.IDFornece
+    INNER JOIN
+        Produto ON ItemFornecido.IDProduto = Produto.IDProduto
+    INNER JOIN
+        ProdutoServico ON Produto.IDProdutoServico = ProdutoServico.IDProdutoServico
+    WHERE
+        Fornece.IDFornece = ?
+    """
+
+    cursor.execute(query, (entry_id,))
+
+    result = cursor.fetchall()
+
+    conn.close()
+
+    return result
+
+def addEntry(data):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    query = """
+    INSERT INTO 
+        Fornece(IDPessoa, DataCompra, ValorTotal)
+    VALUES 
+        (?, ?, ?)
+    """
+
+    cursor.execute(query, (data["fornecedor"], data["data"], data["valor_total"], ))
+
+    query = """
+    INSERT INTO
+        ItemFornecido(IDFornece, IDProduto, Quantidade, PrecoUnitario, DataValidade)
+    VALUES
+        (?, ?, ?, ?, ?)
+    """
+
+    update_query = """
+    UPDATE 
+        Produto 
+    SET 
+        EstoqueAtual = EstoqueAtual + ?, 
+        PrecoCompra = ?, 
+        PrecoVenda = PrecoCompra + (PrecoCompra * Reajuste) 
+    WHERE 
+        IDProduto = ?
+    """
+
+    for item in data["itens"]:
+        product_id = getProductID(item["nome"])[0]
+
+        cursor.execute(query, (
+            cursor.lastrowid,
+            product_id,
+            item["quantidade"],
+            item["preco_compra"],
+            item["data_validade"]
+        ))
+
+        cursor.execute(update_query, (
+            item["quantidade"],
+            item["preco_compra"],
+            product_id
+        ))
+
+    conn.commit()
+    conn.close()
+
+def editEntry(entry_id, data):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    query = """
+    UPDATE 
+        Fornece
+    SET 
+        IDPessoa = ?, 
+        ValorTotal = ?
+    WHERE 
+        IDFornece = ?
+    """
+
+    cursor.execute(query, (data["fornecedor"], data["valor_total"], entry_id, ))
+
+    # Primeiro, precisamos reverter o estoque dos itens antigos
+    select_query = """
+    SELECT 
+        IDProduto, Quantidade
+    FROM 
+        ItemFornecido
+    WHERE 
+        IDFornece = ?
+    """
+
+    cursor.execute(select_query, (entry_id, ))
+    old_items = cursor.fetchall()
+
+    update_stock_query = """
+    UPDATE
+        Produto
+    SET
+        EstoqueAtual = EstoqueAtual - ?
+    WHERE
+        IDProduto = ?
+    """
+
+    for item in old_items:
+        cursor.execute(update_stock_query, (item[1], item[0], ))
+
+    # Agora, removemos os itens antigos
+    delete_items_query = "DELETE FROM ItemFornecido WHERE IDFornece = ?"
+    cursor.execute(delete_items_query, (entry_id, ))
+
+    # Agora, adicionamos os novos itens e atualizamos o estoque
+    insert_item_query = """
+    INSERT INTO
+        ItemFornecido(IDFornece, IDProduto, Quantidade, PrecoUnitario, DataValidade)
+    VALUES  
+        (?, ?, ?, ?, ?)
+    """
+
+    update_stock_query = """
+    UPDATE 
+        Produto
+    SET
+        EstoqueAtual = EstoqueAtual + ?, 
+        PrecoCompra = ?, 
+        PrecoVenda = PrecoCompra + (PrecoCompra * Reajuste)
+    WHERE 
+        IDProduto = ?
+    """
+
+    for item in data["itens"]:
+        product_id = getProductID(item["nome"])[0]
+
+        cursor.execute(insert_item_query, (
+            entry_id,
+            product_id,
+            item["quantidade"],
+            item["preco_compra"],
+            item["data_validade"]
+        ))
+
+        cursor.execute(update_stock_query, (
+            item["quantidade"],
+            item["preco_compra"],
+            product_id
+        ))
+    
+    conn.commit()
+    conn.close()
