@@ -1,6 +1,7 @@
 from src.models.productModel import *
 
 from PySide6.QtWidgets import *
+from src.gui.widgets import Table
 
 class ProductController:
     @staticmethod
@@ -10,11 +11,12 @@ class ProductController:
 
     @staticmethod
     def get(window, data, type):
-        print(data) 
 
         products = getProduct(data)
 
         if type == "edit":
+            product_suppliers = getProductSuppliers(products[0][0])
+
             window.id_input.setValue(products[0][0])
             window.name_input.setText(products[0][1])
             window.brand_input.setCurrentText(products[0][7])
@@ -25,6 +27,16 @@ class ProductController:
             window.sale_input.setValue(products[0][6])
             window.minimum_stock_input.setValue(products[0][2])
             window.current_stock_input.setValue(products[0][3])
+
+            for sup in product_suppliers:
+                supplier_table : Table = window.supplier_table
+                supplier_table.setRowCount(supplier_table.rowCount() + 1)
+
+                row = supplier_table.rowCount() - 1
+
+                for column in range(len(sup)):
+                    supplier_table.setItem(row, column, QTableWidgetItem(str(sup[column] if sup[column] != None else "")))
+
         elif type == "search_item":
             data = []
 

@@ -347,3 +347,30 @@ def removeBrand(id):
 
     conn.commit()
     conn.close()
+
+def getProductSuppliers(id):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    product_id = getProductID(id)
+
+    query = """
+    SELECT 
+        Fornece.IDFornece, Fornece.DataCompra, Pessoa.Nome, ItemFornecido.PrecoUnitario, ItemFornecido.Quantidade, ItemFornecido.DataValidade
+    FROM 
+        Fornece
+    INNER JOIN
+        Pessoa ON Pessoa.IDPessoa = Fornece.IDPessoa
+    INNER JOIN
+        ItemFornecido ON ItemFornecido.IDFornece = Fornece.IDFornece
+    WHERE
+        ItemFornecido.IDProduto = ?
+    """
+
+    cursor.execute(query, product_id)
+
+    data = cursor.fetchall()
+
+    conn.close()
+
+    return data
